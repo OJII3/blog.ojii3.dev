@@ -15,7 +15,7 @@ export default defineConfig({
           autogenerate: { directory: "2024" },
         },
       ],
-      title: "晴れときどき崩壊の日々",
+      title: "晴れときどき崩壊ブログ",
       social: {
         github: "https://github.com/ojii3",
         "x.com": "https://x.com/ojii3dev",
