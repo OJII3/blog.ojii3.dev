@@ -1,12 +1,10 @@
+@import "{{ site.theme }}";
+
 @font-face {
   font-family: "Hachi Maru Pop";
   src: url("/fonts/HachiMaruPop-Regular.ttf");
 }
 
 header {
-  font-family: "Hachi Maru Pop";
-}
-
-h1 {
   font-family: "Hachi Maru Pop";
 }
