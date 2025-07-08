@@ -3,13 +3,8 @@
 
 @import "minima/skins/{{ site.minima.skin | default: 'classic' }}",
   "minima/initialize";
-@import url("https://fonts.googleapis.com/css2?family=Hachi+Maru+Pop&family=M+PLUS+Rounded+1c&display=swap&text=晴れきどき崩壊ブログ")
 
 @font-face {
   font-family: "Hachi Maru Pop" 
-  src: url("/fonts/HachiMaruPop-Regular.ttf");
-}
-
-header {
-  font-family: "Hachi Maru Pop";
+  src: url("https://fonts.googleapis.com/css2?family=Hachi+Maru+Pop&family=M+PLUS+Rounded+1c&display=swap&text=晴れきどき崩壊ブログ");
 }

@@ -2,8 +2,19 @@
 theme: minima
 markdown: GFM
 paginate: 20
+domain: ojii3.dev
+url: https://ojii3.dev
 
 title: 晴れときどき崩壊ブログ
 description: 技術と日常を綴る備忘録なのです
-twitter_username: ojii3dev
-github_username: ojii3
+# twitter_username: ojii3dev
+# github_username: ojii3
+
+minima:
+  social_links:
+    - title: GitHub
+      icon: github
+      url: "https://github.com/ojii3"
+    - title: OJII3 at X (formerly Twitter)
+      icon: x-twitter
+      url: "https://x.com/ojii3dev"
