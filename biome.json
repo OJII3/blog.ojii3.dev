@@ -9,7 +9,7 @@
     "ignoreUnknown": false
   },
   "formatter": {
-    "enabled": true,
+    "enabled": false,
     "indentStyle": "tab"
   },
   "linter": {
@@ -26,10 +26,26 @@
   "assist": {
     "enabled": true,
     "actions": {
-      "recommended": true,
       "source": {
         "organizeImports": "on"
       }
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["**/*.svelte", "**/*.astro", "**/*.vue"],
+      "linter": {
+        "rules": {
+          "style": {
+            "useConst": "off",
+            "useImportType": "off"
+          },
+          "correctness": {
+            "noUnusedVariables": "off",
+            "noUnusedImports": "off"
+          }
+        }
+      }
+    }
+  ]
 }
