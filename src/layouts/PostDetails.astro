@@ -1,0 +1,160 @@
+---
+import { type CollectionEntry, render } from "astro:content";
+import { Icon } from "astro-icon/components";
+import { SITE_NAME } from "../constants";
+import GlobalLayout from "./GlobalLayout.astro";
+
+import "../styles/markdown.css";
+import { getBgColorByDate, getBorderColorByDate } from "../lib/colors";
+// import Header from "@/components/Header.astro";
+// import Footer from "@/components/Footer.astro";
+// import Tag from "@/components/Tag.astro";
+// import Datetime from "@/components/Datetime.astro";
+// import EditPost from "@/components/EditPost.astro";
+// import ShareLinks from "@/components/ShareLinks.astro";
+// import BackButton from "@/components/BackButton.astro";
+// import BackToTopButton from "@/components/BackToTopButton.astro";
+// import { getPath } from "@/utils/getPath";
+// import { slugifyStr } from "@/utils/slugify";
+// import IconChevronLeft from "@/assets/icons/IconChevronLeft.svg";
+// import IconChevronRight from "@/assets/icons/IconChevronRight.svg";
+// import { SITE } from "@/config";
+
+export interface Props {
+  post: CollectionEntry<"blog">;
+  posts: CollectionEntry<"blog">[];
+}
+
+const { post, posts } = Astro.props;
+
+const {
+  title,
+  // ogImage: initOgImage,
+  date,
+  tags,
+} = post.data;
+
+const { Content } = await render(post);
+
+let ogImageUrl: string | undefined;
+
+// Determine OG image source
+// if (typeof initOgImage === "string") {
+//   ogImageUrl = initOgImage; // Remote OG image (absolute URL)
+// } else if (initOgImage?.src) {
+//   ogImageUrl = initOgImage.src; // Local asset
+// }
+
+// Use dynamic OG image if enabled and no remote|local ogImage
+// if (!ogImageUrl && SITE.dynamicOgImage) {
+//   ogImageUrl = `${getPath(post.id, post.filePath)}/index.png`;
+// }
+
+// Resolve OG image URL (or fallback to SITE.ogImage / default `og.png`)
+const ogImage = ogImageUrl
+  ? new URL(ogImageUrl, Astro.url.origin).href
+  : undefined;
+
+const layoutProps = {
+  title: `${title} | ${SITE_NAME}`,
+  date,
+  ogImage,
+  scrollSmooth: true,
+};
+
+/* ========== Prev/Next Posts ========== */
+
+const allPosts = posts.map(({ data: { title }, id, filePath }) => ({
+  id,
+  title,
+  filePath,
+}));
+
+const currentPostIndex = allPosts.findIndex((a) => a.id === post.id);
+
+const prevPost = currentPostIndex !== 0 ? allPosts[currentPostIndex - 1] : null;
+const nextPost =
+  currentPostIndex !== allPosts.length ? allPosts[currentPostIndex + 1] : null;
+const bgColor = getBgColorByDate(new Date(date));
+const borderColor = getBorderColorByDate(new Date(date));
+---
+
+<GlobalLayout {...layoutProps}>
+  <header class="max-w-5x mx-auto p-4 pb-0">
+    <h2>
+      <a
+        href="/"
+        class:list={[
+          "font-hachimaru sticky top-4 left-4 z-10 flex h-12 items-center rounded-2xl px-4 py-2 text-white",
+          bgColor,
+        ]}
+      >
+        晴れときどき崩壊ブログ
+      </a>
+    </h2>
+  </header>
+
+  <main
+    transition:name={post.id}
+    class="max-w-5x mx-auto w-full p-4"
+    data-pagefind-body
+  >
+    <h1 class="text-default mt-4 text-2xl font-bold sm:text-3xl">
+      {title}
+    </h1>
+
+    <div class="mt-2 mb-8 flex items-center gap-2">
+      <span aria-hidden="true" class="text-sm"
+        >{post.data.date.toISOString().split("T")[0]}</span
+      >
+    </div>
+
+    <article class="post-markdown-content">
+      <Content />
+    </article>
+
+    <hr class:list={["my-6 border-dashed", borderColor]} />
+
+    <ul class="mt-4 mb-8 sm:my-8">
+      <!-- {tags.map((tag) => <Tag tag={slugifyStr(tag)} tagName={tag} />)} -->
+    </ul>
+
+    <div data-pagefind-ignore class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      {
+        prevPost && (
+          <a
+            href={`/${prevPost.id}`}
+            class:list={[
+              "flex w-full items-center gap-1 rounded-lg border-2 p-2 hover:opacity-75",
+              borderColor,
+            ]}
+          >
+            <Icon name="tabler:arrow-left" />
+            <div>
+              <span>Previous Post</span>
+              <div class="text-default text-sm">{prevPost.title}</div>
+            </div>
+          </a>
+        )
+      }
+      {
+        nextPost && (
+          <a
+            href={`/${nextPost.id}`}
+            class:list={[
+              "flex w-full items-center justify-end gap-1 rounded-lg border-2 p-2 text-end hover:opacity-75 sm:col-start-2",
+              borderColor,
+            ]}
+          >
+            <div>
+              <span>Next Post</span>
+              <div class="text-accent/85 text-sm">{nextPost.title}</div>
+            </div>
+            <Icon name="tabler:arrow-right" />
+          </a>
+        )
+      }
+    </div>
+  </main>
+  <!-- <Footer /> -->
+</GlobalLayout>

@@ -1,11 +1,27 @@
 ---
-import Welcome from "../components/Welcome.astro";
-import Layout from "../layouts/Layout.astro";
+import { type CollectionEntry, getCollection } from "astro:content";
+import Card from "../components/Card.astro";
+import TopCard from "../components/TopCard.astro";
+import GlobalLayout from "../layouts/GlobalLayout.astro";
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const allBlogPosts: CollectionEntry<"blog">[] = await getCollection("blog");
+allBlogPosts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 ---
 
-<Layout>
-  <Welcome />
-</Layout>
+<GlobalLayout>
+  <main
+    class="3x:grid-cols-3 3x:w-3x 4x:grid-cols-4 4x:w-4x 5x:grid-cols-5 5x:w-5x 2x:w-2x mx-auto grid max-w-[1096px] grid-cols-2 items-center justify-items-center gap-4 p-4"
+  >
+    <TopCard />
+    {
+      allBlogPosts.map((post) => (
+        <Card
+          id={post.id}
+          href={`/${post.id}`}
+          title={post.data.title}
+          date={post.data.date.toISOString().split("T")[0]}
+        />
+      ))
+    }
+  </main>
+</GlobalLayout>

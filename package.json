@@ -11,8 +11,13 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/starlight": "^0.35.1",
+    "@astrojs/starlight-tailwind": "^4.0.1",
+    "@iconify-json/tabler": "^1.2.20",
     "@tailwindcss/vite": "^4.1.11",
     "astro": "^5.12.1",
+    "astro-expressive-code": "^0.41.3",
+    "astro-icon": "^1.1.5",
     "tailwindcss": "^4.1.11"
   },
   "devDependencies": {
