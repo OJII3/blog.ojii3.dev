@@ -16,12 +16,15 @@ const borderColor = getBorderColorByDate(new Date(date));
 <a
   transition:name={id}
   class:list={[
-    "2x:w-[200px] 2x:h-[200px] flex h-[calc(50dvw-32px)] max-w-[200px] min-w-full flex-col justify-between gap-2 overflow-hidden rounded-2xl border-2 p-4 duration-200 hover:scale-95 hover:cursor-pointer",
+    "2x:w-[200px] 2x:h-[200px] flex h-[calc(50dvw-32px)] max-w-[200px] min-w-full cursor-pointer flex-col justify-between gap-2 overflow-hidden rounded-2xl border-2 p-4 duration-200 hover:scale-95",
     borderColor,
   ]}
   href={href}
 >
-  <h2 class="2x:text-xl text-lg overflow-ellipsis">
+  <h2
+    class="2x:text-xl text-lg overflow-ellipsis"
+    transition:name={`${id}-title`}
+  >
     {title}
   </h2>
   <p class="2x:text-sm text-xs overflow-ellipsis">{date}</p>

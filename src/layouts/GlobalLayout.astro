@@ -3,6 +3,7 @@ import "../styles/global.css";
 
 import { GOOGLE_ANALYTICS_ID } from "astro:env/client";
 import { ClientRouter } from "astro:transitions";
+import DarkModeManager from "../components/DarkModeManager.astro";
 import GoogleAnalytics from "../components/GoogleAnalytics.astro";
 import { SITE_NAME } from "../constants";
 
@@ -12,8 +13,6 @@ type Props = {
 };
 
 const { title } = Astro.props;
-
-const pageTitle = title ? `${title} | ${SITE_NAME}` : SITE_NAME;
 ---
 
 <!doctype html>
@@ -26,10 +25,11 @@ const pageTitle = title ? `${title} | ${SITE_NAME}` : SITE_NAME;
     <link rel="manifest" href="/site.webmanifest" />
     <meta name="generator" content={Astro.generator} />
     {GOOGLE_ANALYTICS_ID && <GoogleAnalytics id={GOOGLE_ANALYTICS_ID} />}
-    <title>{pageTitle}</title>
+    <title>{title}</title>
     <ClientRouter />
   </head>
-  <body class="bg-gray-0 text-gray-7 min-h-dvh">
+  <body class="bg-gray-0 text-gray-7 min-h-dvh cursor-default">
     <slot />
+    <DarkModeManager />
   </body>
 </html>
