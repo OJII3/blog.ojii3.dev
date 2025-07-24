@@ -12,7 +12,7 @@ export default defineConfig({
   },
   integrations: [
     expressiveCode({
-      themes: ["github-light", "github-dark"],
+      themes: ["andromeeda"],
     }),
     icon(),
     partytown(),
