@@ -1,7 +1,7 @@
 ---
 import { type CollectionEntry, render } from "astro:content";
 import { Icon } from "astro-icon/components";
-import { SITE_NAME } from "../constants";
+import { SITE_NAME, SITE_URL } from "../constants";
 import { getBgColorByDate, getBorderColorByDate } from "../lib/colors";
 import GlobalLayout from "./GlobalLayout.astro";
 // import Header from "@/components/Header.astro";
@@ -25,42 +25,12 @@ export interface Props {
 
 const { post, posts } = Astro.props;
 
-const {
-  title,
-  // ogImage: initOgImage,
-  date,
-  tags,
-} = post.data;
+const { title, date, tags } = post.data;
 
 const { Content } = await render(post);
 
-let ogImageUrl: string | undefined;
-
-// Determine OG image source
-// if (typeof initOgImage === "string") {
-//   ogImageUrl = initOgImage; // Remote OG image (absolute URL)
-// } else if (initOgImage?.src) {
-//   ogImageUrl = initOgImage.src; // Local asset
-// }
-
-// Use dynamic OG image if enabled and no remote|local ogImage
-// if (!ogImageUrl && SITE.dynamicOgImage) {
-//   ogImageUrl = `${getPath(post.id, post.filePath)}/index.png`;
-// }
-
-// Resolve OG image URL (or fallback to SITE.ogImage / default `og.png`)
-const ogImage = ogImageUrl
-  ? new URL(ogImageUrl, Astro.url.origin).href
-  : undefined;
-
-const layoutProps = {
-  title: `${title} | ${SITE_NAME}`,
-  date,
-  ogImage,
-  scrollSmooth: true,
-};
-
-/* ========== Prev/Next Posts ========== */
+const titleText = `${title} | ${SITE_NAME}`;
+const ogImage = `${SITE_URL}/${post.id}/og-image.png`;
 
 const allPosts = posts.map(({ data: { title }, id, filePath }) => ({
   id,
@@ -73,11 +43,11 @@ const currentPostIndex = allPosts.findIndex((a) => a.id === post.id);
 const prevPost = currentPostIndex !== 0 ? allPosts[currentPostIndex - 1] : null;
 const nextPost =
   currentPostIndex !== allPosts.length ? allPosts[currentPostIndex + 1] : null;
-const bgColor = getBgColorByDate(new Date(date));
-const borderColor = getBorderColorByDate(new Date(date));
+const bgColor = getBgColorByDate(date);
+const borderColor = getBorderColorByDate(date);
 ---
 
-<GlobalLayout {...layoutProps}>
+<GlobalLayout title={titleText} ogImage={ogImage}>
   <header class="mx-auto max-w-[65ch] p-4 pb-0">
     <h2 class:list={["flex rounded-2xl", bgColor]}>
       <a
@@ -97,10 +67,7 @@ const borderColor = getBorderColorByDate(new Date(date));
     class="mx-auto w-full max-w-[65ch] p-4"
     data-pagefind-body
   >
-    <h1
-      class="text-default mt-4 text-2xl font-bold sm:text-3xl"
-      transition:name={`${post.id}-title`}
-    >
+    <h1 class="text-default mt-4 text-2xl font-bold sm:text-3xl">
       {title}
     </h1>
 

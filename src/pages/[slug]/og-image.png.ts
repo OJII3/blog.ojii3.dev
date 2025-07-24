@@ -1,0 +1,50 @@
+import { readFile } from "node:fs/promises";
+import type { APIRoute } from "astro";
+import { Resvg } from "@resvg/resvg-js";
+import satori from "satori";
+import { getCollection, getEntry } from "astro:content";
+import { OGImage } from "../../components/OGImage";
+import { createElement } from "react";
+
+export const GET: APIRoute = async ({ params }) => {
+  const { slug } = params;
+  if (slug == null) {
+    return new Response("Not found", { status: 404 });
+  }
+
+  const post = await getEntry("blog", slug);
+  if (post == null) {
+    return new Response("Not found", { status: 404 });
+  }
+
+  const font = await readFile("./src/assets/MPLUSRounded1c-Bold.ttf");
+  const svg = await satori(
+    createElement(OGImage, { title: post.data.title, date: post.data.date }),
+    {
+      width: 1200,
+      height: 630,
+      fonts: [
+        {
+          name: "M PLUS Rounded 1c",
+          data: font,
+          weight: 400,
+          style: "normal",
+        },
+      ],
+    },
+  );
+  const png = new Resvg(svg).render().asPng();
+
+  return new Response(png, {
+    headers: { "Content-Type": "image/png" },
+    status: 200,
+  });
+};
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog");
+
+  return posts.map((post) => ({
+    params: { slug: post.id },
+  }));
+}

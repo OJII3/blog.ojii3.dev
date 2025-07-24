@@ -1,7 +1,6 @@
 ---
 import { type CollectionEntry, getCollection } from "astro:content";
-import PostDetails from "../../layouts/PostDetails.astro";
-// import { getPath } from "@/utils/getPath";
+import PostLayout from "../../layouts/PostLayout.astro";
 
 export interface Props {
   post: CollectionEntry<"blog">;
@@ -24,4 +23,4 @@ const posts = (await getCollection("blog")).sort(
 );
 ---
 
-<PostDetails post={post} posts={posts} />
+<PostLayout post={post} posts={posts} />
