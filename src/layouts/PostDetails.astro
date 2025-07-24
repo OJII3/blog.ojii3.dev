@@ -95,11 +95,12 @@ const borderColor = getBorderColorByDate(new Date(date));
   </header>
 
   <main
-    transition:name={post.id}
     class="max-w-5x mx-auto w-full p-4"
     data-pagefind-body
   >
-    <h1 class="text-default mt-4 text-2xl font-bold sm:text-3xl">
+    <h1
+       transition:name={post.id}
+       class="text-default mt-4 text-2xl font-bold sm:text-3xl">
       {title}
     </h1>
 
