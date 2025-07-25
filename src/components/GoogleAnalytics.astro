@@ -1,15 +1,14 @@
 ---
-type Props = {
+interface Props {
   id: string;
-};
+}
 
 const { id } = Astro.props;
 
-const script = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());gtag("config",${id})`;
+const script = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());gtag("config","${id}")`;
 ---
 
 <script
-  is:inline
   type="text/partytown"
   src={`https://www.googletagmanager.com/gtag/js?id=${id}`}></script>
 <script type="text/partytown" set:html={script} />
