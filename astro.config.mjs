@@ -35,6 +35,7 @@ export default defineConfig({
       "raw.githubusercontent.com",
       "avatars.githubusercontent.com",
       "github.com",
+      "*.s3.amazonaws.com",
     ],
   },
   env: {
