@@ -1,10 +1,10 @@
-import { readFile } from "node:fs/promises";
-import type { APIRoute } from "astro";
-import { Resvg } from "@resvg/resvg-js";
-import satori from "satori";
 import { getCollection, getEntry } from "astro:content";
-import { OGImage } from "../../components/OGImage";
+import { readFile } from "node:fs/promises";
+import { Resvg } from "@resvg/resvg-js";
+import type { APIRoute } from "astro";
 import { createElement } from "react";
+import satori from "satori";
+import { OGImage } from "../../components/OGImage";
 
 export const GET: APIRoute = async ({ params }) => {
   const { slug } = params;

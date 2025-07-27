@@ -12,7 +12,11 @@ import { Icon } from "astro-icon/components";
     技術と日常を綴る<br />備忘録なのです
   </p>
   <div class="flex justify-end gap-2">
-    <button id="theme-toggle" class="cursor-pointer hover:scale-95">
+    <button
+      id="theme-toggle"
+      class="cursor-pointer hover:scale-95"
+      aria-label="Toggle theme"
+    >
       <Icon name="tabler:sun" class="h-8 w-8" />
     </button>
     <a
@@ -20,6 +24,7 @@ import { Icon } from "astro-icon/components";
       target="_blank"
       rel="noopener noreferrer"
       class="cursor-pointer hover:scale-95"
+      aria-label="GitHub repository"
     >
       <Icon name="tabler:brand-github-filled" class="h-8 w-8" />
     </a>

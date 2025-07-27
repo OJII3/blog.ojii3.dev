@@ -28,15 +28,12 @@ export default defineConfig({
     sitemap(),
   ],
   markdown: {
+    gfm: true,
     rehypePlugins: [],
   },
   image: {
-    domains: [
-      "raw.githubusercontent.com",
-      "avatars.githubusercontent.com",
-      "github.com",
-      "*.s3.amazonaws.com",
-    ],
+    domains: ["raw.githubusercontent.com", "github.com", "*.s3.amazonaws.com"],
+    layout: "constrained",
   },
   env: {
     schema: {
@@ -48,4 +45,3 @@ export default defineConfig({
     },
   },
 });
-

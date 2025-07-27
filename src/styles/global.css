@@ -1,7 +1,13 @@
-@import url("https://fonts.googleapis.com/css2?family=Hachi+Maru+Pop&weight=700&display=swap&text=晴れきどき崩壊ブログ");
+/* @import url("https://fonts.googleapis.com/css2?family=Hachi+Maru+Pop&weight=700&display=swap&text=晴れきどき崩壊ブログ"); */
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 @custom-variant dark (&:where(.dark, .dark *));
+@font-face {
+  font-family: "Hachi Maru Pop";
+  font-style: normal;
+  font-weight: 700;
+  src: url("../assets/font.woff2") format("woff2");
+}
 
 @theme {
   --font-hachimaru: "Hachi Maru Pop", cursive, sans-serif;
