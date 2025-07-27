@@ -29,6 +29,9 @@ jobs:
         with:
           bun-version-file: ".bun-version"
 
+      - name: Setup | Install dependencies
+        run: bun install --frozen-lockfile
+
       - name: Setup | Post comment
         if: github.event_name == 'pull_request'
         run: |
@@ -93,6 +96,9 @@ jobs:
         uses: oven-sh/setup-bun@v2
         with:
           bun-version-file: ".bun-version"
+
+      - name: Setup | Install dependencies
+        run: bun install --frozen-lockfile
 
       - name: Setup | Get version ID
         id: get-version-id
