@@ -8,7 +8,8 @@
     "check": "prettier ./src && biome check ./src",
     "format": "prettier --write ./src && biome check ./src --write",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "wrangler": "wrangler"
   },
   "dependencies": {
     "@astrojs/partytown": "^2.1.4",
@@ -32,6 +33,7 @@
     "prettier": "^3.6.2",
     "prettier-plugin-astro": "^0.14.1",
     "react": "^19.1.0",
-    "satori": "^0.16.1"
+    "satori": "^0.16.1",
+    "wrangler": "^4.26.0"
   }
 }
