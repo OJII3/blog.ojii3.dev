@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.1.2/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.3.6/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
@@ -9,8 +9,9 @@
     "ignoreUnknown": false
   },
   "formatter": {
-    "enabled": false,
-    "indentStyle": "tab"
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2
   },
   "linter": {
     "enabled": true,
@@ -23,6 +24,11 @@
       "quoteStyle": "double"
     }
   },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
+  },
   "assist": {
     "enabled": true,
     "actions": {
@@ -33,7 +39,7 @@
   },
   "overrides": [
     {
-      "includes": ["**/*.svelte", "**/*.astro", "**/*.vue"],
+      "includes": ["**/*.astro", "**/*.svelte", "**/*.vue"],
       "linter": {
         "rules": {
           "style": {
