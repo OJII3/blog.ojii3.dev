@@ -30,3 +30,13 @@ export const BG_COLORS: Record<VitaColor, string> = {
   [VitaColor.Indigo]: "bg-indigo-500",
   [VitaColor.Violet]: "bg-purple-500",
 };
+
+export const CODE_COLORS: Record<VitaColor, string> = {
+  [VitaColor.Red]: "prose-code:bg-rose-200 dark:prose-code:bg-rose-700",
+  [VitaColor.Orange]: "prose-code:bg-orange-200 dark:prose-code:bg-orange-700",
+  [VitaColor.Yellow]: "prose-code:bg-yellow-200 dark:prose-code:bg-yellow-700",
+  [VitaColor.Green]: "prose-code:bg-lime-200 dark:prose-code:bg-lime-700",
+  [VitaColor.Blue]: "prose-code:bg-emerald-200 dark:prose-code:bg-emerald-700",
+  [VitaColor.Indigo]: "prose-code:bg-indigo-200 dark:prose-code:bg-indigo-700",
+  [VitaColor.Violet]: "prose-code:bg-purple-200 dark:prose-code:bg-purple-700",
+};

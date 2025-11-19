@@ -2,7 +2,11 @@
 import { type CollectionEntry, render } from "astro:content";
 import { Icon } from "astro-icon/components";
 import { SITE_NAME, SITE_URL } from "../constants";
-import { getBgColorByDate, getBorderColorByDate } from "../lib/colors";
+import {
+  getBgColorByDate,
+  getBorderColorByDate,
+  getCodeColorByDate,
+} from "../lib/colors";
 import GlobalLayout from "./GlobalLayout.astro";
 // import Header from "@/components/Header.astro";
 // import Footer from "@/components/Footer.astro";
@@ -43,6 +47,8 @@ const currentPostIndex = allPosts.findIndex((a) => a.id === post.id);
 const prevPost = currentPostIndex !== 0 ? allPosts[currentPostIndex - 1] : null;
 const nextPost =
   currentPostIndex !== allPosts.length ? allPosts[currentPostIndex + 1] : null;
+
+const codeColor = getCodeColorByDate(date);
 const bgColor = getBgColorByDate(date);
 const borderColor = getBorderColorByDate(date);
 ---
@@ -81,29 +87,26 @@ const borderColor = getBorderColorByDate(date);
       >
     </div>
 
-    <article class="prose dark:prose-invert mx-auto overflow-hidden">
+    <article class:list={["prose dark:prose-invert mx-auto overflow-hidden prose-code:rounded-xs", codeColor]}>
       <Content />
     </article>
-
-    <hr class:list={["my-6 border-dashed", borderColor]} />
 
     <ul class="mt-4 mb-8 sm:my-8">
       <!-- {tags.map((tag) => <Tag tag={slugifyStr(tag)} tagName={tag} />)} -->
     </ul>
 
-    <div data-pagefind-ignore class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <div data-pagefind-ignore class="grid grid-cols-1 gap-4 pt-8 pb-4 sm:grid-cols-2">
       {
         prevPost && (
           <a
             href={`/${prevPost.id}`}
             class:list={[
-              "flex w-full items-center gap-1 rounded-lg border-2 p-2 duration-200 hover:scale-95",
+              "flex w-full items-center gap-2 rounded-2xl border-2 p-4 duration-200",
               borderColor,
             ]}
           >
             <Icon name="tabler:arrow-left" />
             <div>
-              <span>Previous Post</span>
               <div class="text-sm">{prevPost.title}</div>
             </div>
           </a>
@@ -114,12 +117,11 @@ const borderColor = getBorderColorByDate(date);
           <a
             href={`/${nextPost.id}`}
             class:list={[
-              "flex w-full items-center justify-end gap-1 rounded-lg border-2 p-2 text-end duration-200 hover:scale-95 sm:col-start-2",
+              "flex w-full items-center justify-end gap-2 rounded-2xl border-2 p-4 text-end duration-200 sm:col-start-2",
               borderColor,
             ]}
           >
             <div>
-              <span>Next Post</span>
               <div class="text-accent/85 text-sm">{nextPost.title}</div>
             </div>
             <Icon name="tabler:arrow-right" />
