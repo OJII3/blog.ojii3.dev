@@ -22,9 +22,6 @@
   --spacing-4x: 880px;
   --spacing-5x: 1096px;
 
-  --text-default: var(--color-gray-900);
-  --text-secondary: var(--color-slate-600);
-
   --color-accent-50: var(--color-indigo-50);
   --color-accent-100: var(--color-indigo-100);
   --color-accent-200: var(--color-indigo-200);
