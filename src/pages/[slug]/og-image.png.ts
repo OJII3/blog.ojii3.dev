@@ -7,44 +7,44 @@ import satori from "satori";
 import { OGImage } from "../../components/OGImage";
 
 export const GET: APIRoute = async ({ params }) => {
-  const { slug } = params;
-  if (slug == null) {
-    return new Response("Not found", { status: 404 });
-  }
+	const { slug } = params;
+	if (slug == null) {
+		return new Response("Not found", { status: 404 });
+	}
 
-  const post = await getEntry("blog", slug);
-  if (post == null) {
-    return new Response("Not found", { status: 404 });
-  }
+	const post = await getEntry("blog", slug);
+	if (post == null) {
+		return new Response("Not found", { status: 404 });
+	}
 
-  const font = await readFile("./src/assets/MPLUSRounded1c-Bold.ttf");
-  const svg = await satori(
-    createElement(OGImage, { title: post.data.title, date: post.data.date }),
-    {
-      width: 1200,
-      height: 630,
-      fonts: [
-        {
-          name: "M PLUS Rounded 1c",
-          data: font,
-          weight: 400,
-          style: "normal",
-        },
-      ],
-    },
-  );
-  const png = new Resvg(svg).render().asPng();
+	const font = await readFile("./src/assets/MPLUSRounded1c-Bold.ttf");
+	const svg = await satori(
+		createElement(OGImage, { title: post.data.title, date: post.data.date }),
+		{
+			width: 1200,
+			height: 630,
+			fonts: [
+				{
+					name: "M PLUS Rounded 1c",
+					data: font,
+					weight: 400,
+					style: "normal",
+				},
+			],
+		},
+	);
+	const png = new Resvg(svg).render().asPng();
 
-  return new Response(png, {
-    headers: { "Content-Type": "image/png" },
-    status: 200,
-  });
+	return new Response(png, {
+		headers: { "Content-Type": "image/png" },
+		status: 200,
+	});
 };
 
 export async function getStaticPaths() {
-  const posts = await getCollection("blog");
+	const posts = await getCollection("blog");
 
-  return posts.map((post) => ({
-    params: { slug: post.id },
-  }));
+	return posts.map((post) => ({
+		params: { slug: post.id },
+	}));
 }

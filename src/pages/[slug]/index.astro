@@ -3,23 +3,23 @@ import { type CollectionEntry, getCollection } from "astro:content";
 import PostLayout from "../../layouts/PostLayout.astro";
 
 export interface Props {
-  post: CollectionEntry<"blog">;
+	post: CollectionEntry<"blog">;
 }
 
 export async function getStaticPaths() {
-  const posts = await getCollection("blog");
-  const postResult = posts.map((post) => ({
-    params: { slug: `/${post.id}` },
-    props: { post },
-  }));
+	const posts = await getCollection("blog");
+	const postResult = posts.map((post) => ({
+		params: { slug: `/${post.id}` },
+		props: { post },
+	}));
 
-  return postResult;
+	return postResult;
 }
 
 const { post } = Astro.props;
 
 const posts = (await getCollection("blog")).sort(
-  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+	(a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
 );
 ---
 

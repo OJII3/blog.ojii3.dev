@@ -3,9 +3,9 @@ import { type CollectionEntry, render } from "astro:content";
 import { Icon } from "astro-icon/components";
 import { SITE_NAME, SITE_URL } from "../constants";
 import {
-  getBgColorByDate,
-  getBorderColorByDate,
-  getCodeColorByDate,
+	getBgColorByDate,
+	getBorderColorByDate,
+	getCodeColorByDate,
 } from "../lib/colors";
 import GlobalLayout from "./GlobalLayout.astro";
 // import Header from "@/components/Header.astro";
@@ -23,8 +23,8 @@ import GlobalLayout from "./GlobalLayout.astro";
 // import { SITE } from "@/config";
 
 export interface Props {
-  post: CollectionEntry<"blog">;
-  posts: CollectionEntry<"blog">[];
+	post: CollectionEntry<"blog">;
+	posts: CollectionEntry<"blog">[];
 }
 
 const { post, posts } = Astro.props;
@@ -37,16 +37,16 @@ const titleText = `${title} | ${SITE_NAME}`;
 const ogImage = `${SITE_URL}/${post.id}/og-image.png`;
 
 const allPosts = posts.map(({ data: { title }, id, filePath }) => ({
-  id,
-  title,
-  filePath,
+	id,
+	title,
+	filePath,
 }));
 
 const currentPostIndex = allPosts.findIndex((a) => a.id === post.id);
 
 const prevPost = currentPostIndex !== 0 ? allPosts[currentPostIndex - 1] : null;
 const nextPost =
-  currentPostIndex !== allPosts.length ? allPosts[currentPostIndex + 1] : null;
+	currentPostIndex !== allPosts.length ? allPosts[currentPostIndex + 1] : null;
 
 const codeColor = getCodeColorByDate(date);
 const bgColor = getBgColorByDate(date);

@@ -1,36 +1,36 @@
 {
-  "name": "blog.ojii3.dev",
-  "type": "module",
-  "version": "0.0.1",
-  "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "check": "biome check .",
-    "format": "biome check . --write",
-    "preview": "astro preview",
-    "astro": "astro",
-    "wrangler": "wrangler"
-  },
-  "dependencies": {
-    "@astrojs/partytown": "^2.1.4",
-    "@astrojs/react": "^4.3.0",
-    "@astrojs/sitemap": "^3.4.1",
-    "@iconify-json/tabler": "^1.2.20",
-    "@tailwindcss/vite": "^4.1.11",
-    "@types/react-dom": "^19.1.6",
-    "astro": "^5.12.1",
-    "astro-expressive-code": "^0.41.3",
-    "astro-icon": "^1.1.5",
-    "react-dom": "^19.1.0",
-    "tailwindcss": "^4.1.11"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "^2.3.6",
-    "@resvg/resvg-js": "^2.6.2",
-    "@tailwindcss/typography": "^0.5.19",
-    "@types/react": "^19.1.8",
-    "react": "^19.1.0",
-    "satori": "^0.16.1",
-    "wrangler": "^4.26.0"
-  }
+	"name": "blog.ojii3.dev",
+	"type": "module",
+	"version": "0.0.1",
+	"scripts": {
+		"dev": "astro dev",
+		"build": "astro build",
+		"check": "biome check .",
+		"format": "biome check . --write",
+		"preview": "astro preview",
+		"astro": "astro",
+		"wrangler": "wrangler"
+	},
+	"dependencies": {
+		"@astrojs/partytown": "^2.1.4",
+		"@astrojs/react": "^4.3.0",
+		"@astrojs/sitemap": "^3.4.1",
+		"@iconify-json/tabler": "^1.2.20",
+		"@tailwindcss/vite": "^4.1.11",
+		"@types/react-dom": "^19.1.6",
+		"astro": "^5.12.1",
+		"astro-expressive-code": "^0.41.3",
+		"astro-icon": "^1.1.5",
+		"react-dom": "^19.1.0",
+		"tailwindcss": "^4.1.11"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.3.6",
+		"@resvg/resvg-js": "^2.6.2",
+		"@tailwindcss/typography": "^0.5.19",
+		"@types/react": "^19.1.8",
+		"react": "^19.1.0",
+		"satori": "^0.16.1",
+		"wrangler": "^4.26.0"
+	}
 }
