@@ -1,4 +1,5 @@
 ---
+import "../_styles/override.css";
 import { type CollectionEntry, render } from "astro:content";
 import { CODE_COLORS, SITE_NAME, SITE_URL } from "../../../constants";
 import GlobalLayout from "../../_layouts/GlobalLayout.astro";
@@ -36,39 +37,40 @@ const ogImage = `${SITE_URL}/${post.id}/og-image.png`;
 <GlobalLayout title={titleText} ogImage={ogImage}>
   <div class="max-w-[80ch] mx-auto">
 
-  <PostHeader color={color} />
+    <PostHeader color={color} />
 
-  <main
-    transition:name={post.id}
-    class="w-full p-4"
-    data-pagefind-body
-  >
-    <h1 class="mt-4 text-2xl font-bold sm:text-3xl">
-      {title}
-    </h1>
+    <main
+      transition:name={post.id}
+      class="w-full p-4"
+      data-pagefind-body
+    >
+      <h1 class="mt-4 text-2xl font-bold sm:text-3xl">
+        {title}
+      </h1>
 
-    <div class="mt-2 mb-8 flex items-center gap-2">
-      <span aria-hidden="true" class="text-sm"
-        >{dateString}</span
-      >
-    </div>
+      <div class="mt-2 mb-8 flex items-center gap-2">
+        <span aria-hidden="true" class="text-sm"
+          >{dateString}</span
+        >
+      </div>
 
-    <article class:list={["prose dark:prose-invert mx-auto max-w-none overflow-hidden prose-code:rounded-xs", CODE_COLORS[color]]}>
-      <Content />
-    </article>
+      <article class:list={["prose dark:prose-invert mx-auto max-w-none overflow-hidden prose-code:rounded-xs prose-code:px-1", CODE_COLORS[color]]}>
+        <Content />
+      </article>
 
-    <ul class="mt-4 mb-8 sm:my-8">
-      <!-- {tags.map((tag) => <Tag tag={slugifyStr(tag)} tagName={tag} />)} -->
-    </ul>
+      <ul class="mt-4 mb-8 sm:my-8">
+        <!-- {tags.map((tag) => <Tag tag={slugifyStr(tag)} tagName={tag} />)} -->
+      </ul>
 
-    <div data-pagefind-ignore class="grid grid-cols-1 gap-4 pt-8 pb-4 sm:grid-cols-2">
-      {
-        prevPost && <PostPrevNext post={prevPost} isPrev />
-      }
-      {
-        nextPost && <PostPrevNext post={nextPost} isNext />
-      }
-    </div>
-  </main>
+      <div data-pagefind-ignore class="grid grid-cols-1 gap-4 pt-8 pb-4 sm:grid-cols-2">
+        {
+          prevPost && <PostPrevNext post={prevPost} isPrev />
+        }
+        {
+          nextPost && <PostPrevNext post={nextPost} isNext />
+        }
+      </div>
+    </main>
+  </div>
   <!-- <Footer /> -->
 </GlobalLayout>

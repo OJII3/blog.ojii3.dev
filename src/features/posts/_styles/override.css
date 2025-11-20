@@ -1,0 +1,8 @@
+@layer base {
+	code {
+		&::after,
+		&::before {
+			content: "" !important;
+		}
+	}
+}

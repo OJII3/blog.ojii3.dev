@@ -6,7 +6,7 @@
 	font-family: "Hachi Maru Pop";
 	font-style: normal;
 	font-weight: 700;
-	src: url("../assets/font.woff2") format("woff2");
+	src: url("../../assets/font.woff2") format("woff2");
 }
 
 @theme {

@@ -54,11 +54,14 @@
 			}
 		},
 		{
-			"includes": ["**/markdown.css"],
+			"includes": ["**/override.css"],
 			"linter": {
 				"rules": {
 					"style": {
 						"noDescendingSpecificity": "off"
+					},
+					"complexity": {
+						"noImportantStyles": "off"
 					}
 				}
 			}
