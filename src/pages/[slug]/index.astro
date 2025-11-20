@@ -1,6 +1,6 @@
 ---
 import { type CollectionEntry, getCollection } from "astro:content";
-import PostLayout from "../../layouts/PostLayout.astro";
+import PostLayout from "../../features/posts/_layouts/PostLayout.astro";
 
 export interface Props {
 	post: CollectionEntry<"blog">;
@@ -21,6 +21,11 @@ const { post } = Astro.props;
 const posts = (await getCollection("blog")).sort(
 	(a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
 );
+
+const postIndex = posts.findIndex((p) => p.id === post.id);
+
+const prevPost = postIndex > 0 ? posts[postIndex - 1] : null;
+const nextPost = postIndex < posts.length - 1 ? posts[postIndex + 1] : null;
 ---
 
-<PostLayout post={post} posts={posts} />
+<PostLayout post={post} prevPost={prevPost} nextPost={nextPost} />

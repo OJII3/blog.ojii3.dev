@@ -1,8 +1,8 @@
 ---
 import { type CollectionEntry, getCollection } from "astro:content";
-import Card from "../components/Card.astro";
-import TopCard from "../components/TopCard.astro";
-import GlobalLayout from "../layouts/GlobalLayout.astro";
+import GlobalLayout from "../features/_layouts/GlobalLayout.astro";
+import Card from "../features/posts/_components/Card.astro";
+import TopCard from "../features/posts/_components/TopCard.astro";
 
 const allBlogPosts: CollectionEntry<"blog">[] = await getCollection("blog");
 allBlogPosts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());

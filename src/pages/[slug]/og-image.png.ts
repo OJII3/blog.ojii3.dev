@@ -4,7 +4,7 @@ import { Resvg } from "@resvg/resvg-js";
 import type { APIRoute } from "astro";
 import { createElement } from "react";
 import satori from "satori";
-import { OGImage } from "../../components/OGImage";
+import { OGImage } from "../../features/posts/_components/OGImage";
 
 export const GET: APIRoute = async ({ params }) => {
 	const { slug } = params;
@@ -18,21 +18,19 @@ export const GET: APIRoute = async ({ params }) => {
 	}
 
 	const font = await readFile("./src/assets/MPLUSRounded1c-Bold.ttf");
-	const svg = await satori(
-		createElement(OGImage, { title: post.data.title, date: post.data.date }),
-		{
-			width: 1200,
-			height: 630,
-			fonts: [
-				{
-					name: "M PLUS Rounded 1c",
-					data: font,
-					weight: 400,
-					style: "normal",
-				},
-			],
-		},
-	);
+	const { title, date, color } = post.data;
+	const svg = await satori(createElement(OGImage, { title, date, color }), {
+		width: 1200,
+		height: 630,
+		fonts: [
+			{
+				name: "M PLUS Rounded 1c",
+				data: font,
+				weight: 400,
+				style: "normal",
+			},
+		],
+	});
 	const png = new Resvg(svg).render().asPng();
 
 	return new Response(png, {

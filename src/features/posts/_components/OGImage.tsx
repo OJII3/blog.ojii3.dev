@@ -1,6 +1,6 @@
 import type { FC } from "react";
-import wordmark from "../assets/wordmark-for-og.svg?inline";
-import { HEX_COLORS, type VitaColor } from "../constants";
+import wordmark from "../../../assets/wordmark-for-og.svg?inline";
+import { HEX_COLORS, type VitaColor } from "../../../constants";
 
 type Props = {
 	title: string;

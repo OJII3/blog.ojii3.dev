@@ -1,10 +1,10 @@
 ---
-import "../styles/global.css";
+import "../../styles/global.css";
 
 import { GOOGLE_ANALYTICS_ID } from "astro:env/client";
 import { ClientRouter } from "astro:transitions";
-import DarkModeManager from "../components/DarkModeManager.astro";
-import GoogleAnalytics from "../components/GoogleAnalytics.astro";
+import DarkModeManager from "../_components/DarkModeManager.astro";
+import GoogleAnalytics from "../_components/GoogleAnalytics.astro";
 
 type Props = {
 	title?: string;
@@ -37,6 +37,5 @@ const { title, ogImage } = Astro.props;
   </head>
   <body class="bg-gray-0 text-gray-7 min-h-dvh">
     <slot />
-    <DarkModeManager />
   </body>
 </html>
