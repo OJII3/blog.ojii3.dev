@@ -19,7 +19,8 @@ allBlogPosts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
           id={post.id}
           href={`/${post.id}`}
           title={post.data.title}
-          date={post.data.date.toISOString().split("T")[0]}
+          date={post.data.dateString}
+          color={post.data.color}
         />
       ))
     }

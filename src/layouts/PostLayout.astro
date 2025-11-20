@@ -1,12 +1,13 @@
 ---
 import { type CollectionEntry, render } from "astro:content";
 import { Icon } from "astro-icon/components";
-import { SITE_NAME, SITE_URL } from "../constants";
 import {
-	getBgColorByDate,
-	getBorderColorByDate,
-	getCodeColorByDate,
-} from "../lib/colors";
+	BG_COLORS,
+	BORDER_COLORS,
+	CODE_COLORS,
+	SITE_NAME,
+	SITE_URL,
+} from "../constants";
 import GlobalLayout from "./GlobalLayout.astro";
 // import Header from "@/components/Header.astro";
 // import Footer from "@/components/Footer.astro";
@@ -16,11 +17,9 @@ import GlobalLayout from "./GlobalLayout.astro";
 // import ShareLinks from "@/components/ShareLinks.astro";
 // import BackButton from "@/components/BackButton.astro";
 // import BackToTopButton from "@/components/BackToTopButton.astro";
-// import { getPath } from "@/utils/getPath";
 // import { slugifyStr } from "@/utils/slugify";
 // import IconChevronLeft from "@/assets/icons/IconChevronLeft.svg";
 // import IconChevronRight from "@/assets/icons/IconChevronRight.svg";
-// import { SITE } from "@/config";
 
 export interface Props {
 	post: CollectionEntry<"blog">;
@@ -29,7 +28,7 @@ export interface Props {
 
 const { post, posts } = Astro.props;
 
-const { title, date, tags } = post.data;
+const { title, dateString, color, tags } = post.data;
 
 const { Content } = await render(post);
 
@@ -48,13 +47,15 @@ const prevPost = currentPostIndex !== 0 ? allPosts[currentPostIndex - 1] : null;
 const nextPost =
 	currentPostIndex !== allPosts.length ? allPosts[currentPostIndex + 1] : null;
 
-const codeColor = getCodeColorByDate(date);
-const bgColor = getBgColorByDate(date);
-const borderColor = getBorderColorByDate(date);
+const codeColor = CODE_COLORS[color];
+const bgColor = BG_COLORS[color];
+const borderColor = BORDER_COLORS[color];
 ---
 
 <GlobalLayout title={titleText} ogImage={ogImage}>
-  <header class="mx-auto max-w-[70ch] p-4 pb-0">
+  <div class="max-w-[80ch] mx-auto">
+
+  <header class="p-4 pb-0">
     <h2 class:list={["flex rounded-2xl", bgColor]}>
       <a
         href="/"
@@ -74,7 +75,7 @@ const borderColor = getBorderColorByDate(date);
 
   <main
     transition:name={post.id}
-    class="mx-auto w-full max-w-[70ch] p-4"
+    class="w-full p-4"
     data-pagefind-body
   >
     <h1 class="mt-4 text-2xl font-bold sm:text-3xl">
@@ -83,11 +84,11 @@ const borderColor = getBorderColorByDate(date);
 
     <div class="mt-2 mb-8 flex items-center gap-2">
       <span aria-hidden="true" class="text-sm"
-        >{post.data.date.toISOString().split("T")[0]}</span
+        >{dateString}</span
       >
     </div>
 
-    <article class:list={["prose dark:prose-invert mx-auto overflow-hidden prose-code:rounded-xs", codeColor]}>
+    <article class:list={["prose dark:prose-invert mx-auto max-w-none overflow-hidden prose-code:rounded-xs", codeColor]}>
       <Content />
     </article>
 

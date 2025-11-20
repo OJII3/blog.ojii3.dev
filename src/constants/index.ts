@@ -11,6 +11,16 @@ export enum VitaColor {
 	Violet,
 }
 
+export const HEX_COLORS: Record<VitaColor, string> = {
+	[VitaColor.Red]: "#FF2056",
+	[VitaColor.Orange]: "#FF6900",
+	[VitaColor.Yellow]: "#FFBC00",
+	[VitaColor.Green]: "#7CCF00",
+	[VitaColor.Blue]: "#00BC7D",
+	[VitaColor.Indigo]: "#615FFF",
+	[VitaColor.Violet]: "#AD46FF",
+};
+
 export const BORDER_COLORS: Record<VitaColor, string> = {
 	[VitaColor.Red]: "border-rose-500",
 	[VitaColor.Orange]: "border-orange-500",
