@@ -1,6 +1,7 @@
 ---
+# yamllint disable rule:line-length
 name: Deploy Preview & Publish Production
-on:
+'on':
   pull_request:
     types: [opened, synchronize, reopened]
   push:
@@ -8,6 +9,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -35,7 +37,10 @@ jobs:
       - name: Setup | Post comment
         if: github.event_name == 'pull_request'
         run: |
-          gh pr comment ${{ github.event.pull_request.number }} --edit-last --create-if-none --body-file - <<EOF
+          gh pr comment ${{ github.event.pull_request.number }} \
+            --edit-last \
+            --create-if-none \
+            --body-file - <<EOF
           ### <span aria-hidden="true">🚧</span> Deploy Preview building...
 
           |  Name | Link |
@@ -44,6 +49,8 @@ jobs:
           |<span aria-hidden="true">🔍</span> Latest deploy log | ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} |
           ---
           EOF
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - name: Setup | Get version
         id: get-version
@@ -66,12 +73,17 @@ jobs:
             versions
             upload
             --tag "${{ steps.get-version.outputs.version }}"
-            --message "${{ github.event_name == 'pull_request' && format('Preview deployment for PR #{0}', github.event.pull_request.number) || 'Release deployment' }}"
+            --message "${{ github.event_name == 'pull_request' &&
+            format('Preview deployment for PR #{0}',
+            github.event.pull_request.number) || 'Release deployment' }}"
 
       - name: Finish | Post comment
         if: github.event_name == 'pull_request'
         run: |
-          gh pr comment ${{ github.event.pull_request.number }} --edit-last --create-if-none --body-file - <<EOF
+          gh pr comment ${{ github.event.pull_request.number }} \
+            --edit-last \
+            --create-if-none \
+            --body-file - <<EOF
           ### <span aria-hidden="true">✅</span> Deploy Preview ready!
 
           |  Name | Link |
@@ -81,6 +93,8 @@ jobs:
           |<span aria-hidden="true">🌐</span> Preview link | [${{ steps.deploy-preview.outputs.deployment-url }}](${{ steps.deploy-preview.outputs.deployment-url }}) |
           ---
           EOF
+        env:
+          GH_TOKEN: ${{ github.token }}
 
   publish:
     runs-on: ubuntu-latest
@@ -105,7 +119,9 @@ jobs:
       - name: Setup | Get version ID
         id: get-version-id
         run: |
-          version_id="$(bun wrangler versions list --json | jq -r '.[] | select(.annotations."workers/tag" == "${{ needs.deploy.outputs.version_tag }}") | .id')"
+          version_id="$(bun wrangler versions list --json | \
+            jq -r '.[] |
+            select(.annotations."workers/tag" == "${{ needs.deploy.outputs.version_tag }}") | .id')"
           echo "version_id=${version_id}" >> $GITHUB_OUTPUT
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -117,4 +133,5 @@ jobs:
         with:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          command: versions deploy ${{ steps.get-version-id.outputs.version_id }} -y
+          command: |
+            versions deploy ${{ steps.get-version-id.outputs.version_id }} -y
