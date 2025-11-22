@@ -49,6 +49,8 @@ jobs:
           |<span aria-hidden="true">🔍</span> Latest deploy log | ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} |
           ---
           EOF
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - name: Setup | Get version
         id: get-version
@@ -91,6 +93,8 @@ jobs:
           |<span aria-hidden="true">🌐</span> Preview link | [${{ steps.deploy-preview.outputs.deployment-url }}](${{ steps.deploy-preview.outputs.deployment-url }}) |
           ---
           EOF
+        env:
+          GH_TOKEN: ${{ github.token }}
 
   publish:
     runs-on: ubuntu-latest
