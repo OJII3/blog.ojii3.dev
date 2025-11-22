@@ -1,24 +1,30 @@
-# Repository Guidelines
+# リポジトリガイドライン
 
-## Project Structure & Module Organization
-Astro source lives in `src/`: `pages/` defines routes, `layouts/` hosts wrappers, `components/` holds shared UI, and `lib/` keeps helpers. Shared visuals belong in `assets/` and `styles/`. Markdown posts sit under `content/blog/` and inherit schemas from `src/content.config.ts`. Ship static files through `public/`. Production output goes to `dist/` and is deployed via the Worker config in `wrangler.toml`.
+## プロジェクト構造とモジュール構成
 
-## Build, Test, and Development Commands
-- `bun install` — install dependencies with Bun (required runtime).
-- `bun run dev` — start the Astro dev server with hot reload.
-- `bun run build` — produce the optimized bundle in `dist/`.
-- `bun run preview` — serve the bundle locally to mimic Cloudflare.
-- `bun run check` — run Biome lint/format checks project-wide.
-- `bun run format` — apply Biome fixes in-place.
+Astro のソースは `src/` にあります。`pages/` はルートを定義し、`layouts/` はラッパーをホストし、`components/` は共有 UI を保持し、`lib/` はヘルパーを保持します。共有のビジュアルは `assets/` と `styles/` に属します。Markdown の記事は `content/blog/` の下に配置され、`src/content.config.ts` からスキーマを継承します。静的ファイルは `public/` を通じて配布します。本番環境の出力は `dist/` に配置され、`wrangler.toml` の Worker 設定を通じてデプロイされます。
 
-## Coding Style & Naming Conventions
-Use 2-space indentation and TypeScript syntax. Components, layouts, and hooks are PascalCase (`TopCard.astro`, `OGImage.tsx`); utilities or configs can stay lowerCamel or kebab case when that matches existing files. Tailwind classes should reuse the custom breakpoint prefixes already in the repo (`2x:`, `3x:`). Let Biome enforce spacing, import order, and unused-code rules (it now formats `.astro` templates); run `bun run format` before committing.
+## ビルド、テスト、開発コマンド
 
-## Testing Guidelines
-There is no automated test suite; rely on linting plus manual verification. Before pushing, run `bun run check`, `bun run build`, and `bun run preview` to catch runtime errors, layout issues, and Cloudflare-specific regressions. For content edits, review `http://localhost:4321/<slug>` via `bun run dev` and ensure metadata (date, OG image) is correct. Document manual QA steps in the PR so reviewers can repeat them.
+- `bun install` — Bun で依存関係をインストールします (必須ランタイム)。
+- `bun run dev` — ホットリロードで Astro 開発サーバーを起動します。
+- `bun run build` — `dist/` に最適化されたバンドルを生成します。
+- `bun run preview` — Cloudflare を模倣するためにバンドルをローカルで提供します。
+- `bun run check` — プロジェクト全体で Biome のリント/フォーマットチェックを実行します。
+- `bun run format` — Biome の修正をインプレースで適用します。
 
-## Commit & Pull Request Guidelines
-Commits follow a loose Conventional Commit style (`feat:`, `chore:`, `fix:`) or short imperative messages (“Rename 2025-11-17 post”). Squash noisy WIP commits before pushing. Pull requests should include a summary, linked issues, screenshots for visual tweaks, commands executed (`bun run check`, `bun run build`), and notes on config or content migrations. Changes touching global layouts or deployment settings should request review from an Astro maintainer.
+## コーディングスタイルと命名規則
 
-## Deployment & Configuration Notes
-Cloudflare credentials and routes live in `wrangler.toml`; update secrets with `bun run wrangler secret put` rather than storing them in source. `@astrojs/sitemap` auto-builds the sitemap, so add new dynamic paths to `astro.config.mjs` when needed. Load third-party scripts through `@astrojs/partytown` to protect main-thread performance.
+2スペースのインデントと TypeScript 構文を使用します。コンポーネント、レイアウト、フックは PascalCase (`TopCard.astro`, `OGImage.tsx`) を使用し、ユーティリティや設定は、既存のファイルと一致する場合は lowerCamel または kebab-case のままにできます。Tailwind クラスは、リポジトリに既に存在するカスタムブレークポイントプレフィックス (`2x:`, `3x:`) を再利用する必要があります。Biome にスペース、インポート順序、未使用コードのルールを強制させます (`.astro` テンプレートもフォーマットするようになりました)。コミットする前に `bun run format` を実行します。
+
+## テストガイドライン
+
+自動テストスイートはありません。リンティングと手動検証に頼ります。プッシュする前に、`bun run check`、`bun run build`、`bun run preview` を実行して、ランタイムエラー、レイアウトの問題、Cloudflare 固有のリグレッションを捕捉します。コンテンツの編集については、`bun run dev` を介して `http://localhost:4321/<slug>` を確認し、メタデータ (日付、OG 画像) が正しいことを確認します。レビューアが繰り返せるように、PR に手動 QA の手順を文書化します。
+
+## コミットとプルリクエストのガイドライン
+
+コミットは、緩やかな Conventional Commit スタイル (`feat:`, `chore:`, `fix:`) または短い命令形メッセージ (例: 「2025-11-17 の記事名を変更」) に従います。プッシュする前に、ノイズの多い WIP コミットをスカッシュします。プルリクエストには、概要、リンクされた課題、視覚的な調整のスクリーンショット、実行されたコマンド (`bun run check`, `bun run build`)、および設定またはコンテンツの移行に関するメモを含める必要があります。グローバルなレイアウトまたはデプロイ設定に影響する変更は、Astro メンテナーからのレビューをリクエストする必要があります。
+
+## デプロイと設定に関する注意事項
+
+Cloudflare の認証情報とルートは `wrangler.toml` にあります。シークレットはソースに保存するのではなく、`bun run wrangler secret put` で更新します。`@astrojs/sitemap` はサイトマップを自動生成するため、必要に応じて新しい動的パスを `astro.config.mjs` に追加します。サードパーティースクリプトは、メインスレッドのパフォーマンスを保護するために `@astrojs/partytown` を通じてロードします。
