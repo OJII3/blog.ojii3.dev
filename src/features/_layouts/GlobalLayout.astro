@@ -3,6 +3,7 @@ import "../_styles/global.css";
 
 import { GOOGLE_ANALYTICS_ID } from "astro:env/client";
 import { ClientRouter } from "astro:transitions";
+import DarkModeManager from "../_components/DarkModeManager.astro";
 import GoogleAnalytics from "../_components/GoogleAnalytics.astro";
 
 type Props = {
@@ -32,39 +33,10 @@ const { title, ogImage } = Astro.props;
     <meta property="twitter:card" content="summary_large_image" />
     <link rel="sitemap" href="/sitemap-index.xml" />
 
-    <script is:inline>
-      const setupTheme = () => {
-        const localStorageTheme = localStorage?.getItem("theme") ?? "";
-
-        if (["dark", "light"].includes(localStorageTheme)) {
-          return localStorageTheme;
-        }
-        if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-          return "dark";
-        }
-        return "light";
-      };
-
-      const applyTheme = () => {
-        const theme = setupTheme();
-        window.localStorage.setItem("theme", theme);
-        if (theme === "light") {
-          document.documentElement.classList.remove("dark");
-        } else {
-          document.documentElement.classList.add("dark");
-        }
-      };
-
-      // 初回ロード時に即座に適用
-      applyTheme();
-
-      // View Transitions でのページ遷移時にも適用
-      document.addEventListener("astro:after-swap", applyTheme);
-    </script>
-
     <ClientRouter />
   </head>
   <body class="bg-gray-0 text-gray-7 min-h-dvh">
     <slot />
+    <DarkModeManager />
   </body>
 </html>
