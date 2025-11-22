@@ -18,14 +18,15 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props;
 
-const posts = (await getCollection("blog")).sort(
-	(a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
-);
+const allBlogPosts = (await getCollection("blog"))
+	.filter((p) => !p.data.draft)
+	.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
-const postIndex = posts.findIndex((p) => p.id === post.id);
+const postIndex = allBlogPosts.findIndex((p) => p.id === post.id);
 
-const prevPost = postIndex > 0 ? posts[postIndex - 1] : null;
-const nextPost = postIndex < posts.length - 1 ? posts[postIndex + 1] : null;
+const prevPost = postIndex > 0 ? allBlogPosts[postIndex - 1] : null;
+const nextPost =
+	postIndex < allBlogPosts.length - 1 ? allBlogPosts[postIndex + 1] : null;
 ---
 
 <PostLayout post={post} prevPost={prevPost} nextPost={nextPost} />
