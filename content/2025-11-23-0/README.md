@@ -25,6 +25,6 @@ document.addEventListener('astro:after-swap', () => {
 });
 ```
 
-### まとめ
+## まとめ
 
 Astroなんもわからんぞよ
