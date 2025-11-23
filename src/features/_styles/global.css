@@ -103,4 +103,8 @@
 
 		--line-height-headings: 1.2;
 	}
+
+  .expressive-code {
+    margin-block: 1.25em;
+  }
 }
