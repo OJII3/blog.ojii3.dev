@@ -4,27 +4,28 @@ import { Icon } from "astro-icon/components";
 import { BORDER_COLORS } from "../../../constants";
 
 export interface Props {
-	post: CollectionEntry<"blog">;
+	originalPost: CollectionEntry<"blog">;
+	targetPost: CollectionEntry<"blog">;
 	isPrev?: boolean;
 	isNext?: boolean;
 }
 
-const { post, isPrev, isNext } = Astro.props;
+const { originalPost, targetPost, isPrev, isNext } = Astro.props;
 ---
 
 <a
-  href={`/${post.id}`}
+  href={`/${targetPost.id}`}
   class:list={[
     "flex w-full items-center gap-2 rounded-2xl border-2 p-4 duration-200",
-    BORDER_COLORS[post.data.color],
+    BORDER_COLORS[originalPost.data.color],
   ]}
 >
   {isPrev ? (
     <Icon name="tabler:arrow-left" />
   ) : null}
 
-  <div>
-    <div class="text-sm">{post.data.title}</div>
+  <div class="flex-1">
+    <div class="text-sm">{targetPost.data.title}</div>
   </div>
 
   {isNext ? (

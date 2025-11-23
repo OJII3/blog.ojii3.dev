@@ -64,10 +64,10 @@ const ogImage = `${SITE_URL}/${post.id}/og-image.png`;
 
       <div data-pagefind-ignore class="grid grid-cols-1 gap-4 pt-8 pb-4 sm:grid-cols-2">
         {
-          prevPost ? <PostPrevNext post={prevPost} isPrev /> : <div></div>
+          prevPost ? <PostPrevNext originalPost={post} targetPost={prevPost} isPrev /> : <div></div>
         }
         {
-          nextPost ? <PostPrevNext post={nextPost} isNext /> : <div></div>
+          nextPost ? <PostPrevNext originalPost={post} targetPost={nextPost} isNext /> : <div></div>
         }
       </div>
     </main>

@@ -42,11 +42,18 @@ export const BG_COLORS: Record<VitaColor, string> = {
 };
 
 export const CODE_COLORS: Record<VitaColor, string> = {
-	[VitaColor.Red]: "prose-code:bg-rose-100 dark:prose-code:bg-rose-800",
-	[VitaColor.Orange]: "prose-code:bg-orange-100 dark:prose-code:bg-orange-800",
-	[VitaColor.Yellow]: "prose-code:bg-yellow-100 dark:prose-code:bg-yellow-800",
-	[VitaColor.Green]: "prose-code:bg-lime-100 dark:prose-code:bg-lime-800",
-	[VitaColor.Blue]: "prose-code:bg-emerald-100 dark:prose-code:bg-emerald-800",
-	[VitaColor.Indigo]: "prose-code:bg-indigo-100 dark:prose-code:bg-indigo-800",
-	[VitaColor.Violet]: "prose-code:bg-purple-100 dark:prose-code:bg-purple-800",
+	[VitaColor.Red]:
+		"prose-code:bg-rose-200 dark:prose-code:bg-rose-300/90 dark:prose-code:text-gray-900",
+	[VitaColor.Orange]:
+		"prose-code:bg-orange-200 dark:prose-code:bg-orange-300/90 dark:prose-code:text-gray-900",
+	[VitaColor.Yellow]:
+		"prose-code:bg-yellow-200 dark:prose-code:bg-yellow-300/90 dark:prose-code:text-gray-900",
+	[VitaColor.Green]:
+		"prose-code:bg-lime-200 dark:prose-code:bg-lime-300/90 dark:prose-code:text-gray-900",
+	[VitaColor.Blue]:
+		"prose-code:bg-emerald-200 dark:prose-code:bg-emerald-300/90 dark:prose-code:text-gray-900",
+	[VitaColor.Indigo]:
+		"prose-code:bg-indigo-200 dark:prose-code:bg-indigo-300/90 dark:prose-code:text-gray-900",
+	[VitaColor.Violet]:
+		"prose-code:bg-purple-200 dark:prose-code:bg-purple-300/90 dark:prose-code:text-gray-900",
 };
