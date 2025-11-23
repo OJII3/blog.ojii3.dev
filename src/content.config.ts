@@ -13,7 +13,7 @@ const blog = defineCollection({
 		generateId: ({ entry }) =>
 			entry
 				.replace(/\\/g, "/")
-				.replace(/README\.md$/i, "")
+				.replace(/\/README\.md$/i, "")
 				.replace(/\.md$/, ""),
 	}),
 	schema: z
@@ -25,6 +25,7 @@ const blog = defineCollection({
 		})
 		.transform((data) => ({
 			...data,
+			// YYYY-MM-DD 形式の日付
 			dateString: data.date.toISOString().split("T")[0],
 			// 記事作成日を基準に、その記事の色を決定する.
 			color: getColorIndex(data.date),

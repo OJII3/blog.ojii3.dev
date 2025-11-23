@@ -7,6 +7,7 @@ import tailwindcss from "@tailwindcss/vite";
 import { defineConfig, envField } from "astro/config";
 import expressiveCode from "astro-expressive-code";
 import icon from "astro-icon";
+import pagefind from "astro-pagefind";
 // https://astro.build/config
 export default defineConfig({
 	site: "https://blog.ojii3.dev",
@@ -26,6 +27,7 @@ export default defineConfig({
 		partytown(),
 		react(),
 		sitemap(),
+		pagefind(),
 	],
 	markdown: {
 		gfm: true,
