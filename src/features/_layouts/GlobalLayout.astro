@@ -17,6 +17,7 @@ const { title, ogImage } = Astro.props;
 <!doctype html>
 <html lang="ja" class="min-h-dvh">
   <head>
+    <DarkModeManager />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
@@ -34,7 +35,6 @@ const { title, ogImage } = Astro.props;
     <link rel="sitemap" href="/sitemap-index.xml" />
 
     <ClientRouter />
-    <DarkModeManager />
   </head>
   <body class="bg-gray-0 text-gray-7 min-h-dvh">
     <slot />
