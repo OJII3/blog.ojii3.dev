@@ -34,9 +34,9 @@ const { title, ogImage } = Astro.props;
     <link rel="sitemap" href="/sitemap-index.xml" />
 
     <ClientRouter />
+    <DarkModeManager />
   </head>
   <body class="bg-gray-0 text-gray-7 min-h-dvh">
     <slot />
-    <DarkModeManager />
   </body>
 </html>
