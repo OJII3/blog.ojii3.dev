@@ -19,6 +19,7 @@ const { originalPost, targetPost, isPrev, isNext } = Astro.props;
     "flex w-full items-center gap-2 rounded-2xl border-2 p-4 duration-200",
     BORDER_COLORS[originalPost.data.color],
   ]}
+  data-astro-reload
 >
   {isPrev ? (
     <Icon name="tabler:arrow-left" />
