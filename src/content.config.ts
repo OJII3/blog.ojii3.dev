@@ -7,7 +7,15 @@ export const getColorIndex = (date: Date): VitaColor => {
 };
 
 const blog = defineCollection({
-	loader: glob({ pattern: "**/*.md", base: "./content" }),
+	loader: glob({
+		pattern: "**/README.md",
+		base: "./content",
+		generateId: ({ entry }) =>
+			entry
+				.replace(/\\/g, "/")
+				.replace(/README\.md$/i, "")
+				.replace(/\.md$/, ""),
+	}),
 	schema: z
 		.object({
 			title: z.string(),
