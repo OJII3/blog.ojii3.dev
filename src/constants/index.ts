@@ -21,6 +21,16 @@ export const HEX_COLORS: Record<VitaColor, string> = {
 	[VitaColor.Violet]: "#AD46FF",
 };
 
+export const TEXT_COLORS: Record<VitaColor, string> = {
+	[VitaColor.Red]: "text-rose-500",
+	[VitaColor.Orange]: "text-orange-500",
+	[VitaColor.Yellow]: "text-yellow-500",
+	[VitaColor.Green]: "text-lime-500",
+	[VitaColor.Blue]: "text-emerald-500",
+	[VitaColor.Indigo]: "text-indigo-500",
+	[VitaColor.Violet]: "text-purple-500",
+};
+
 export const BORDER_COLORS: Record<VitaColor, string> = {
 	[VitaColor.Red]: "border-rose-500",
 	[VitaColor.Orange]: "border-orange-500",

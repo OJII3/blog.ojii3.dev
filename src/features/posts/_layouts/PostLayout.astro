@@ -1,7 +1,12 @@
 ---
 import "../_styles/override.css";
 import { type CollectionEntry, render } from "astro:content";
-import { CODE_COLORS, SITE_NAME, SITE_URL } from "../../../constants";
+import {
+	CODE_COLORS,
+	SITE_NAME,
+	SITE_URL,
+	TEXT_COLORS,
+} from "../../../constants";
 import GlobalLayout from "../../_layouts/GlobalLayout.astro";
 import PostHeader from "../_components/PostHeader.astro";
 import PostPrevNext from "../_components/PostPrevNext.astro";
@@ -44,7 +49,7 @@ const ogImage = `${SITE_URL}/${post.id}/og-image.png`;
       class="w-full p-4"
       data-pagefind-body
     >
-      <h1 class="mt-4 text-2xl font-bold sm:text-3xl">
+      <h1 class="mt-4 text-2xl font-bold sm:text-3xl" data-pagefind-meta="title">
         {title}
       </h1>
 
@@ -54,12 +59,15 @@ const ogImage = `${SITE_URL}/${post.id}/og-image.png`;
         >
       </div>
 
-      <article class:list={["prose dark:prose-invert mx-auto max-w-none overflow-hidden prose-code:rounded-xs prose-code:px-1", CODE_COLORS[color]]}>
+      <article class:list={["prose dark:prose-invert mx-auto max-w-none mb-16 overflow-hidden prose-code:rounded-xs prose-code:px-1", CODE_COLORS[color]]}>
         <Content />
       </article>
 
-      <ul class="mt-4 mb-8 sm:my-8">
-        <!-- {tags.map((tag) => <Tag tag={slugifyStr(tag)} tagName={tag} />)} -->
+      <ul class="my-8 flex flex-wrap gap-2">
+        {tags?.map((tag) => <span class:list={["px-2", TEXT_COLORS[color]]}
+          >
+          #<span data-pagefind-filter="tag">{tag}</span>
+        </span>)}
       </ul>
 
       <div data-pagefind-ignore="all" class="grid grid-cols-1 gap-4 pt-8 pb-4 sm:grid-cols-2">
