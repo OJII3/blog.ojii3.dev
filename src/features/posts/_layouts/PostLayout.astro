@@ -47,7 +47,6 @@ const ogImage = `${SITE_URL}/${post.id}/og-image.png`;
     <main
       transition:name={post.id}
       class="w-full p-4"
-      data-pagefind-body
     >
       <h1 class="mt-4 text-2xl font-bold sm:text-3xl" data-pagefind-meta="title">
         {title}
@@ -59,7 +58,10 @@ const ogImage = `${SITE_URL}/${post.id}/og-image.png`;
         >
       </div>
 
-      <article class:list={["prose dark:prose-invert mx-auto max-w-none mb-16 overflow-hidden prose-code:rounded-xs prose-code:px-1", CODE_COLORS[color]]}>
+      <article
+        class:list={["prose dark:prose-invert mx-auto max-w-none mb-16 overflow-hidden prose-code:rounded-xs prose-code:px-1", CODE_COLORS[color]]}
+        data-pagefind-body
+      >
         <Content />
       </article>
 
