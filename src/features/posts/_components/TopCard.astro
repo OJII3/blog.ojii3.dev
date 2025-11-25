@@ -1,30 +1,45 @@
 ---
 import { Icon } from "astro-icon/components";
+import {
+	SEARCH_ICON_TRANSITION_NAME,
+	SITE_HEADER_TRANSITION_NAME,
+	TITLE_TRANSITION_NAME,
+} from "../../../constants";
 import DarkModeButton from "../../_components/DarkModeButton.astro";
 import Card from "./Card.astro";
 ---
 
 <Card
-  class="flex-col justify-between gap-2"
+	class="flex-col justify-between gap-2"
+	transition:name={SITE_HEADER_TRANSITION_NAME}
 >
-  <h1 class="font-hachimaru 2x:text-xl flex text-lg font-bold">
-    晴れときどき<br />崩壊ブログ
-  </h1>
-  <p class="2x:block mb-4 hidden text-xs">
-    技術と日常を綴る<br />備忘録なのです
-  </p>
+	<h1
+		class="font-hachimaru 2x:text-xl flex text-lg font-bold"
+		transition:name={TITLE_TRANSITION_NAME}
+	>
+		晴れときどき<br />崩壊ブログ
+	</h1>
+	<p class="2x:block mb-4 hidden text-xs">
+		技術と日常を綴る<br />備忘録なのです
+	</p>
 
-  <div class="flex justify-end gap-2">
-    <a href="/search"
-      class="hover:rotate-30 duration-100"
-      aria-label="Search posts">
-      <Icon name="tabler:search" class="h-8 w-8" />
-    </a>
-    <DarkModeButton 
-      class="hover:rotate-30 duration-100"
-      aria-label="Toggle theme">
-      <Icon name="tabler:sun" class="h-8 w-8" />
-    </DarkModeButton>
-  </div>
+	<div class="flex justify-between gap-2">
+		<a
+			href="/search"
+			class="group rounded-full duration-100"
+			aria-label="Search posts"
+		>
+			<Icon
+				name="tabler:search"
+				class="h-8 w-8 group-hover:scale-110"
+				transition:name={SEARCH_ICON_TRANSITION_NAME}
+			/>
+		</a>
+		<DarkModeButton
+			class="group rounded-full duration-100 hover:scale-110"
+			aria-label="Toggle theme"
+		>
+			<Icon name="tabler:sun" class="h-8 w-8 group-hover:scale-110" />
+		</DarkModeButton>
+	</div>
 </Card>
-

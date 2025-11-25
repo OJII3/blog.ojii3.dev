@@ -1,11 +1,22 @@
 ---
+import { Icon } from "astro-icon/components";
+import { SEARCH_ICON_TRANSITION_NAME } from "../../../constants";
 ---
 
 <form class="w-full">
-  <input
-      id="search"
-      type="text"
-      placeholder="Search..."
-      class="w-full rounded-2xl p-4 mb-4 text-lg border-gray-2 border-2 focus:outline-none focus:ring-blue-500"
-    />
+	<div
+		class="border-gray-5 flex h-14 w-full items-center rounded-2xl border-2 px-4 focus-within:ring-blue-500"
+	>
+		<Icon
+			name="tabler:search"
+			class="text-gray-4 mr-4 h-6 w-6"
+			transition:name={SEARCH_ICON_TRANSITION_NAME}
+		/>
+		<input
+			id="search"
+			type="text"
+			placeholder="Search..."
+			class="w-full bg-transparent focus:outline-none"
+		/>
+	</div>
 </form>

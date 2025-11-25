@@ -13,15 +13,15 @@ const { id, title, date, href, color } = Astro.props;
 ---
 
 <a
-  transition:name={id}
-  class:list={[
-    "2x:w-[200px] 2x:h-[200px] flex h-[calc(50dvw-32px)] max-w-[200px] min-w-full cursor-pointer flex-col justify-between gap-2 overflow-hidden rounded-2xl border-2 p-4 duration-200",
-    BORDER_COLORS[color],
-  ]}
-  href={href}
+	transition:name={id}
+	class:list={[
+		"2x:w-[200px] 2x:h-[200px] 2x:max-w-[200px] flex h-[calc(50dvw-32px)] max-w-full min-w-full cursor-pointer flex-col justify-between gap-2 overflow-hidden rounded-2xl border-2 p-4 duration-200",
+		BORDER_COLORS[color],
+	]}
+	href={href}
 >
-  <h2 class="2x:text-lg inline-block text-sm overflow-ellipsis md:text-lg">
-    {title}
-  </h2>
-  <p class="2x:text-sm text-xs overflow-ellipsis">{date}</p>
+	<h2 class="2x:text-lg inline-block text-sm overflow-ellipsis md:text-lg">
+		{title}
+	</h2>
+	<p class="2x:text-sm text-xs overflow-ellipsis">{date}</p>
 </a>
