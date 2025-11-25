@@ -19,6 +19,8 @@ draft: false
 
 `astro:after-swap`イベントを使うことで、ページが読み込まれたタイミングでコードを実行できました。
 
+<https://docs.astro.build/en/guides/view-transitions/#script-re-execution>
+
 ```javascript
 document.addEventListener('astro:after-swap', () => {
   // ページが読み込まれたタイミングで実行したいコード
