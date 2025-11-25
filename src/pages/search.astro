@@ -1,26 +1,57 @@
 ---
-import { default as PageFind } from "astro-pagefind/components/Search";
 import GlobalLayout from "../features/_layouts/GlobalLayout.astro";
+import SearchForm from "../features/search/_components/SearchForm.astro";
+import SearchResult from "../features/search/_components/SearchResult.astro";
 ---
 
-<GlobalLayout title="記事を検索">
+<GlobalLayout title="Search">
   <main class="max-w-[80ch] mx-auto p-4">
-    <PageFind id="search" className="pagefind-ui" uiOptions={{ showImages: true }} />
+    <div class="p-4">
+      <h1
+        transition:name=""
+        class="font-hachimaru 2x:text-xl flex text-lg font-bold"
+      >
+        晴れときどき崩壊ブログ
+      </h1>
+    </div>
+    <SearchForm />
+    <SearchResult />
   </main>
 </GlobalLayout>
 
-<style>
-.pagefind-ui {
-  --pagefind-ui-scale: 1
-  --pagefind-ui-primary: #034ad8;
-  --pagefind-ui-text: #393939;
-  --pagefind-ui-background: #ffffff;
-  --pagefind-ui-border: #eeeeee;
-  --pagefind-ui-tag: #eeeeee;
-  --pagefind-ui-border-width: 2px;
-  --pagefind-ui-border-radius: var(--radius-2xl);
-  --pagefind-ui-image-border-radius: 8px;
-  --pagefind-ui-image-box-ratio: 3 / 2;
-  --pagefind-ui-font: sans-serif;
-}
-</style>
+<script is:inline>
+const initSearch = () => {
+  document.querySelector("#search")?.addEventListener("input", async (e) => {
+    // Pagefindのスクリプトを最初の検索時にのみ読み込み
+    if (e.target.dataset.loaded !== "true") {
+      e.target.dataset.loaded = "true";
+      // Pagefindのスクリプトを読み込む
+      window.pagefind = await import("/pagefind/pagefind.js");
+    }
+
+    // 入力された値でインデックスを検索
+    const search = await window.pagefind.search(e.target.value);
+
+    // 以前の検索結果をクリア
+    document.querySelector("#results").innerHTML = "";
+
+    // 新しい検索結果を追加
+    for (const result of search.results) {
+      const data = await result.data();
+      document.querySelector("#results").innerHTML += `
+<a
+  class="relative flex flex-col"
+  href="${data.url}"
+>
+  <h3 class="-mb-3 z-1">
+    <span class="bg-gray-0 font-bold px-2 ml-2">${data.meta.title}</span>
+  </h3>
+  <p class="border-2 rounded-2xl p-4">${data.excerpt}</p>
+</a>`;
+    }
+  });
+};
+
+document.addEventListener("astro:after-swap", initSearch);
+initSearch();
+</script>

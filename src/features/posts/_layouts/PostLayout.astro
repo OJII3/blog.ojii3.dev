@@ -2,7 +2,7 @@
 import "../_styles/override.css";
 import { type CollectionEntry, render } from "astro:content";
 import {
-	CODE_COLORS,
+	H2_BORDER_COLORS,
 	SITE_NAME,
 	SITE_URL,
 	TEXT_COLORS,
@@ -59,7 +59,11 @@ const ogImage = `${SITE_URL}/${post.id}/og-image.png`;
       </div>
 
       <article
-        class:list={["prose dark:prose-invert mx-auto max-w-none mb-16 overflow-hidden prose-code:rounded-xs prose-code:px-1", CODE_COLORS[color]]}
+        class:list={["prose dark:prose-invert mx-auto max-w-none mb-16 overflow-hidden",
+          "prose-code:rounded-sm prose-code:px-1 prose-code:bg-gray-2",
+          "prose-h2:pl-2 prose-h2:border-l-4",
+          H2_BORDER_COLORS[color]
+        ]}
         data-pagefind-body
       >
         <Content />

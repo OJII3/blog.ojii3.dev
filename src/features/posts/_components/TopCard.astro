@@ -13,14 +13,18 @@ import Card from "./Card.astro";
   <p class="2x:block mb-4 hidden text-xs">
     技術と日常を綴る<br />備忘録なのです
   </p>
-  <div class="flex justify-end gap-2">
 
+  <div class="flex justify-end gap-2">
+    <a href="/search"
+      class="hover:rotate-30 duration-100"
+      aria-label="Search posts">
+      <Icon name="tabler:search" class="h-8 w-8" />
+    </a>
     <DarkModeButton 
       class="hover:rotate-30 duration-100"
       aria-label="Toggle theme">
       <Icon name="tabler:sun" class="h-8 w-8" />
     </DarkModeButton>
-
   </div>
 </Card>
 

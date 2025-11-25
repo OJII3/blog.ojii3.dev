@@ -51,19 +51,12 @@ export const BG_COLORS: Record<VitaColor, string> = {
 	[VitaColor.Violet]: "bg-purple-500",
 };
 
-export const CODE_COLORS: Record<VitaColor, string> = {
-	[VitaColor.Red]:
-		"prose-code:bg-rose-200 dark:prose-code:bg-rose-300/90 dark:prose-code:text-gray-900",
-	[VitaColor.Orange]:
-		"prose-code:bg-orange-200 dark:prose-code:bg-orange-300/90 dark:prose-code:text-gray-900",
-	[VitaColor.Yellow]:
-		"prose-code:bg-yellow-200 dark:prose-code:bg-yellow-300/90 dark:prose-code:text-gray-900",
-	[VitaColor.Green]:
-		"prose-code:bg-lime-200 dark:prose-code:bg-lime-300/90 dark:prose-code:text-gray-900",
-	[VitaColor.Blue]:
-		"prose-code:bg-emerald-200 dark:prose-code:bg-emerald-300/90 dark:prose-code:text-gray-900",
-	[VitaColor.Indigo]:
-		"prose-code:bg-indigo-200 dark:prose-code:bg-indigo-300/90 dark:prose-code:text-gray-900",
-	[VitaColor.Violet]:
-		"prose-code:bg-purple-200 dark:prose-code:bg-purple-300/90 dark:prose-code:text-gray-900",
+export const H2_BORDER_COLORS: Record<VitaColor, string> = {
+	[VitaColor.Red]: "prose-h2:border-rose-500",
+	[VitaColor.Orange]: "prose-h2:border-orange-500",
+	[VitaColor.Yellow]: "prose-h2:border-yellow-500",
+	[VitaColor.Green]: "prose-h2:border-lime-500",
+	[VitaColor.Blue]: "prose-h2:border-emerald-500",
+	[VitaColor.Indigo]: "prose-h2:border-indigo-500",
+	[VitaColor.Violet]: "prose-h2:border-purple-500",
 };
