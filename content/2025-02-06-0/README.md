@@ -18,7 +18,6 @@ GitHub(Unity): https://github.com/tuatmcc/SchoolFestival2024_Unity
 GitHub(Web): https://github.com/tuatmcc/SchoolFestival2024_Frontend
 プレイ動画(一部分): https://youtu.be/7DXXWY4bBso?feature=shared
 
-
 ## アチーブ
 
 - 技育博vol.6 企業賞受賞
@@ -66,4 +65,3 @@ GitHub(Web): https://github.com/tuatmcc/SchoolFestival2024_Frontend
 ## まとめ
 
 色々頑張りまくった。色々頑張りまくった他メンバーのおかげでもある。
-  

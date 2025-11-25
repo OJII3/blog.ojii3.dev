@@ -84,7 +84,7 @@ Affinity Photo 2　がいるのはちょっとよくわからないので、後�
 上のRedditと相違ないようです。以下の順にコマンドを打ちました。
 
 ```sh
-diskutil apfs deleteContainer disk0s3 
+diskutil apfs deleteContainer disk0s3
 
 diskutil eraseVolume free none /dev/disk0s4
 

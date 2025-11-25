@@ -7,7 +7,6 @@ draft: false
 
 `wluma` というパッケージがあるらしいぞよ。`home-manager` のオプションも提供されているのでこれで設定を書いていきます。
 
-
 ```nix
 { ... }: {
   services.wluma = {

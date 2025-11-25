@@ -67,7 +67,6 @@ modmap:
 - Henkan: 同上
 - Alt_R: Hyprland の設定で Henkan を 日本語入力(fcitx5)の切り替えに当てています (`bindr = , Henkan, exec, fcitx5-remote -t`)
 
-
 ## Mac 風キーバインド
 
 Mac の Ctrl キーのEmacsライクな挙動が好きです。Macの使用頻度も高いことだし、Linuxでもこれを使いたい。以下の記事を参考にしました。

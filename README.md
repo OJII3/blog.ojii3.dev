@@ -3,5 +3,3 @@
 ## Prerequisites
 
 - [Bun](https://bun.sh/)
-
-

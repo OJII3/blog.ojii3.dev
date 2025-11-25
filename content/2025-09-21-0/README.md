@@ -12,6 +12,7 @@ tags: [linux, nixos]
 ```nix
 services.kdeconnect.enable = true;
 ```
+
 ## サーバー運用だと
 
 このままでは起動しません。

@@ -5,7 +5,6 @@ draft: false
 tags: [linux]
 ---
 
-
 Arch Linuxを使っていたころからNixOSを使っている今まで
 、およそ一年くらいHyprlandを使っています。それ以前はi3wmを使っていました。
 
