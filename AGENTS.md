@@ -1,4 +1,6 @@
-# リポジトリガイドライン
+# [blog.ojii3.dev](https://blog.ojii3.dev)
+
+このリポジトリは [Astro](https://astro.build/) を使用して構築されたパーソナルブログサイトです。Bun をパッケージマネージャ/ビルドランタイムとして使用し、Cloudflare Workers にデプロイされます。
 
 ## プロジェクト構造とモジュール構成
 
@@ -10,6 +12,7 @@ Astro のソースは `src/` にある。
   - `_components/` は共有 UI を保持する。
   - `_styles/` はカスタムスタイルを保持する。あまり使用しないこと。可能な限り Tailwind を使用し、デザイントークンに追加修正して使用すること。
   - `_lib/` はヘルパーを保持する。ヘルパー関数を書く前に、適切なデータ構造を使用していることを確認すること。
+- `constants/` はアプリケーション全体で使用される定数を保持する。
 
 共有のビジュアルは `assets/` に属する。Markdown の記事は `content/blog/` の下に配置され、`src/content.config.ts` からスキーマを継承する。静的ファイルは `public/` を通じて配布する。本番環境の出力は `dist/` に配置され、`wrangler.toml` の Worker 設定を通じてデプロイされる。
 
@@ -19,12 +22,12 @@ Astro のソースは `src/` にある。
 - `bun run dev` — ホットリロードで Astro 開発サーバーを起動する。
 - `bun run build` — `dist/` に最適化されたバンドルを生成する。
 - `bun run preview` — Cloudflare を模倣するためにバンドルをローカルで提供する。
-- `bun run check` — プロジェクト全体で Biome のリント/フォーマットチェックを実行する。
-- `bun run format` — Biome の修正をインプレースで適用する。
+- `bun run check` — プロジェクト全体で Biome/Prettier のリント/フォーマットチェックを実行する。
+- `bun run format` — Biome/Prettier の修正をインプレースで適用する。
 
 ## コーディングスタイルと命名規則
 
-2スペースのインデントと TypeScript 構文を使用する。コンポーネント、レイアウト、フックは PascalCase (`TopCard.astro`, `OGImage.tsx`) を使用し、ユーティリティや設定は、既存のファイルと一致する場合は lowerCamel または kebab-case のままにできる。Tailwind クラスは、リポジトリに既に存在するカスタムブレークポイントプレフィックス (`2x:`, `3x:`) を再利用する必要がある。Biome にスペース、インポート順序、未使用コードのルールを強制させる (`.astro` テンプレートもフォーマットするようになった)。コミットする前に `bun run format` を実行する。
+2スペースのインデントと TypeScript 構文を使用する。コンポーネント、レイアウト、フックは PascalCase (`TopCard.astro`, `OGImage.tsx`) を使用し、ユーティリティや設定は、既存のファイルと一致する場合は lowerCamel または kebab-case のままにできる。Tailwind クラスは、リポジトリに既に存在するカスタムブレークポイントプレフィックス (`2x:`, `3x:`) を再利用する必要がある。コミットする前に `bun run format` を実行する。
 
 ## テストガイドライン
 
