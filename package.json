@@ -5,7 +5,7 @@
 	"scripts": {
 		"dev": "astro dev",
 		"build": "astro build",
-		"check": "biome check .",
+		"check": "biome check . && prettier --check .",
 		"format": "biome check . --write && prettier --write .",
 		"preview": "astro preview",
 		"astro": "astro",
