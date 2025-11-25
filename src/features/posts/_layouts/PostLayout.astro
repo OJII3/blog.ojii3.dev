@@ -2,7 +2,7 @@
 import "../_styles/override.css";
 import { type CollectionEntry, render } from "astro:content";
 import {
-	CODE_COLORS,
+	H2_BORDER_COLORS,
 	SITE_NAME,
 	SITE_URL,
 	TEXT_COLORS,
@@ -19,9 +19,6 @@ import PostPrevNext from "../_components/PostPrevNext.astro";
 // import ShareLinks from "@/components/ShareLinks.astro";
 // import BackButton from "@/components/BackButton.astro";
 // import BackToTopButton from "@/components/BackToTopButton.astro";
-// import { slugifyStr } from "@/utils/slugify";
-// import IconChevronLeft from "@/assets/icons/IconChevronLeft.svg";
-// import IconChevronRight from "@/assets/icons/IconChevronRight.svg";
 
 export interface Props {
 	prevPost: CollectionEntry<"blog"> | null;
@@ -40,47 +37,64 @@ const ogImage = `${SITE_URL}/${post.id}/og-image.png`;
 ---
 
 <GlobalLayout title={titleText} ogImage={ogImage}>
-  <div class="max-w-[80ch] mx-auto">
+	<div class="mx-auto max-w-[80ch]">
+		<PostHeader color={color} />
 
-    <PostHeader color={color} />
+		<main transition:name={post.id} class="w-full p-4">
+			<h1
+				class="mt-4 text-2xl font-bold sm:text-3xl"
+				data-pagefind-meta="title"
+			>
+				{title}
+			</h1>
 
-    <main
-      transition:name={post.id}
-      class="w-full p-4"
-    >
-      <h1 class="mt-4 text-2xl font-bold sm:text-3xl" data-pagefind-meta="title">
-        {title}
-      </h1>
+			<div class="mt-2 mb-8 flex items-center gap-2">
+				<span aria-hidden="true" class="text-sm" data-pagefind-meta="date"
+					>{dateString}</span
+				>
+			</div>
 
-      <div class="mt-2 mb-8 flex items-center gap-2">
-        <span aria-hidden="true" class="text-sm"
-          >{dateString}</span
-        >
-      </div>
+			<article
+				class:list={[
+					"prose dark:prose-invert mx-auto mb-16 max-w-none overflow-hidden",
+					"prose-code:rounded-sm prose-code:px-1 prose-code:bg-gray-2",
+					"prose-h2:pl-2 prose-h2:border-l-4",
+					H2_BORDER_COLORS[color],
+				]}
+				data-pagefind-body
+			>
+				<Content />
+			</article>
 
-      <article
-        class:list={["prose dark:prose-invert mx-auto max-w-none mb-16 overflow-hidden prose-code:rounded-xs prose-code:px-1", CODE_COLORS[color]]}
-        data-pagefind-body
-      >
-        <Content />
-      </article>
+			<ul class="my-8 flex flex-wrap gap-2">
+				{
+					tags?.map((tag) => (
+						<span class:list={["px-2", TEXT_COLORS[color]]}>
+							#<span data-pagefind-filter="tag">{tag}</span>
+						</span>
+					))
+				}
+			</ul>
 
-      <ul class="my-8 flex flex-wrap gap-2">
-        {tags?.map((tag) => <span class:list={["px-2", TEXT_COLORS[color]]}
-          >
-          #<span data-pagefind-filter="tag">{tag}</span>
-        </span>)}
-      </ul>
-
-      <div data-pagefind-ignore="all" class="grid grid-cols-1 gap-4 pt-8 pb-4 sm:grid-cols-2">
-        {
-          prevPost ? <PostPrevNext originalPost={post} targetPost={prevPost} isPrev /> : <div></div>
-        }
-        {
-          nextPost ? <PostPrevNext originalPost={post} targetPost={nextPost} isNext /> : <div></div>
-        }
-      </div>
-    </main>
-  </div>
-  <!-- <Footer /> -->
+			<div
+				data-pagefind-ignore="all"
+				class="grid grid-cols-1 gap-4 pt-8 pb-4 sm:grid-cols-2"
+			>
+				{
+					prevPost ? (
+						<PostPrevNext originalPost={post} targetPost={prevPost} isPrev />
+					) : (
+						<div />
+					)
+				}
+				{
+					nextPost ? (
+						<PostPrevNext originalPost={post} targetPost={nextPost} isNext />
+					) : (
+						<div />
+					)
+				}
+			</div>
+		</main>
+	</div>
 </GlobalLayout>

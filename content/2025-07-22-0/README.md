@@ -51,6 +51,7 @@ services.swaync.settings = {
   };
 }
 ```
+
 同じ階層にJSONファイルで設定を書きます。
 
 ```json

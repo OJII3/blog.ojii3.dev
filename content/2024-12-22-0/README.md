@@ -11,6 +11,7 @@ Hono RPCを使いたいぞよ。サークル用にフロントエンドもセッ
 ## 技術選定
 
 確定事項
+
 - Hono
 - Cloudflare Workers & Pages
 - (Next.js)

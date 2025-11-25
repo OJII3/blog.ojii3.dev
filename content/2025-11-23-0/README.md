@@ -22,8 +22,8 @@ draft: false
 <https://docs.astro.build/en/guides/view-transitions/#script-re-execution>
 
 ```javascript
-document.addEventListener('astro:after-swap', () => {
-  // ページが読み込まれたタイミングで実行したいコード
+document.addEventListener("astro:after-swap", () => {
+	// ページが読み込まれたタイミングで実行したいコード
 });
 ```
 

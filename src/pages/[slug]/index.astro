@@ -23,7 +23,6 @@ const allBlogPosts = (await getCollection("blog"))
 	.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
 const postIndex = allBlogPosts.findIndex((p) => p.id === post.id);
-console.log("post id");
 
 const prevPost = postIndex > 0 ? allBlogPosts[postIndex - 1] : null;
 const nextPost =

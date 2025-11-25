@@ -46,4 +46,3 @@ Astro でブログのリニューアルをしている知人もいたので私�
 ブログリニューアル記念に描いたヴィタさんを供養しておきます。
 
 <img width="128" height="128" alt="image" src="https://github.com/user-attachments/assets/ad2ac855-ec1b-4f70-a08b-80dd9a9eabf2" />
-

@@ -11,21 +11,21 @@ const allBlogPosts = (await getCollection("blog"))
 ---
 
 <GlobalLayout title="晴れときどき崩壊ブログ">
-  <main
-    class="3x:grid-cols-3 3x:w-3x 4x:grid-cols-4 4x:w-4x 5x:grid-cols-5 5x:w-5x 2x:w-2x 2x:columns-1x mx-auto grid max-w-[1096px] grid-cols-2 items-center justify-items-center gap-4 overflow-hidden p-4"
-  >
-    <TopCard />
-    {
-      allBlogPosts.map((post) => (
-        <PostCard
-          id={post.id}
-          href={`/${post.id}`}
-          title={post.data.title}
-          date={post.data.dateString}
-          color={post.data.color}
-        />
-      ))
-    }
-    <BottomCard />
-  </main>
+	<main
+		class="3x:grid-cols-3 3x:w-3x 4x:grid-cols-4 4x:w-4x 5x:grid-cols-5 5x:w-5x 2x:w-2x 2x:columns-1x mx-auto grid max-w-[1096px] grid-cols-2 items-center justify-items-center gap-4 overflow-hidden p-4"
+	>
+		<TopCard />
+		{
+			allBlogPosts.map((post) => (
+				<PostCard
+					id={post.id}
+					href={`/${post.id}`}
+					title={post.data.title}
+					date={post.data.dateString}
+					color={post.data.color}
+				/>
+			))
+		}
+		<BottomCard />
+	</main>
 </GlobalLayout>

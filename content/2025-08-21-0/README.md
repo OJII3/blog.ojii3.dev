@@ -42,7 +42,6 @@ hyprctl activewindow | rg "class: google-chrome" && hyprctl dispatch sendshortcu
 
 この方針でひたすらキーバインドを設定していきます。
 
-
 ```hypr
 bind = $cmd, A, exec, hyprctl activewindow | rg "class: google-chrome" && hyprctl dispatch sendshortcut "CTRL, A, class:google-chrome" || hyprctl dispatch sendshortcut "ALT, A, activewindow"
 bind = $cmd, D, exec, hyprctl activewindow | rg "class: google-chrome" && hyprctl dispatch sendshortcut "CTRL, D, class:google-chrome" || hyprctl dispatch sendshortcut "ALT, D, activewindow"

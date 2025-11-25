@@ -1,27 +1,28 @@
 ---
+
 ---
 
 <script>
-  const initDarkTheme = () => {
-    const theme = (() => {
-      const localStorageTheme = localStorage?.getItem("theme") ?? '';
-      if (['dark', 'light'].includes(localStorageTheme)) {
-        return localStorageTheme;
-      }
-      return 'light';
-    })();
+	const initDarkTheme = () => {
+		const theme = (() => {
+			const localStorageTheme = localStorage?.getItem("theme") ?? "";
+			if (["dark", "light"].includes(localStorageTheme)) {
+				return localStorageTheme;
+			}
+			return "light";
+		})();
 
-    if (theme === 'light') {
-      document.documentElement.classList.remove('dark');
-    } else {
-      document.documentElement.classList.add('dark');
-    }
+		if (theme === "light") {
+			document.documentElement.classList.remove("dark");
+		} else {
+			document.documentElement.classList.add("dark");
+		}
 
-    window.localStorage.setItem('theme', theme);
-  }
+		window.localStorage.setItem("theme", theme);
+	};
 
-  initDarkTheme();
+	initDarkTheme();
 
-  // Client Router でページ遷移した際にもテーマを再適用
-  document.addEventListener('astro:after-swap', initDarkTheme);
+	// Client Router でページ遷移した際にもテーマを再適用
+	document.addEventListener("astro:after-swap", initDarkTheme);
 </script>

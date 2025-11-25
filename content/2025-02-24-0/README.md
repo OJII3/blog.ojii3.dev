@@ -61,7 +61,7 @@ writeToProfile("Default profile", [
 			map("j", "shift").to$(yabai + "-m window --warp south"),
 			map("k", "shift").to$(yabai + "-m window --warp north"),
 			map("l", "shift").to$(yabai + "-m window --warp east"),
-			
+
 			// other window operations
 			map("tab").to$(yabai + "-m window --focus recent"),
 			map("q").to$(yabai + "-m window --close"),
