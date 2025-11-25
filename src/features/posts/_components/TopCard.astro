@@ -1,10 +1,11 @@
 ---
 import { Icon } from "astro-icon/components";
 import DarkModeButton from "../../_components/DarkModeButton.astro";
+import Card from "./Card.astro";
 ---
 
-<section
-  class="2x:w-[200px] 2x:h-[200px] flex h-[calc(50dvw-32px)] max-w-[200px] min-w-full flex-col justify-between gap-2 overflow-hidden rounded-2xl p-4 duration-200"
+<Card
+  class="flex-col justify-between gap-2"
 >
   <h1 class="font-hachimaru 2x:text-xl flex text-lg font-bold">
     晴れときどき<br />崩壊ブログ
@@ -14,19 +15,12 @@ import DarkModeButton from "../../_components/DarkModeButton.astro";
   </p>
   <div class="flex justify-end gap-2">
 
-    <DarkModeButton aria-label="Toggle theme">
+    <DarkModeButton 
+      class="hover:rotate-30 duration-100"
+      aria-label="Toggle theme">
       <Icon name="tabler:sun" class="h-8 w-8" />
     </DarkModeButton>
 
-    <a
-      href="https://github.com/OJII3/blog.ojii3.dev"
-      target="_blank"
-      rel="noopener noreferrer"
-      class="cursor-pointer hover:scale-95"
-      aria-label="GitHub repository"
-    >
-      <Icon name="tabler:brand-github-filled" class="h-8 w-8" />
-    </a>
   </div>
-</section>
+</Card>
 

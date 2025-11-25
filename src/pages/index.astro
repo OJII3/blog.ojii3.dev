@@ -1,7 +1,8 @@
 ---
 import { getCollection } from "astro:content";
 import GlobalLayout from "../features/_layouts/GlobalLayout.astro";
-import Card from "../features/posts/_components/Card.astro";
+import BottomCard from "../features/posts/_components/BottomCard.astro";
+import PostCard from "../features/posts/_components/PostCard.astro";
 import TopCard from "../features/posts/_components/TopCard.astro";
 
 const allBlogPosts = (await getCollection("blog"))
@@ -16,7 +17,7 @@ const allBlogPosts = (await getCollection("blog"))
     <TopCard />
     {
       allBlogPosts.map((post) => (
-        <Card
+        <PostCard
           id={post.id}
           href={`/${post.id}`}
           title={post.data.title}
@@ -25,5 +26,6 @@ const allBlogPosts = (await getCollection("blog"))
         />
       ))
     }
+    <BottomCard />
   </main>
 </GlobalLayout>
