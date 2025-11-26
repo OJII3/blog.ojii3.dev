@@ -2,7 +2,7 @@
 title: ディスプレイマネージャーを見直した
 date: 2025-02-11
 draft: false
-tags: [linux, unixporn]
+tags: [linux]
 ---
 
 ...結局KDE Plasmaは肌に合わなさすぎてHyprlandぞよ。

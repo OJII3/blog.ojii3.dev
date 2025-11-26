@@ -2,7 +2,7 @@
 title: Hyprlandやめたい
 date: 2025-01-31
 draft: false
-tags: [linux, unixporn]
+tags: [linux]
 ---
 
 Arch Linuxを使っていたころからNixOSを使っている今まで

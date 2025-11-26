@@ -1,7 +1,7 @@
 ---
 title: Hyprland で Mac 風キーバインド (リベンジ編)
 date: 2025-08-21
-tags: [nix, linux, hyprland]
+tags: [nix, linux]
 ---
 
 ## Linux でも Mac 風の Ctrl を使いたい

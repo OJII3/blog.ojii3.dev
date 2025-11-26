@@ -2,7 +2,7 @@
 title: ターミナルを変えた
 date: 2025-01-07
 draft: false
-tags: [linux, unixporn]
+tags: [linux]
 ---
 
 ## 前

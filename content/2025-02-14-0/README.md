@@ -2,7 +2,7 @@
 title: Hyprland に Plasma Browser Integration を入れた
 draft: false
 date: 2025-02-14
-tags: [linux, unixporn, nix]
+tags: [linux, nix]
 ---
 
 ## Plasma Brwoser Integration とは
