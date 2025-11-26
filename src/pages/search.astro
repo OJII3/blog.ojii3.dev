@@ -32,7 +32,21 @@ import SearchResult from "../features/search/_components/SearchResult.astro";
 		</div>
 	</main>
 
-	<script is:inline>
+	<template id="search-result-template">
+		<a
+			class="%%borderColor%% 2x:w-[200px] 2x:h-[200px] 2x:max-w-[200px] flex h-[calc(50dvw-32px)] max-w-full min-w-full flex-col gap-2 overflow-hidden rounded-2xl border-2 p-4 duration-100 hover:shadow-lg"
+			href="%%url%%"
+		>
+			<h3 class="text-gray-5 text-xs">%%title%%</h3>
+			<p class="overflow-hidden">
+				<span class="text-sm font-bold overflow-ellipsis">%%excerpt%%</span>
+			</p>
+		</a>
+	</template>
+</GlobalLayout>
+
+<script is:inline>
+	const initSearch = () => {
 		const borderColors = [
 			"border-rose-500",
 			"border-orange-500",
@@ -44,61 +58,58 @@ import SearchResult from "../features/search/_components/SearchResult.astro";
 		];
 		const getIndexByDate = (dateString) => {
 			const date = new Date(dateString);
-			return date.getTime() % borderColors.length;
+			return date.getDate() % borderColors.length;
 		};
 
-		const initSearch = () => {
-			const searchInput = document.querySelector("#search");
-			const resultsContainer = document.querySelector("#results");
+		const searchInput = document.querySelector("#search");
+		const resultsContainer = document.querySelector("#results");
+		const template = document.querySelector("#search-result-template");
 
-			searchInput.addEventListener("input", async (e) => {
-				// Pagefindのスクリプトを最初の検索時にのみ読み込み
-				if (e.target.dataset.loaded !== "true") {
-					e.target.dataset.loaded = "true";
-					window.pagefind = await import("/pagefind/pagefind.js");
-				}
-
-				const search = await window.pagefind.search(e.target.value);
-
-				// 以前の検索結果をクリア
-				resultsContainer.innerHTML = "";
-
-				// 新しい検索結果を追加
-				for (const result of search.results) {
-					const data = await result.data();
-					const borderColor = borderColors[getIndexByDate(data.meta.date)];
-					document.querySelector("#results").innerHTML += `
-<a
-  class="2x:w-[200px] 2x:h-[200px] flex flex-col h-[calc(50dvw-32px)] max-w-full 2x:max-w-[200px] min-w-full overflow-hidden rounded-2xl p-4 gap-2 border-2 ${borderColor}"
-  href="${data.url}"
->
-  <h3 class="text-gray-5 text-xs">${data.meta.title} </h3>
-  <p class="overflow-hidden">
-    <span class="overflow-ellipsis text-sm font-bold">${data.excerpt}</span>
-  </p>
-</a>`;
-				}
-			});
-
-			// 確定時に入力値をクエリパラメータに反映
-			searchInput.closest("form")?.addEventListener("submit", (e) => {
-				e.preventDefault();
-				const query = searchInput.value;
-				const url = new URL(window.location);
-				url.searchParams.set("search", query);
-				window.history.replaceState(null, "", url);
-			});
-
-			// URLのクエリパラメータからデフォルト検索語を設定
-			const urlParams = new URLSearchParams(window.location.search);
-			const query = urlParams.get("search");
-			if (query && searchInput.value !== query) {
-				searchInput.value = query;
-				searchInput.dispatchEvent(new Event("input"));
+		searchInput.addEventListener("input", async (e) => {
+			// Pagefindのスクリプトを最初の検索時にのみ読み込み
+			if (e.target.dataset.loaded !== "true") {
+				e.target.dataset.loaded = "true";
+				window.pagefind = await import("/pagefind/pagefind.js");
 			}
-		};
 
-		document.addEventListener("astro:after-swap", initSearch);
-		initSearch();
-	</script>
-</GlobalLayout>
+			const search = await window.pagefind.search(e.target.value);
+
+			// 以前の検索結果をクリア
+			resultsContainer.innerHTML = "";
+
+			// 新しい検索結果を追加
+			for (const result of search.results) {
+				const data = await result.data();
+				const borderColor = borderColors[getIndexByDate(data.meta.date)];
+				console.log(borderColor);
+				const resultElement = document.createElement("div");
+				resultElement.innerHTML = template.innerHTML
+					.replace("%%borderColor%%", borderColor)
+					.replace("%%url%%", data.url)
+					.replace("%%title%%", data.meta.title)
+					.replace("%%excerpt%%", data.excerpt);
+				resultsContainer.appendChild(resultElement.firstElementChild);
+			}
+		});
+
+		// 確定時に入力値をクエリパラメータに反映
+		searchInput.closest("form")?.addEventListener("submit", (e) => {
+			e.preventDefault();
+			const query = searchInput.value;
+			const url = new URL(window.location);
+			url.searchParams.set("search", query);
+			window.history.replaceState(null, "", url);
+		});
+
+		// URLのクエリパラメータからデフォルト検索語を設定
+		const urlParams = new URLSearchParams(window.location.search);
+		const query = urlParams.get("search");
+		if (query && searchInput.value !== query) {
+			searchInput.value = query;
+			searchInput.dispatchEvent(new Event("input"));
+		}
+	};
+
+	document.addEventListener("astro:after-swap", initSearch);
+	initSearch();
+</script>
