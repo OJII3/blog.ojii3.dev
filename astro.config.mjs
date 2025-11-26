@@ -13,6 +13,11 @@ export default defineConfig({
 	site: "https://blog.ojii3.dev",
 	vite: {
 		plugins: [tailwindcss()],
+		build: {
+			rollupOptions: {
+				external: ["/pagefind/pagefind.js"],
+			},
+		},
 	},
 	integrations: [
 		expressiveCode({

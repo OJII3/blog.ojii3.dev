@@ -3,6 +3,9 @@
 	"include": [".astro/types.d.ts", "**/*", ".prettierrc.mjs"],
 	"exclude": ["dist"],
 	"compilerOptions": {
+		"paths": {
+			"/pagefind/pagefind.js": ["./src/pagefind.d.ts"]
+		},
 		"jsx": "react-jsx",
 		"jsxImportSource": "react"
 	}
