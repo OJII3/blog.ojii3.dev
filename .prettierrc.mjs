@@ -8,6 +8,12 @@ export default {
 				parser: "astro",
 			},
 		},
+		{
+			files: "*.md",
+			options: {
+				useTabs: false,
+			},
+		},
 	],
 	useTabs: true,
 };

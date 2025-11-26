@@ -11,15 +11,15 @@ tags: [astro, web]
 Pagefindのfilter機能を用いて記事にタグを追加します。例えば、以下のようにします。
 
 ```astro title="PostLayout.astro"
-   <ul class="my-8 flex flex-wrap gap-2">
-    {
-     tags?.map((tag) => (
+<ul class="my-8 flex flex-wrap gap-2">
+  {
+    tags?.map((tag) => (
       <span class:list={["px-2", TEXT_COLORS[color]]}>
-       #<span data-pagefind-filter="tag">{tag}</span>
+        #<span data-pagefind-filter="tag">{tag}</span>
       </span>
-     ))
-    }
-   </ul>
+    ))
+  }
+</ul>
 ```
 
 `data-pagefind-filter="tag"` の部分が重要で、Pagefindにこの要素がタグフィルターであることを伝えます。
@@ -31,10 +31,10 @@ PagefindのデフォルトUIでは、検索キーワードとタグの両方が�
 
 ```js
 const search = await pagefind.search(
-    null, // 検索テキスト明示的にnullを渡す
-    {
-        filters: { tag: "tag1" }
-    }
+  null, // 検索テキスト明示的にnullを渡す
+  {
+    filters: { tag: "tag1" },
+  },
 );
 ```
 
