@@ -98,16 +98,6 @@ const allTags = getAllTags(allPosts);
 		}
 
 		inputs.forEach((input) => {
-			// イベントリスナーの重複登録を防ぐために一度削除するか、
-			// { once: true } などを検討するが、initが呼ばれるたびに要素が再生成されているなら問題ない。
-			// AstroのView TransitionsでDOMが置換されるなら再登録が必要。
-			// ここでは単純に replace される前提で書くが、
-			// もしDOMが残るなら重複登録になる。
-			// 安全のため、親要素でデリゲートするか、カスタムプロパティでチェックする。
-			// しかし、astro:after-swap はページ遷移後なのでDOMは新しいはず。
-			// popstate のときは DOM はそのままで init が呼ばれると重複する。
-			// なので、popstate 用の同期処理は分けたほうがいい。
-
 			input.addEventListener("change", () => {
 				const url = new URL(window.location.href);
 				url.searchParams.delete("tag");
@@ -148,6 +138,6 @@ const allTags = getAllTags(allPosts);
 
 	init();
 	document.addEventListener("astro:after-swap", init);
-	window.addEventListener("popstate", syncState);
-	window.addEventListener("url-changed", syncState);
+	window.addEventListener("popstate", syncState); // ブラウザの戻る/進む対応
+	window.addEventListener("url-changed", syncState); // カスタムイベントで同期
 </script>
