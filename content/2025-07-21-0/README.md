@@ -1,6 +1,7 @@
 ---
 title: Aerospace with Home Manager
 date: 2025-07-21
+tags: [mac, nix]
 ---
 
 MacOS向けタイル型ウィンドウマネージャAerospaceを`home-manager`で。
@@ -9,7 +10,7 @@ MacOS向けタイル型ウィンドウマネージャAerospaceを`home-manager`�
 
 有り難いことに、home-manager の options だけで設定できます。本来なら。
 
-https://github.com/nix-community/home-manager/blob/master/modules%2Fprograms%2Faerospace.nix
+<https://github.com/nix-community/home-manager/blob/master/modules%2Fprograms%2Faerospace.nix>
 
 ## aerospace.toml が正しく生成されない
 

@@ -1,6 +1,7 @@
 ---
 title: home-managerの設定をある程度Nixと分離しておきたい
 date: 2025-07-22
+tags: [linux, nix]
 ---
 
 home-managerで多くのオレオレ環境の設定を残しているため、<https://home-manager-options.extranix.com/?query=anyrun&release=master>などで検索しながら設定するのですが、

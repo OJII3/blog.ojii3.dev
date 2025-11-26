@@ -1,7 +1,7 @@
 ---
 title: 画面の明さを自動調整したかった
 date: 2025-04-14
-tags: [nixos]
+tags: [nix, linux]
 draft: false
 ---
 
@@ -26,7 +26,7 @@ draft: false
 
 これでビルド仕直したらデーモンはちゃんと起動したが、`systemctl --user status wluma.service` の出力はこれ。
 
-```
+```txt
 ○ wluma.service - Automatic brightness adjustment based on screen contents and ALS
      Loaded: loaded (/home/ojii3/.config/systemd/user/wluma.service; enabled; preset: ignored)
      Active: inactive (dead)

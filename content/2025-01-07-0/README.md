@@ -1,7 +1,8 @@
 ---
-title: "ターミナルを変えた"
+title: ターミナルを変えた
 date: 2025-01-07
 draft: false
+tags: [linux, unixporn]
 ---
 
 ## 前

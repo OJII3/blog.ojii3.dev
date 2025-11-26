@@ -51,24 +51,17 @@ MacでKDE Walletが使えなかったりしました。
 
 この主鍵をエクスポートして外部に保存してあるので、新たにホストをセットアップする際は、それを副鍵ごとインポートして使用しています。
 
-今回は、暗号化専用の副鍵を新たに作成し、全ホストで共通の鍵ペアを使用することにしました。(sops-nixの想定した使い方ではないような気もしますが)
+同様の運用方法で、 今回は、暗号化専用の鍵を新たに作成し、全ホストで共通の鍵ペアを使用することにしました。(sops-nixの想定した使い方ではないような気もしますが)
 
 ## 手順
 
-鍵ペアの作成部分以外はドキュメント通りです。`sops-nix`をflakeに追加してください。
+1. GPG鍵ペアを作成 (暗号化専用の鍵を新たに作成)
 
-1. `gpg -K` にて主鍵のIDを確認
-2. `gpg --expert --edit-key <鍵ID>` にて鍵の編集画面に入る
-3. `addkey` で新たに鍵を追加
-4. 鍵の種類について、`ECC (Encrypt Only)`を選択
-5. `Curve 25519`を選択
-6. 鍵の有効期限を選択(暗号化するだけの鍵なので、長めにしました)
-7. パスフレーズを空欄で設定(パスフレーズが設定されていると、`sops-nix`で復号化できません)
-8. `save` で鍵の編集を保存
-9. `gpg -K --with-subkey-fingerprint` にて新たに作成した鍵の鍵指紋を確認
-10. `.sops.yaml` にて、`pgp`の部分に新たに作成した鍵の鍵指紋を追加
-11. `sops-nix`のドキュメントに従い、暗号化したいファイルの内容を記述し、暗号化
-12. `sops.nix`等を作成し、`home-manager`で読み込む
+```sh
+gpg --full-generate-key
+```
+
+種類は ECC で、曲線は `Curve 25519` を選択しました。パスフレーズは設定しません(すると`sops`が動かない) 2. Home Manager で設定を書きます
 
 ```nix
 { inputs, config, username, pkgs, ... }:
@@ -92,10 +85,7 @@ MacでKDE Walletが使えなかったりしました。
 
 ```
 
-Mac対応のために若干汚なくなっています(多分もっときれいに書ける)。
-
-13. `home-manager`でビルドし、`echo $GEMINI_API_KEY`で確認
-14. `gpg --armor --export <主鍵の鍵ID>` で公開鍵をエクスポートし、他のホストでもインポート
+Mac対応のために若干汚なくなっています(多分もっときれいに書ける)。3. `home-manager`でビルドし、`echo $GEMINI_API_KEY`で確認4. `gpg --armor --export <主鍵の鍵ID>` で公開鍵をエクスポートし、他のホストでもインポート
 
 全く新しいホストで初めてセットアップする際は、一旦`sops.nix`をインポートせずにビルドし、`gpg`がインストールされてから`sops.nix`をインポートする必要があります。
 
@@ -105,13 +95,15 @@ Mac対応のために若干汚なくなっています(多分もっときれい�
 
 ## 追記
 
+ホームディレクトリの指定は
+
 ```nix
 sops.gnupg.home = "${config.home.homeDirectory}/.gnupg";
 ```
 
 で良いです(ありがとうついったー)
 
-また、`sops-nix.service`はデフォルトでは `graphical-session-pre.target`で起動するのですが、HyprlandやCLI環境だと起動しないので手を加えてあげます。
+また、`sops-nix.service`はデフォルトでは `graphical-session-pre.target`で起動するのですが、とくに追加の設定をしていないHyprlandやCLI環境だと起動しないので手を加えてあげます。
 
 ```nix
 systemd.user.services.sops-nix = {

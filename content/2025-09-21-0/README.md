@@ -2,7 +2,7 @@
 title: サーバーでKDE Connectを使う
 date: 2025-09-21
 draft: false
-tags: [linux, nixos]
+tags: [linux, nix]
 ---
 
 ## 標準的な KDE Connect のセットアップ

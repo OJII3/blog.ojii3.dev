@@ -1,7 +1,7 @@
 ---
 title: ブログが崩壊したので作りなおした
 date: 2025-07-25
-tag: [astro, web, frontend]
+tags: [astro, web]
 ---
 
 ## ブログが崩壊した

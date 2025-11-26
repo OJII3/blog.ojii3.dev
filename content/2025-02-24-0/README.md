@@ -35,51 +35,51 @@ JSONを直接書くのはしんどいので`karabiner.ts`というライブラ�
 const yabai = "/run/current-system/sw/bin/yabai ";
 
 writeToProfile("Default profile", [
-	rule("IME-toggle").manipulators([
-		map("japanese_kana")
-			.to("japanese_eisuu")
-			.condition(ifInputSource({ language: "ja" })),
-	]),
-	rule("Modifiers").manipulators([
-		map("caps_lock").to("left_command"),
-		map("left_control").to("left_control").toIfAlone("escape"),
-	]),
+ rule("IME-toggle").manipulators([
+  map("japanese_kana")
+   .to("japanese_eisuu")
+   .condition(ifInputSource({ language: "ja" })),
+ ]),
+ rule("Modifiers").manipulators([
+  map("caps_lock").to("left_command"),
+  map("left_control").to("left_control").toIfAlone("escape"),
+ ]),
 
-	// Disable system shortcuts
-	rule("Disable-system").manipulators([map("q", "command").toNone()]),
+ // Disable system shortcuts
+ rule("Disable-system").manipulators([map("q", "command").toNone()]),
 
-	layer("japanese_eisuu", "super")
-		.configKey((v) => v.toIfAlone("spacebar", "command"), true)
-		.manipulators([
-			// focus window
-			map("h").to$(yabai + "-m window --focus west"),
-			map("j").to$(yabai + "-m window --focus south"),
-			map("k").to$(yabai + "-m window --focus north"),
-			map("l").to$(yabai + "-m window --focus east"),
-			// move wndow
-			map("h", "shift").to$(yabai + "-m window --warp west"),
-			map("j", "shift").to$(yabai + "-m window --warp south"),
-			map("k", "shift").to$(yabai + "-m window --warp north"),
-			map("l", "shift").to$(yabai + "-m window --warp east"),
+ layer("japanese_eisuu", "super")
+  .configKey((v) => v.toIfAlone("spacebar", "command"), true)
+  .manipulators([
+   // focus window
+   map("h").to$(yabai + "-m window --focus west"),
+   map("j").to$(yabai + "-m window --focus south"),
+   map("k").to$(yabai + "-m window --focus north"),
+   map("l").to$(yabai + "-m window --focus east"),
+   // move wndow
+   map("h", "shift").to$(yabai + "-m window --warp west"),
+   map("j", "shift").to$(yabai + "-m window --warp south"),
+   map("k", "shift").to$(yabai + "-m window --warp north"),
+   map("l", "shift").to$(yabai + "-m window --warp east"),
 
-			// other window operations
-			map("tab").to$(yabai + "-m window --focus recent"),
-			map("q").to$(yabai + "-m window --close"),
-			//  applications
-			map("f", "shift").to$(
-				yabai + "-m window --toggle float --grid 4:4:1:1:2:2",
-			),
-			map("w").to$(
-				yabai +
-					"-m window --toggle float;" +
-					yabai +
-					"-m window --grid 1:1:0:0:1:1",
-			),
-			map("return_or_enter").to$("/usr/bin/open -a kitty ~"),
-			map("o").to$(
-				"$HOME/.nix-profile/bin/google-chrome-stable --profile-directory=Default",
-			),
-		]),
+   // other window operations
+   map("tab").to$(yabai + "-m window --focus recent"),
+   map("q").to$(yabai + "-m window --close"),
+   //  applications
+   map("f", "shift").to$(
+    yabai + "-m window --toggle float --grid 4:4:1:1:2:2",
+   ),
+   map("w").to$(
+    yabai +
+     "-m window --toggle float;" +
+     yabai +
+     "-m window --grid 1:1:0:0:1:1",
+   ),
+   map("return_or_enter").to$("/usr/bin/open -a kitty ~"),
+   map("o").to$(
+    "$HOME/.nix-profile/bin/google-chrome-stable --profile-directory=Default",
+   ),
+  ]),
   ...
 ```
 

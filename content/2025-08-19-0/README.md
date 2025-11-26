@@ -1,7 +1,7 @@
 ---
 title: Xremap の設定修正 & Mac 風キーバインド
 date: 2025-08-19
-tags: [nixos]
+tags: [nix, linux]
 ---
 
 ## Xremap とは

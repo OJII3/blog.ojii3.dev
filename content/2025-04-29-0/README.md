@@ -9,7 +9,7 @@ MacBook M2 Pro に入れた Asahi を消すぞよ！インストールより怖�
 
 ## 調査
 
-- https://www.reddit.com/r/AsahiLinux/comments/1ajjjoo/uninstall_asahi_fully/
+<https://www.reddit.com/r/AsahiLinux/comments/1ajjjoo/uninstall_asahi_fully/>
 
 diskutil結果とその結果をもとに消すべきパーティションについてのやり取りが書かれています。
 
@@ -23,9 +23,9 @@ diskutil結果とその結果をもとに消すべきパーティションにつ
 >
 > Partitions you most likely shouldn’t remove: 2. It’s your normal macOS installation.
 
-- curl -L https://alx.sh/wipe-linux | sh
+- `curl -L https://alx.sh/wipe-linux | sh`
 
-直接実行するのは怖いので中身を確認します。前半は上のredditに書かれているコマンドと実質同じですね。後半は少々違くて、パーティションのuuidをいじっている？ようです。
+直接実行するのは怖いので確認します。前半は上のredditに書かれているコマンドと実質同じですね。後半は少々違くて、パーティションのuuidをいじっている？ようです。
 
 正しいのかもしれませんが、今回はこのスクリプトを使うのはやめて手動でやろうと思います。
 
@@ -39,7 +39,7 @@ diskutil list
 
 出力:
 
-```
+```txt
 /dev/disk0 (internal, physical):
    #:                       TYPE NAME                    SIZE       IDENTIFIER
    0:      GUID_partition_scheme                        *1.0 TB     disk0

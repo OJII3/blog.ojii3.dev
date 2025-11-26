@@ -1,6 +1,7 @@
 ---
 title: Arch Linux + Home Manager で pinentry が正しく動作しない
 date: 2025-05-11
+tags: [linux, nix]
 ---
 
 pinentryがダブってるぞよ！

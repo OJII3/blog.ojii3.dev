@@ -14,9 +14,9 @@ draft: false
 
 ## リンク
 
-GitHub(Unity): https://github.com/tuatmcc/SchoolFestival2024_Unity
-GitHub(Web): https://github.com/tuatmcc/SchoolFestival2024_Frontend
-プレイ動画(一部分): https://youtu.be/7DXXWY4bBso?feature=shared
+GitHub(Unity): <https://github.com/tuatmcc/SchoolFestival2024_Unity>
+GitHub(Web): <https://github.com/tuatmcc/SchoolFestival2024_Frontend>
+プレイ動画(一部分): <https://youtu.be/7DXXWY4bBso?feature=shared>
 
 ## アチーブ
 
@@ -64,4 +64,4 @@ GitHub(Web): https://github.com/tuatmcc/SchoolFestival2024_Frontend
 
 ## まとめ
 
-色々頑張りまくった。色々頑張りまくった他メンバーのおかげでもある。
+色々頑張った。色々頑張った他メンバーのおかげでもある。

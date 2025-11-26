@@ -2,7 +2,7 @@
 title: Hyprlandやめたい
 date: 2025-01-31
 draft: false
-tags: [linux]
+tags: [linux, unixporn]
 ---
 
 Arch Linuxを使っていたころからNixOSを使っている今まで
@@ -36,3 +36,7 @@ Arch Linuxを使っていたころからNixOSを使っている今まで
 kdewalletやkdeconnect, plasma-workspaceなどのkde plasma系の一部コンポーネントを借りているのもあり、kde plasmaしか勝たんのでは？という気持ちもあります。
 
 Hyprland自体は一年前に比べてかなり便利になっているので、〇〇が動かない系は解消されていくかもしれないです。でもやっぱり、全体的に見るとKDE PlasmaやGnomeといった大手に遅れを取っている感じがしてしまい、作り手側に回る気がない以上、より大きな船に乗ったほうがいいのかもしれないと思いました。
+
+## 追記
+
+1週間ほどKDE Plasmaを使ってみたなのですが、肌に合わなさすぎてHyprlandに戻したなのです。

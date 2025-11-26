@@ -1,7 +1,7 @@
 ---
 title: NixOSインストール時のエラーについて
 date: 2025-04-27
-tags: [nixos]
+tags: [nix, linux]
 draft: false
 ---
 
@@ -14,7 +14,7 @@ NixOSインストール直後(非ライブ環境)にて、dotfilesを落とし�
 
 ### 解決策
 
-- https://discourse.nixos.org/t/issue-building-linux-kernel-modules-after-flake-update/62322
+<https://discourse.nixos.org/t/issue-building-linux-kernel-modules-after-flake-update/62322>
 
 ここに載っていました。たぶんnixバイナリかデーモンが古かったためかと思われます。
 

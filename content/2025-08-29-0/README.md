@@ -2,6 +2,7 @@
 title: AdGuardHome を導入した
 date: 2025-08-29
 draft: false
+tags: [nix, linux]
 ---
 
 ## DNSフィルタリングについて

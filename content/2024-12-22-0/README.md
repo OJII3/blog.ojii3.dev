@@ -2,6 +2,7 @@
 title: Hono RPC を使いたい
 date: 2024-12-22
 draft: false
+tags: [web]
 ---
 
 ## もちべ

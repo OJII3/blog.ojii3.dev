@@ -1,10 +1,10 @@
 ---
 title: Hyprland で Mac 風キーバインド (リベンジ編)
 date: 2025-08-21
-tags: [nixos, hyprland]
+tags: [nix, linux, hyprland]
 ---
 
-## Linux でも Mac 風の Ctrl を使いたい！
+## Linux でも Mac 風の Ctrl を使いたい
 
 前回の記事では `xremap` を使うことで実現していたのですが、何もしてないのに壊れる事件が多発し、不安定だったため、
 `xremap` とは決別いたしました。

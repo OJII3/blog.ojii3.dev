@@ -1,7 +1,7 @@
 ---
 title: ブログを用意した
 date: 2024-11-30
-tags: ["Astro"]
+tags: [astro]
 ---
 
 Astro Starlight で簡単に作ったなのです。
