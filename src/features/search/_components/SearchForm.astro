@@ -3,20 +3,34 @@ import { Icon } from "astro-icon/components";
 import { SEARCH_ICON_TRANSITION_NAME } from "../../../constants";
 ---
 
-<form class="w-full">
-	<div
-		class="border-gray-5 flex h-14 w-full items-center rounded-2xl border-2 px-4 focus-within:ring-blue-500"
+<div class="flex items-center gap-4 p-4">
+	<a
+		href="/"
+		class="group"
+		aria-label="Go back to home"
+		data-astro-history="auto"
 	>
-		<Icon
-			name="tabler:search"
-			class="text-gray-4 mr-4 h-6 w-6"
-			transition:name={SEARCH_ICON_TRANSITION_NAME}
-		/>
-		<input
-			id="search"
-			type="text"
-			placeholder="Search..."
-			class="w-full bg-transparent focus:outline-none"
-		/>
-	</div>
-</form>
+		<span
+			class="border-gray-5 flex h-12 w-12 items-center justify-center rounded-full border-2 p-2 duration-100"
+		>
+			<Icon name="tabler:arrow-left" class="h-6 w-6" />
+		</span>
+	</a>
+	<form class="w-full">
+		<div
+			class="border-gray-5 flex h-14 w-full items-center rounded-2xl border-2 px-4 focus-within:ring-blue-500"
+		>
+			<Icon
+				name="tabler:search"
+				class="text-gray-4 mr-4 h-6 w-6"
+				transition:name={SEARCH_ICON_TRANSITION_NAME}
+			/>
+			<input
+				id="search"
+				type="text"
+				placeholder="Search..."
+				class="w-full bg-transparent focus:outline-none"
+			/>
+		</div>
+	</form>
+</div>
