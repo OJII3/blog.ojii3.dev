@@ -73,7 +73,7 @@ const allTags = getAllTags(allPosts);
 		// URLから初期状態を設定
 		const urlParams = new URLSearchParams(window.location.search);
 		const currentTags = urlParams.getAll("tag");
-		const currentSearch = urlParams.get("search");
+		const currentSearch = urlParams.get("q");
 
 		inputs.forEach((input) => {
 			if (input instanceof HTMLInputElement) {
@@ -88,9 +88,9 @@ const allTags = getAllTags(allPosts);
 				const url = new URL(window.location.href);
 				const value = (e.target as HTMLInputElement).value;
 				if (value) {
-					url.searchParams.set("search", value);
+					url.searchParams.set("q", value);
 				} else {
-					url.searchParams.delete("search");
+					url.searchParams.delete("q");
 				}
 				window.history.replaceState({}, "", url);
 				window.dispatchEvent(new Event("url-changed"));
@@ -128,7 +128,7 @@ const allTags = getAllTags(allPosts);
 		const searchInput = document.getElementById("search");
 		const urlParams = new URLSearchParams(window.location.search);
 		const currentTags = urlParams.getAll("tag");
-		const currentSearch = urlParams.get("search");
+		const currentSearch = urlParams.get("q");
 
 		inputs.forEach((input) => {
 			if (input instanceof HTMLInputElement) {
