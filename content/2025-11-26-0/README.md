@@ -14,9 +14,9 @@ Pagefindのfilter機能を用いて記事にタグを追加します。例えば
 <ul class="my-8 flex flex-wrap gap-2">
   {
     tags?.map((tag) => (
-      <span class:list={["px-2", TEXT_COLORS[color]]}>
+      <li class:list={["px-2", TEXT_COLORS[color]]}>
         #<span data-pagefind-filter="tag">{tag}</span>
-      </span>
+      </li>
     ))
   }
 </ul>
