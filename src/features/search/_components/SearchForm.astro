@@ -43,24 +43,26 @@ const allTags = getAllTags(allPosts);
 
 	<div class="flex flex-wrap gap-2">
 		{
-			Object.entries(allTags).map(([tag, count]) => (
-				<div class="flex">
-					<input
-						class="peer"
-						name="tag"
-						id={tag}
-						value={tag}
-						type="checkbox"
-						hidden
-					/>
-					<label
-						for={tag}
-						class="tag border-gray-5 hover:bg-gray-2 rounded-full border-2 px-4 py-2 text-sm duration-200 peer-checked:border-lime-500"
-					>
-						#<span class="tag-key">{tag}</span> ({count})
-					</label>
-				</div>
-			))
+			Object.entries(allTags)
+				.sort((a, b) => b[1] - a[1])
+				.map(([tag, count]) => (
+					<div class="flex">
+						<input
+							class="peer"
+							name="tag"
+							id={tag}
+							value={tag}
+							type="checkbox"
+							hidden
+						/>
+						<label
+							for={tag}
+							class="tag border-gray-5 hover:bg-gray-2 rounded-full border-2 px-4 py-2 text-sm duration-200 peer-checked:border-lime-500 peer-checked:bg-lime-200 hover:cursor-pointer dark:peer-checked:bg-lime-800"
+						>
+							#<span class="tag-key">{tag}</span> ({count})
+						</label>
+					</div>
+				))
 		}
 	</div>
 </form>
@@ -107,7 +109,7 @@ const allTags = getAllTags(allPosts);
 					}
 				});
 				// 検索クエリも維持する (URLオブジェクトを使っているので自動的に維持される)
-				window.history.pushState({}, "", url);
+				window.history.replaceState({}, "", url);
 				window.dispatchEvent(new Event("url-changed"));
 			});
 		});
