@@ -69,9 +69,14 @@ const ogImage = `${SITE_URL}/${post.id}/og-image.png`;
 			<ul class="my-8 flex flex-wrap gap-2">
 				{
 					tags?.map((tag) => (
-						<span class:list={["px-2", TEXT_COLORS[color]]}>
-							#<span data-pagefind-filter="tag">{tag}</span>
-						</span>
+						<li>
+							<a
+								href={`/search?tag=${tag}`}
+								class:list={["px-1 hover:underline", TEXT_COLORS[color]]}
+							>
+								#<span data-pagefind-filter="tag">{tag}</span>
+							</a>
+						</li>
 					))
 				}
 			</ul>
