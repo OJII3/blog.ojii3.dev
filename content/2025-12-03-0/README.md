@@ -28,6 +28,35 @@ tags: [unity, game-dev]
 まず、キャラクターの挙動をステートとして書き出します。この際、キャラのアニメーションを意識すると考えやすいです。
 
 ```cs
+namespace Wand.Play.Player
+{
+    /// <summary>
+    ///     インゲームでのプレイヤーのステート
+    ///     ----------------------------------------------------
+    ///     起こり得るステートの遷移
+    ///     - WalkAndRun -> Charge | Guard | Damaged
+    ///     - Charged -> WalkAndRun | Guard | Damaged | Charge
+    ///     - Charge -> Charged | WalkAndRun | Damaged
+    ///     - Guard -> WalkAndRun | Parriable
+    ///     - Parriable -> WalkAndRun | Parried
+    ///     - Parried -> WalkAndRun
+    ///     - Damaged -> WalkAndRun | Defeated
+    ///     - Defeated -> WalkAndRun
+    ///     ステートに関係なく発生しうるイベントの有効無効の判定
+    ///     - 攻撃は Charge, Charged ステートをよしなに見る
+    ///     - 被弾はWalkAndRun,Charge,Charged中のみ有効(パリィ早すぎの被弾も遅すぎの被弾もWalkAndRunステートに戻ってから起こる)
+    /// </summary>
+    public enum PlayerState
+    {
+        WalkAndRun = 0,
+        Charge = 1,
+        Guard = 2,
+        Parriable = 3,
+        Parried = 4,
+        Damaged = 5,
+        Defeated = 6,
+        Charged = 7
+    }
+}
 ```
 
-Ani
