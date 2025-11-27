@@ -4,7 +4,7 @@
 	"exclude": ["dist"],
 	"compilerOptions": {
 		"paths": {
-			"/pagefind/pagefind.js": ["./src/pagefind.d.ts"]
+			"/pagefind/pagefind.js": ["./src/types/pagefind.d.ts"]
 		},
 		"jsx": "react-jsx",
 		"jsxImportSource": "react"
