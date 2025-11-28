@@ -29,6 +29,7 @@ const blog = defineCollection({
 			dateString: data.date.toISOString().split("T")[0],
 			// 記事作成日を基準に、その記事の色を決定する.
 			color: getColorIndex(data.date),
+			draft: data.draft ? true : undefined,
 		})),
 });
 
