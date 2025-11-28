@@ -65,7 +65,7 @@ const ogImage = `${SITE_URL}/${post.id}/og-image.png`;
 					"prose-h2:pl-2 prose-h2:border-l-4",
 					H2_BORDER_COLORS[color],
 				]}
-				data-pagefind-body
+				data-pagefind-body={draft ? undefined : true}
 				data-pagefind-ignore={draft}
 			>
 				<Content />
