@@ -7,6 +7,7 @@
 		"build": "astro build",
 		"check": "biome check . && prettier --check .",
 		"format": "biome check . --write && prettier --write .",
+		"markdownlint": "markdownlint-cli2 --fix './content/**/*.md'",
 		"preview": "astro preview",
 		"astro": "astro",
 		"wrangler": "wrangler"
@@ -23,6 +24,7 @@
 		"astro-expressive-code": "^0.41.3",
 		"astro-icon": "^1.1.5",
 		"astro-pagefind": "^1.8.5",
+		"markdownlint-cli2": "^0.19.1",
 		"pagefind": "^1.4.0",
 		"prettier-plugin-astro": "^0.14.1",
 		"react-dom": "^19.1.0",

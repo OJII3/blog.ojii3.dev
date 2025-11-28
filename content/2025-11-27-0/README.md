@@ -34,14 +34,14 @@ Astro のコンフィグに Vite のビルド設定を指定できるので、`/
 
 ```js title="astro.config.mjs"
 export default defineConfig({
-	vite: {
-		plugins: [tailwindcss()],
-		build: {
-			rollupOptions: {
-				external: ["/pagefind/pagefind.js"],
-			},
-		},
-	},
+ vite: {
+  plugins: [tailwindcss()],
+  build: {
+   rollupOptions: {
+    external: ["/pagefind/pagefind.js"],
+   },
+  },
+ },
     ...
 ```
 
@@ -113,13 +113,13 @@ declare module "/pagefind/pagefind.js" {
 ```json title="tsconfig.json"
 {
     ...,
-	"compilerOptions": {
-		"paths": {
-			"/pagefind/pagefind.js": ["./src/pagefind.d.ts"]
-		},
-		"jsx": "react-jsx",
-		"jsxImportSource": "react"
-	},
+ "compilerOptions": {
+  "paths": {
+   "/pagefind/pagefind.js": ["./src/pagefind.d.ts"]
+  },
+  "jsx": "react-jsx",
+  "jsxImportSource": "react"
+ },
     ...
 }
 ```
