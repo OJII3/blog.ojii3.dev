@@ -28,7 +28,7 @@ export interface Props {
 
 const { post, prevPost, nextPost } = Astro.props;
 
-const { title, dateString, color, tags } = post.data;
+const { title, dateString, color, tags, draft } = post.data;
 
 const { Content } = await render(post);
 
@@ -44,13 +44,17 @@ const ogImage = `${SITE_URL}/${post.id}/og-image.png`;
 			<h1
 				class="mt-4 text-2xl font-bold sm:text-3xl"
 				data-pagefind-meta="title"
+				data-pagefind-ignore={draft}
 			>
 				{title}
 			</h1>
 
 			<div class="mt-2 mb-8 flex items-center gap-2">
-				<span aria-hidden="true" class="text-sm" data-pagefind-meta="date"
-					>{dateString}</span
+				<span
+					aria-hidden="true"
+					class="text-sm"
+					data-pagefind-meta="date"
+					data-pagefind-ignore={draft}>{dateString}</span
 				>
 			</div>
 
@@ -62,6 +66,7 @@ const ogImage = `${SITE_URL}/${post.id}/og-image.png`;
 					H2_BORDER_COLORS[color],
 				]}
 				data-pagefind-body
+				data-pagefind-ignore={draft}
 			>
 				<Content />
 			</article>
@@ -74,7 +79,10 @@ const ogImage = `${SITE_URL}/${post.id}/og-image.png`;
 								href={`/search?tag=${tag}`}
 								class:list={["px-1 hover:underline", TEXT_COLORS[color]]}
 							>
-								#<span data-pagefind-filter="tag">{tag}</span>
+								#
+								<span data-pagefind-filter="tag" data-pagefind-ignore={draft}>
+									{tag}
+								</span>
 							</a>
 						</li>
 					))
