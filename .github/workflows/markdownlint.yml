@@ -1,27 +1,34 @@
 ---
 # yamllint disable rule:line-length
 name: Markdown Lint
-"on":
+
+on:
   pull_request:
     types: [opened, synchronize, reopened]
   push:
     branches: [main]
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   markdownlint:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      - name: Run markdownlint with auto-fix
-        uses: DavidAnson/markdownlint-cli2-action@v17
+      - name: Setup | Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          globs: "**/*.md"
-          fix: true
+          bun-version-file: ".bun-version"
+
+      - name: Setup | Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Run markdownlint and apply fixes
+        run: bun run markdownlint
         continue-on-error: true
 
       - name: Check for changes
@@ -35,14 +42,18 @@ jobs:
 
       - name: Create Pull Request
         if: steps.changes.outputs.has_changes == 'true' && github.ref == 'refs/heads/main'
-        uses: peter-evans/create-pull-request@v7
-        with:
-          commit-message: "chore: auto-fix markdownlint issues"
-          title: "chore: auto-fix markdownlint issues"
-          body: |
-            This PR was automatically created by the markdownlint workflow.
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b markdownlint-fixes
+          git add .
+          git commit -m "chore: apply markdownlint fixes"
+          git push origin markdownlint-fixes
 
-            Markdownlint has detected and fixed formatting issues in the markdown files.
-          branch: markdownlint-auto-fix
-          delete-branch: true
-          labels: automated, markdown
+          gh pr create \
+            --title "chore: apply markdownlint fixes" \
+            --body "This PR applies automatic fixes from markdownlint." \
+            --head markdownlint-fixes \
+            --base main
+        env:
+          GH_TOKEN: ${{ github.token }}

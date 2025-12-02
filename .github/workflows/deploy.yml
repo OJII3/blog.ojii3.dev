@@ -24,7 +24,7 @@ jobs:
       version_tag: ${{ steps.get-version.outputs.version }}
     steps:
       - name: Setup | Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup | Bun
         uses: oven-sh/setup-bun@v2
@@ -106,7 +106,7 @@ jobs:
       url: ${{ steps.publish.outputs.deployment-url }}
     steps:
       - name: Setup | Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup | Bun
         uses: oven-sh/setup-bun@v2
