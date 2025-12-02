@@ -102,7 +102,7 @@ _inputHandler.PlayInputRx.OnChargePush
 _staminaManager.CurrentStaminaState
     .Where(state => state == StaminaState.Recovering &&
                     IsCurrentPlayerState(PlayerState.Guard))
-    .Subscribe(_ => _playSceneManager.ChangeMyPlayerState(PlayerState.WalkAndRun))
+    .Subscribe(_ => _playerContext.ChangeMyPlayerState(PlayerState.WalkAndRun))
     .AddTo(this);
 ```
 
@@ -112,7 +112,7 @@ _staminaManager.CurrentStaminaState
 // Damaged -> WalkAndRun
 _playerAnimationEventHandler.OnDamagedAnimationEnd
     .Where(_ => IsCurrentPlayerState(PlayerState.Damaged))
-    .Subscribe(_ => _playSceneManager.ChangeMyPlayerState(PlayerState.WalkAndRun))
+    .Subscribe(_ => _playerContext.ChangeMyPlayerState(PlayerState.WalkAndRun))
     .AddTo(this);
 ```
 
