@@ -1,7 +1,7 @@
 ---
 title: Unityで3Dキャラクターを制御した
 date: 2025-12-03
-draft: true
+draft: false
 tags: [unity, game-dev]
 ---
 
