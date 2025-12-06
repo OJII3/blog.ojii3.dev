@@ -22,7 +22,7 @@ jobs:
 
       - name: Setup | Bun
         # v2.0.2
-        uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76
+        uses: oven-sh/setup-bun@735343b667d3e6f658f44d0ecaa948eb6282f2b76
         with:
           bun-version-file: ".bun-version"
 
@@ -50,12 +50,13 @@ jobs:
           git checkout -b markdownlint-fixes
           git add .
           git commit -m "chore: apply markdownlint fixes"
-          git push origin markdownlint-fixes
+          git push -f origin markdownlint-fixes
 
+          # Create PR if it doesn't exist, otherwise just update the branch
           gh pr create \
             --title "chore: apply markdownlint fixes" \
             --body "This PR applies automatic fixes from markdownlint." \
             --head markdownlint-fixes \
-            --base main
+            --base main || echo "PR already exists, branch updated"
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
