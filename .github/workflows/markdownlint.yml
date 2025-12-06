@@ -17,10 +17,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        # v6.0.1
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
 
       - name: Setup | Bun
-        uses: oven-sh/setup-bun@v2
+        # v2.0.2
+        uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76
         with:
           bun-version-file: ".bun-version"
 
@@ -33,7 +35,8 @@ jobs:
 
       - name: Create Pull Request
         if: github.ref == 'refs/heads/main'
-        uses: peter-evans/create-pull-request@v7
+        # v7.0.11
+        uses: peter-evans/create-pull-request@22a9089034f40e5a961c8808d113e2c98fb63676
         with:
           commit-message: "chore: apply markdownlint fixes"
           title: "chore: apply markdownlint fixes"

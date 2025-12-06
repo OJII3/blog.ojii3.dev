@@ -19,12 +19,12 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Setup | Checkout
-        # v4.2.2
-        uses: actions/checkout@v6
+        # v6.0.1
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
 
       - name: Setup | Bun
-        # v2.0.1
-        uses: oven-sh/setup-bun@4bc047ad259df6fc24a6c9b0f9a0cb08cf17fbe5
+        # v2.0.2
+        uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76
         with:
           bun-version-file: ".bun-version"
 
