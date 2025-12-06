@@ -24,10 +24,12 @@ jobs:
       version_tag: ${{ steps.get-version.outputs.version }}
     steps:
       - name: Setup | Checkout
-        uses: actions/checkout@v6
+        # v6.0.1
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
 
       - name: Setup | Bun
-        uses: oven-sh/setup-bun@v2
+        # v2.0.2
+        uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76
         with:
           bun-version-file: ".bun-version"
 
@@ -64,7 +66,8 @@ jobs:
           GOOGLE_ANALYTICS_ID: ${{ secrets.GOOGLE_ANALYTICS_ID }}
 
       - name: Run | Deploy
-        uses: cloudflare/wrangler-action@v3
+        # v3.14.1
+        uses: cloudflare/wrangler-action@da0e0dfe58b7a431659754fdf3f186c529afbe65
         id: deploy-preview
         with:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -106,10 +109,12 @@ jobs:
       url: ${{ steps.publish.outputs.deployment-url }}
     steps:
       - name: Setup | Checkout
-        uses: actions/checkout@v6
+        # v6.0.1
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
 
       - name: Setup | Bun
-        uses: oven-sh/setup-bun@v2
+        # v2.0.2
+        uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76
         with:
           bun-version-file: ".bun-version"
 
@@ -128,7 +133,8 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
 
       - name: Run | Publish
-        uses: cloudflare/wrangler-action@v3
+        # v3.14.1
+        uses: cloudflare/wrangler-action@da0e0dfe58b7a431659754fdf3f186c529afbe65
         id: publish
         with:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
