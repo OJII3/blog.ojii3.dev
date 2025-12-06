@@ -31,29 +31,13 @@ jobs:
         run: bun run markdownlint
         continue-on-error: true
 
-      - name: Check for changes
-        id: changes
-        run: |
-          if [[ -n $(git status --porcelain) ]]; then
-            echo "has_changes=true" >> $GITHUB_OUTPUT
-          else
-            echo "has_changes=false" >> $GITHUB_OUTPUT
-          fi
-
       - name: Create Pull Request
-        if: steps.changes.outputs.has_changes == 'true' && github.ref == 'refs/heads/main'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout -b markdownlint-fixes
-          git add .
-          git commit -m "chore: apply markdownlint fixes"
-          git push origin markdownlint-fixes
-
-          gh pr create \
-            --title "chore: apply markdownlint fixes" \
-            --body "This PR applies automatic fixes from markdownlint." \
-            --head markdownlint-fixes \
-            --base main
-        env:
-          GH_TOKEN: ${{ github.token }}
+        if: github.ref == 'refs/heads/main'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: "chore: apply markdownlint fixes"
+          title: "chore: apply markdownlint fixes"
+          body: "This PR applies automatic fixes from markdownlint."
+          branch: markdownlint-fixes
+          delete-branch: true
+          base: main
