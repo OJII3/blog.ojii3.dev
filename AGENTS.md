@@ -1,6 +1,6 @@
 # [blog.ojii3.dev](https://blog.ojii3.dev)
 
-このリポジトリは [Astro](https://astro.build/) を使用して構築されたパーソナルブログサイトです. Bun をパッケージマネージャ/ビルドランタイムとして使用し、Cloudflare Workers にデプロイされます.
+このリポジトリは [Astro](https://astro.build/) を使用して構築されたパーソナルブログサイトである. Bun をパッケージマネージャ/ビルドランタイムとして使用し、Cloudflare Workers にデプロイされる.
 
 ## プロジェクト構造とモジュール構成
 
@@ -14,7 +14,7 @@ Astro のソースは `src/` にある.
   - `_lib/` はヘルパーを保持する. ヘルパー関数を書く前に、適切なデータ構造を使用していることを確認すること.
 - `constants/` はアプリケーション全体で使用される定数を保持する.
 
-共有のビジュアルは `assets/` に属する. Markdown の記事は `content/blog/` の下に配置され、`src/content.config.ts` からスキーマを継承する. 静的ファイルは `public/` を通じて配布する. 本番環境の出力は `dist/` に配置され、`wrangler.toml` の Worker 設定を通じてデプロイされる.
+共有のビジュアルは `assets/` に属する. Markdown の記事は `content/` 配下の日付ディレクトリ (例: `2025-01-01-0/`) 内の `README.md` として配置され、`src/content.config.ts` からスキーマを継承する. 静的ファイルは `public/` を通じて配布する. 本番環境の出力は `dist/` に配置され、`wrangler.jsonc` の Worker 設定を通じてデプロイされる.
 
 ## ビルド、テスト、開発コマンド
 
@@ -24,6 +24,7 @@ Astro のソースは `src/` にある.
 - `bun run preview` — Cloudflare を模倣するためにバンドルをローカルで提供する.
 - `bun run check` — プロジェクト全体で Biome/Prettier のリント/フォーマットチェックを実行する.
 - `bun run format` — Biome/Prettier の修正をインプレースで適用する.
+- `bun run markdownlint` — Markdown ファイルのリンティングと修正を行う.
 
 ## コーディングスタイルと命名規則
 
@@ -46,3 +47,4 @@ Cloudflare の認証情報とルートは `wrangler.toml` にある. シーク�
 ## その他
 
 - voicvox-mcp が利用可能であれば、タスクが進むごとに音声で報告すること.
+- MacOS であれば、タスク完了時に `open raycast://confetti` を実行すること.
