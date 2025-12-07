@@ -6,13 +6,13 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
     paths:
-      - 'content/**/*.md'
-      - '.markdownlint.jsonc'
+      - "content/**/*.md"
+      - ".markdownlint.jsonc"
   push:
     branches: [main]
     paths:
-      - 'content/**/*.md'
-      - '.markdownlint.jsonc'
+      - "content/**/*.md"
+      - ".markdownlint.jsonc"
 
 permissions:
   contents: write
