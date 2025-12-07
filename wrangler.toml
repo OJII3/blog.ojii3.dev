@@ -1,6 +1,0 @@
-name = "blog-ojii3-dev"
-compatibility_date = "2025-07-21"
-
-[assets]
-directory = "./dist"
-not_found_handling = "404-page"
