@@ -1,6 +1,7 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "blog-ojii3-dev",
+	"main": "dist/_worker.js/index.js",
 	"compatibility_date": "2025-07-21",
 	"compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
 	"observability": {
