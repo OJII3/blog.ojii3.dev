@@ -46,7 +46,6 @@ export default defineConfig({
 	image: {
 		domains: ["raw.githubusercontent.com", "github.com", "*.s3.amazonaws.com"],
 		layout: "constrained",
-		service: passthroughImageService(),
 	},
 	adapter: cloudflare({
 		routes: {
@@ -54,7 +53,7 @@ export default defineConfig({
 				include: [{ pattern: "/admin/*" }],
 			},
 		},
-		imageService: "cloudflare",
+		imageService: "passthrough",
 	}),
 	env: {
 		schema: {
