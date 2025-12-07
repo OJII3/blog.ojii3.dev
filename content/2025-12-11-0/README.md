@@ -20,22 +20,22 @@ import { defineCollection, z } from "astro:content";
 import { glob } from "astro/loaders";
 
 const blog = defineCollection({
-	loader: glob({
-		pattern: "**/README.md",
-		base: "./content",
-		generateId: ({ entry }) =>
-			entry
-				.replace(/\\/g, "/")
-				.replace(/\/README\.md$/i, "")
-				.replace(/\.md$/, ""),
-	}),
-	schema: z
-		.object({
-			title: z.string(),
-			tags: z.string().array().optional(),
-			date: z.date(),
-			draft: z.boolean().optional(),
-		})
+ loader: glob({
+  pattern: "**/README.md",
+  base: "./content",
+  generateId: ({ entry }) =>
+   entry
+    .replace(/\\/g, "/")
+    .replace(/\/README\.md$/i, "")
+    .replace(/\.md$/, ""),
+ }),
+ schema: z
+  .object({
+   title: z.string(),
+   tags: z.string().array().optional(),
+   date: z.date(),
+   draft: z.boolean().optional(),
+  })
 });
 
 export const collections = { blog };
