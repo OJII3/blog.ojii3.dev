@@ -1,5 +1,6 @@
 // @ts-check
 
+import cloudflare from "@astrojs/cloudflare";
 import partytown from "@astrojs/partytown";
 import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
@@ -15,7 +16,11 @@ export default defineConfig({
 		plugins: [tailwindcss()],
 		build: {
 			rollupOptions: {
-				external: ["/pagefind/pagefind.js"],
+				external: [
+					"/pagefind/pagefind.js",
+					"@resvg/resvg-js",
+					"node:fs/promises",
+				],
 			},
 		},
 	},
@@ -43,6 +48,14 @@ export default defineConfig({
 		layout: "constrained",
 		service: passthroughImageService(),
 	},
+	adapter: cloudflare({
+		routes: {
+			extend: {
+				include: [{ pattern: "/admin/*" }],
+			},
+		},
+		imageService: "cloudflare",
+	}),
 	env: {
 		schema: {
 			GOOGLE_ANALYTICS_ID: envField.string({
