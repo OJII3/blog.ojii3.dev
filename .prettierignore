@@ -1,5 +1,6 @@
 content
 **/*.json
+**/*.jsonc
 **/*.md
 **/*.{js,jsx,ts,tsx}
 **/*.{m,c}js
