@@ -19,6 +19,17 @@ concurrency:
 jobs:
   markdownlint:
     runs-on: ubuntu-latest
+    # このワークフロー自身によるコミットでトリガーされないようにする
+    if: |
+      github.event_name == 'pull_request' ||
+      (
+        github.event_name == 'push' &&
+        github.ref == 'refs/heads/main' &&
+        !(
+          contains(github.event.head_commit.message, 'Merge pull request') &&
+          contains(github.event.head_commit.message, 'from ojii3/markdownlint-fixes')
+        )
+      )
     steps:
       - name: Checkout code
         # v6.0.1
