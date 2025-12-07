@@ -1,10 +1,11 @@
 // @ts-check
 
+import cloudflare from "@astrojs/cloudflare";
 import partytown from "@astrojs/partytown";
-import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
-import { defineConfig, envField, passthroughImageService } from "astro/config";
+import { defineConfig, envField } from "astro/config";
+
 import expressiveCode from "astro-expressive-code";
 import icon from "astro-icon";
 import pagefind from "astro-pagefind";
@@ -15,7 +16,11 @@ export default defineConfig({
 		plugins: [tailwindcss()],
 		build: {
 			rollupOptions: {
-				external: ["/pagefind/pagefind.js"],
+				external: [
+					"/pagefind/pagefind.js",
+					"@resvg/resvg-js",
+					"node:fs/promises",
+				],
 			},
 		},
 	},
@@ -30,7 +35,6 @@ export default defineConfig({
 		}),
 		icon(),
 		partytown(),
-		react(),
 		sitemap(),
 		pagefind(),
 	],
@@ -41,8 +45,15 @@ export default defineConfig({
 	image: {
 		domains: ["raw.githubusercontent.com", "github.com", "*.s3.amazonaws.com"],
 		layout: "constrained",
-		service: passthroughImageService(),
 	},
+	adapter: cloudflare({
+		routes: {
+			extend: {
+				include: [{ pattern: "/admin/*" }],
+			},
+		},
+		imageService: "passthrough",
+	}),
 	env: {
 		schema: {
 			GOOGLE_ANALYTICS_ID: envField.string({
