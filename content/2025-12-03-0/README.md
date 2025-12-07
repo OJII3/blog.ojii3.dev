@@ -157,7 +157,7 @@ private void Update()
 
 ちなみに、今回のゲームで作成した AnimatorController は以下のような見た目になっており、`int` 型のパラメーターを `PlayerState` の `enum` と対応させることでステートを遷移させています。プログラム上のステートとアニメーションのステートの同期は自分で担保する必要があるのがやっかいですね....
 
-![](./animation_controller.png)
+![Animator Controller の設定画面](./animation_controller.png)
 
 アニメーションの制御には Unity の Animator Controller を使用します。使いかたは[このへん](https://eda-inc.jp/post-1830/)とかを見ると良いのではないでしょうか。
 

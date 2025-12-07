@@ -7,12 +7,12 @@ draft: false
 
 エラーに遭遇したぞよ。
 
-### エラー内容
+## エラー内容
 
 NixOSインストール直後(非ライブ環境)にて、dotfilesを落としてきてビルドしようとしたところ、
 `error: path '*******-linux-zen-6.14.**-modules-shrunk/lib' is not in the Nix store` というようなエラーがでました。
 
-### 解決策
+## 解決策
 
 <https://discourse.nixos.org/t/issue-building-linux-kernel-modules-after-flake-update/62322>
 

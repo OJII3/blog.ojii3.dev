@@ -47,6 +47,6 @@ Apr 14 10:54:51 Komachan systemd[2127]: Failed to start Adjusting screen brightn
 
 一応WEBCamで疑似的にALS(Ambient Light Sensor)の代替をできるらしいです。
 
-### まとめ
+## まとめ
 
 できなかったぞよ！

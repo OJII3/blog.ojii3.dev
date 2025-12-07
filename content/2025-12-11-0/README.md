@@ -20,22 +20,22 @@ import { defineCollection, z } from "astro:content";
 import { glob } from "astro/loaders";
 
 const blog = defineCollection({
-	loader: glob({
-		pattern: "**/README.md",
-		base: "./content",
-		generateId: ({ entry }) =>
-			entry
-				.replace(/\\/g, "/")
-				.replace(/\/README\.md$/i, "")
-				.replace(/\.md$/, ""),
-	}),
-	schema: z
-		.object({
-			title: z.string(),
-			tags: z.string().array().optional(),
-			date: z.date(),
-			draft: z.boolean().optional(),
-		})
+ loader: glob({
+  pattern: "**/README.md",
+  base: "./content",
+  generateId: ({ entry }) =>
+   entry
+    .replace(/\\/g, "/")
+    .replace(/\/README\.md$/i, "")
+    .replace(/\.md$/, ""),
+ }),
+ schema: z
+  .object({
+   title: z.string(),
+   tags: z.string().array().optional(),
+   date: z.date(),
+   draft: z.boolean().optional(),
+  })
 });
 
 export const collections = { blog };
@@ -110,7 +110,7 @@ export const collections = { blog };
 
 クローン処理を完全にAstroに任せられるので、ビルド前にスクリプトを走らせる必要がなくなり、非常に幸せです。
 
-```
+```ts title="src/content/config.ts"
 loader: NODE.ENV === "development"
     ? github("**/README.md", "./content")
     : glob({ pattern: "**/README.md", base: "./content" }),
@@ -118,6 +118,6 @@ loader: NODE.ENV === "development"
 
 みたいに、開発環境と本番環境でローダーを切り替えることも簡単にできます。
 
-## おわりに
+## まとめ
 
 Astro 楽しいぞよ！いずれ Live Content Collection も使ってみたいぞよ！
