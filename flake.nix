@@ -25,7 +25,8 @@
         {
           devShells.default = pkgs.mkShell {
             packages = with pkgs; [
-              bun
+              bun # as a package manager
+              nodejs-slim # wrangler dev requires nodejs
             ];
           };
         };
