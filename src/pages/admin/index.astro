@@ -22,7 +22,7 @@ export const prerender = false;
 		loginButton.addEventListener("click", () =>
 			signIn.social({
 				provider: "github",
-				callbackURL: "/dashboard",
+				callbackURL: "/admin/dashboard",
 			}),
 		);
 		logoutButton.addEventListener("click", () => signOut());
