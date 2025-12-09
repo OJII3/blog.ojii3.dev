@@ -5,8 +5,13 @@
 	},
 	"mcpServers": {
 		"figma": {
-			"command": "bunx",
-			"args": ["mcp-remote", "https://127.0.0.1:3845/mcp"]
+			"httpUrl": "https://127.0.0.1:3845/mcp"
+		},
+		"astro-docs": {
+			"httpUrl": "https://mcp.docs.astro.build/mcp"
+		},
+		"better-auth-docs": {
+			"httpUrl": "https://mcp.chonkie.ai/better-auth/better-auth-builder/mcp"
 		}
 	}
 }
