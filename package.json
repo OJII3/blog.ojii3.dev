@@ -6,10 +6,10 @@
 		"dev": "astro dev",
 		"build": "astro build",
 		"check": "biome check . && prettier --check .",
-		"typecheck": "tsc --noEmit",
+		"typecheck": "astro sync && tsc --noEmit",
 		"format": "biome check . --write && prettier --write .",
 		"markdownlint": "markdownlint-cli2 --fix './content/**/*.md'",
-		"db:generate": "better-auth generate --config src/auth-cli.ts --output src/db/schema.ts",
+		"db:generate": "bunx @better-auth/cli generate --config src/db/auth-cli.ts --output src/db/generated/auth-schema.ts",
 		"preview": "wrangler dev --port 4321",
 		"astro": "astro",
 		"wrangler": "wrangler"
