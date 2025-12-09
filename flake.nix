@@ -28,6 +28,9 @@
               bun # as a package manager
               nodejs-slim # wrangler dev requires nodejs
             ];
+            shellHook = ''
+              bun --version > .bun-version
+            '';
           };
         };
     };
