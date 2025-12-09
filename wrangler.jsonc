@@ -4,9 +4,17 @@
 	"main": "dist/_worker.js/index.js",
 	"compatibility_date": "2025-07-12",
 	"compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+	"account_id": "c400a4d044bf4655006c3245036fdb68",
 	"observability": {
 		"enabled": true
 	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "blog-auth-db",
+			"database_id": "293fc19f-f74c-4d68-80d5-4d45a3bcbe6a"
+		}
+	],
 	"assets": {
 		"binding": "ASSETS",
 		"directory": "./dist",
