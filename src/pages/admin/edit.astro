@@ -1,0 +1,93 @@
+---
+import { getLiveEntry } from "astro:content";
+import { createMarkdownProcessor } from "@astrojs/markdown-remark";
+import AdminLivePostLayout from "../../features/admin/_layouts/AdminLivePostLayout.astro";
+import { getGitHubAccessToken } from "../../features/admin/_lib/github/client";
+
+export const prerender = false;
+
+const searchParams = new URL(Astro.request.url).searchParams;
+const id = searchParams.get("id");
+
+type EntryState =
+	| { status: "missing" }
+	| { status: "error"; message: string }
+	| {
+			status: "ok";
+			title: string;
+			date?: string;
+			html: string;
+			path: string;
+			sha: string;
+	  };
+
+let state: EntryState = { status: "missing" };
+
+if (id) {
+	const tokenResult = await getGitHubAccessToken(Astro.request.headers);
+	const token = tokenResult.status === "ok" ? tokenResult.data : undefined;
+
+	const entry = await getLiveEntry("liveBlog", { id, token });
+
+	const content = entry && "data" in entry ? entry.data.content : null;
+
+	if (!entry || "error" in entry || !content) {
+		state = {
+			status: "error",
+			message:
+				entry && "error" in entry
+					? entry.error.message
+					: "Entry not found or content missing.",
+		};
+	} else {
+		const processor = await createMarkdownProcessor();
+		const rendered = await processor.render(content);
+		const frontmatter = rendered.metadata.frontmatter ?? {};
+
+		const title =
+			typeof frontmatter.title === "string" && frontmatter.title.length > 0
+				? frontmatter.title
+				: id;
+
+		let date: string | undefined;
+		if (frontmatter.date) {
+			const parsed = new Date(frontmatter.date as string);
+			if (!Number.isNaN(parsed.valueOf())) {
+				date = parsed.toISOString().split("T")[0];
+			}
+		}
+
+		state = {
+			status: "ok",
+			title,
+			date,
+			html: rendered.code,
+			path: entry.data.path,
+			sha: entry.data.sha,
+		};
+	}
+}
+---
+
+{
+	state.status === "ok" ? (
+		<AdminLivePostLayout
+			title={state.title}
+			date={state.date}
+			html={state.html}
+			path={state.path}
+			sha={state.sha}
+		/>
+	) : (
+		<AdminLivePostLayout
+			title="Live entry"
+			path={id ?? "no id"}
+			sha="N/A"
+			html={
+				state.status === "missing"
+					? "<p>Query parameter <code>?id=...</code> を指定してください。</p>"
+					: `<p>読み込みに失敗しました: ${state.message}</p>`
+			}
+		/>
+	)
+}

@@ -1,16 +1,20 @@
-import type { components } from "@octokit/openapi-types";
-
 export type Result<T> =
 	| { status: "ok"; data: T }
 	| { status: "error"; message: string };
 
-export type GitHubContentItem =
-	| components["schemas"]["content-file"]
-	| components["schemas"]["content-directory"]
-	| components["schemas"]["content-symlink"]
-	| components["schemas"]["content-submodule"];
+export type GitHubContentItem = {
+	type: "file" | "dir" | "symlink" | "submodule";
+	name: string;
+	path: string;
+	sha: string;
+	htmlUrl?: string | null;
+};
 
-export type GitHubFileCommit = components["schemas"]["file-commit"];
+export type GitHubFileCommit = {
+	content?: unknown;
+	commit?: unknown;
+	[key: string]: unknown;
+};
 
 export type UpsertContentParams = {
 	path: string;
@@ -29,4 +33,16 @@ export type DeleteContentParams = {
 	branch?: string;
 	author?: { name: string; email: string };
 	committer?: { name: string; email: string };
+};
+
+export type GetFileParams = {
+	path: string;
+	ref?: string;
+};
+
+export type GitHubFileContent = {
+	path: string;
+	sha: string;
+	htmlUrl?: string | null;
+	content: string;
 };

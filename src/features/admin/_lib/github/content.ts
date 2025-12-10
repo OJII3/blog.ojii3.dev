@@ -1,17 +1,24 @@
 import type { Octokit } from "@octokit/core";
 import { RequestError } from "@octokit/request-error";
-import { createOctokitClient, repoName, repoOwner } from "./client";
+import {
+	createOctokit,
+	createOctokitClient,
+	repoName,
+	repoOwner,
+} from "./client";
 import type {
 	DeleteContentParams,
+	GetFileParams,
 	GitHubContentItem,
 	GitHubFileCommit,
+	GitHubFileContent,
 	Result,
 	UpsertContentParams,
 } from "./types";
 
 const DEFAULT_PATH = "content";
 
-type ContentClient = {
+export type ContentClient = {
 	listRepoPath: (path: string) => Promise<Result<GitHubContentItem[]>>;
 	upsertFile: (
 		params: UpsertContentParams,
@@ -19,6 +26,7 @@ type ContentClient = {
 	deleteFile: (
 		params: DeleteContentParams,
 	) => Promise<Result<GitHubFileCommit>>;
+	getFile: (params: GetFileParams) => Promise<Result<GitHubFileContent>>;
 };
 
 const trimBody = (body: string) =>
@@ -73,7 +81,13 @@ const listRepoPathWithOctokit = async (
 		const items = Array.isArray(response.data)
 			? response.data
 			: [response.data].filter(Boolean);
-		const data = items as GitHubContentItem[];
+		const data = items.map((item) => ({
+			type: item.type,
+			path: item.path,
+			name: item.name,
+			sha: item.sha,
+			htmlUrl: "html_url" in item ? item.html_url : undefined,
+		}));
 
 		return { status: "ok", data };
 	} catch (error) {
@@ -136,6 +150,71 @@ const deleteFileWithOctokit = async (
 	}
 };
 
+const decodeBase64 = (content: string) => {
+	if (typeof Buffer !== "undefined") {
+		return Buffer.from(content, "base64").toString("utf8");
+	}
+	const binary = atob(content);
+	const bytes = new Uint8Array(binary.length);
+	for (let i = 0; i < binary.length; i += 1) {
+		bytes[i] = binary.charCodeAt(i);
+	}
+	return new TextDecoder().decode(bytes);
+};
+
+const getFileWithOctokit = async (
+	octokit: Octokit,
+	params: GetFileParams,
+): Promise<Result<GitHubFileContent>> => {
+	const { path, ref } = params;
+	const resolvedPath = normalizePath(path);
+	try {
+		const response = await octokit.request(
+			"GET /repos/{owner}/{repo}/contents/{path}",
+			{
+				owner: repoOwner,
+				repo: repoName,
+				path: resolvedPath,
+				ref,
+			},
+		);
+
+		if (Array.isArray(response.data)) {
+			return {
+				status: "error",
+				message: "Expected a file but received a directory listing.",
+			};
+		}
+
+		if (!("type" in response.data) || response.data.type !== "file") {
+			return {
+				status: "error",
+				message: "Expected a file but received a non-file response.",
+			};
+		}
+
+		const { content, sha, html_url: htmlUrl, encoding } = response.data;
+		if (!content || encoding !== "base64") {
+			return {
+				status: "error",
+				message: "Unsupported file response from GitHub.",
+			};
+		}
+
+		return {
+			status: "ok",
+			data: {
+				path: resolvedPath,
+				sha,
+				htmlUrl,
+				content: decodeBase64(content),
+			},
+		};
+	} catch (error) {
+		return toErrorResult(error);
+	}
+};
+
 export const createContentClient = async (
 	headers: Headers,
 ): Promise<Result<ContentClient>> => {
@@ -149,7 +228,24 @@ export const createContentClient = async (
 			upsertFileWithOctokit(octokitResult.data, params),
 		deleteFile: (params: DeleteContentParams) =>
 			deleteFileWithOctokit(octokitResult.data, params),
+		getFile: (params: GetFileParams) =>
+			getFileWithOctokit(octokitResult.data, params),
 	};
 
+	return { status: "ok", data: client };
+};
+
+export const createContentClientFromToken = (
+	accessToken?: string,
+): Result<ContentClient> => {
+	const octokit = createOctokit(accessToken);
+	const client: ContentClient = {
+		listRepoPath: (path: string) => listRepoPathWithOctokit(octokit, path),
+		upsertFile: (params: UpsertContentParams) =>
+			upsertFileWithOctokit(octokit, params),
+		deleteFile: (params: DeleteContentParams) =>
+			deleteFileWithOctokit(octokit, params),
+		getFile: (params: GetFileParams) => getFileWithOctokit(octokit, params),
+	};
 	return { status: "ok", data: client };
 };

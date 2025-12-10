@@ -10,7 +10,7 @@ export const repoLabel = `${repoOwner}/${repoName}`;
 
 const USER_AGENT = "blog.ojii3.dev-admin";
 
-export const createOctokit = (accessToken: string) =>
+export const createOctokit = (accessToken?: string) =>
 	new Octokit({
 		auth: accessToken,
 		userAgent: USER_AGENT,
@@ -38,6 +38,18 @@ export const getGitHubAccessToken = async (
 		}
 
 		return { status: "ok", data: accessToken };
+	} catch (error) {
+		const message =
+			error instanceof Error ? error.message : "未知のエラーが発生しました。";
+		return { status: "error", message };
+	}
+};
+
+export const createOctokitFromToken = (
+	accessToken?: string,
+): Result<Octokit> => {
+	try {
+		return { status: "ok", data: createOctokit(accessToken) };
 	} catch (error) {
 		const message =
 			error instanceof Error ? error.message : "未知のエラーが発生しました。";

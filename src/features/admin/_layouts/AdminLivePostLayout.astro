@@ -1,0 +1,29 @@
+---
+import GlobalLayout from "../../_layouts/GlobalLayout.astro";
+
+type Props = {
+	title: string;
+	date?: string;
+	html: string;
+	path: string;
+	sha: string;
+};
+
+const { title, date, html, path, sha } = Astro.props;
+---
+
+<GlobalLayout title={`Admin | ${title}`}>
+	<main class="mx-auto flex max-w-4xl flex-col gap-4 p-4">
+		<header class="border-gray-2 border-b pb-3">
+			<p class="text-gray-5 text-xs">Path: {path}</p>
+			<p class="text-gray-5 text-xs">SHA: {sha}</p>
+			<h1 class="text-gray-7 text-2xl font-semibold">{title}</h1>
+			{date && <p class="text-gray-5 text-sm">{date}</p>}
+		</header>
+
+		<article
+			class="prose dark:prose-invert prose-code:rounded-sm prose-code:px-1 prose-code:bg-gray-2"
+			set:html={html}
+		/>
+	</main>
+</GlobalLayout>

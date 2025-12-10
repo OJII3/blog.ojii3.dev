@@ -38,6 +38,9 @@ export default defineConfig({
 		sitemap(),
 		pagefind(),
 	],
+	experimental: {
+		liveContentCollections: true,
+	},
 	markdown: {
 		gfm: true,
 		rehypePlugins: [],
