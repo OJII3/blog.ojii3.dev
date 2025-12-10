@@ -12,5 +12,5 @@
 		"binding": "ASSETS",
 		"directory": "./dist",
 		"not_found_handling": "404-page"
-	},
+	}
 }
