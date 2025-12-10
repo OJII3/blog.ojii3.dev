@@ -1,30 +1,5 @@
 ---
-import GlobalLayout from "../../features/_layouts/GlobalLayout.astro";
-
 export const prerender = false;
 ---
 
-<GlobalLayout>
-	<button id="login">Login</button>
-	<button id="logout">Logout</button>
-
-	<script>
-		const { signIn, signOut } = await import(
-			"../../features/admin/_lib/auth-client"
-		);
-		const loginButton = document.querySelector("#login");
-		const logoutButton = document.querySelector("#logout");
-
-		if (!loginButton || !logoutButton) {
-			throw new Error("Login or Logout button not found");
-		}
-
-		loginButton.addEventListener("click", () =>
-			signIn.social({
-				provider: "github",
-				callbackURL: "/admin/dashboard",
-			}),
-		);
-		logoutButton.addEventListener("click", () => signOut());
-	</script>
-</GlobalLayout>
+<div>Hello</div>

@@ -9,7 +9,9 @@
 		"typecheck": "astro sync && tsc --noEmit",
 		"format": "biome check . --write && prettier --write .",
 		"markdownlint": "markdownlint-cli2 --fix './content/**/*.md'",
-		"db:generate": "bunx @better-auth/cli generate --config src/db/auth-cli.ts --output src/db/generated/auth-schema.ts",
+		"db:generate": "bunx @better-auth/cli generate --config src/db/auth-config.ts --output src/db/generated/auth-schema.ts",
+		"db:migrate:local": "wrangler d1 migrations apply DB --local",
+		"db:migrate:remote": "wrangler d1 migrations apply DB --remote",
 		"preview": "wrangler dev --port 4321",
 		"astro": "astro",
 		"wrangler": "wrangler"
