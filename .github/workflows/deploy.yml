@@ -65,8 +65,8 @@ jobs:
         env:
           GOOGLE_ANALYTICS_ID: ${{ secrets.GOOGLE_ANALYTICS_ID }}
           GH_OAUTH_CLIENT_ID: ${{ secrets.GH_OAUTH_CLIENT_ID }}
-          GH_OAUTH_CLIENT_SECRET: ${{ secrets.GH_OAUTH_CLIENT_SECRET }}
-          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+          GH_OAUTH_CLIENT_SECRET: dummy_value
+          BETTER_AUTH_SECRET: dummy_value
 
       - name: Run | Deploy
         # v3.14.1
@@ -144,3 +144,9 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           command: |
             versions deploy ${{ steps.get-version-id.outputs.version_id }} -y
+          secrets: |
+            BETTER_AUTH_SECRET
+            GH_OAUTH_CLIENT_SECRET
+        env:
+          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+          GH_OAUTH_CLIENT_SECRET: ${{ secrets.GH_OAUTH_CLIENT_SECRET }}

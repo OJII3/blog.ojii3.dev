@@ -6,6 +6,7 @@
 		"dev": "astro dev",
 		"build": "astro build",
 		"check": "biome check . && prettier --check .",
+		"typecheck": "astro sync && tsc --noEmit",
 		"format": "biome check . --write && prettier --write .",
 		"markdownlint": "markdownlint-cli2 --fix './content/**/*.md'",
 		"preview": "wrangler dev --port 4321",
@@ -32,6 +33,7 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.3.7",
+		"@cloudflare/workers-types": "^4.20251209.0",
 		"@resvg/resvg-js": "^2.6.2",
 		"@tailwindcss/typography": "^0.5.19",
 		"@types/react": "^19.1.8",

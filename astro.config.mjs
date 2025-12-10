@@ -67,11 +67,11 @@ export default defineConfig({
 			}),
 			GH_OAUTH_CLIENT_SECRET: envField.string({
 				context: "server",
-				access: "public",
+				access: "secret",
 			}),
 			BETTER_AUTH_SECRET: envField.string({
 				context: "server",
-				access: "public",
+				access: "secret",
 			}),
 		},
 	},

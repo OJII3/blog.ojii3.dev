@@ -4,6 +4,7 @@
 	"main": "dist/_worker.js/index.js",
 	"compatibility_date": "2025-07-12",
 	"compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+	"account_id": "c400a4d044bf4655006c3245036fdb68",
 	"observability": {
 		"enabled": true
 	},

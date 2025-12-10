@@ -5,12 +5,13 @@ import {
 } from "astro:env/server";
 import { betterAuth } from "better-auth";
 
-export const auth = betterAuth({
-	secret: BETTER_AUTH_SECRET,
-	socialProviders: {
-		github: {
-			clientId: GH_OAUTH_CLIENT_ID,
-			clientSecret: GH_OAUTH_CLIENT_SECRET,
+export const createAuth = () =>
+	betterAuth({
+		secret: BETTER_AUTH_SECRET,
+		socialProviders: {
+			github: {
+				clientId: GH_OAUTH_CLIENT_ID,
+				clientSecret: GH_OAUTH_CLIENT_SECRET,
+			},
 		},
-	},
-});
+	});
