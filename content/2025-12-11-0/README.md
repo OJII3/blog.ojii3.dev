@@ -106,17 +106,23 @@ export const collections = { blog };
 ちなみに、クローン処理は [simple-git](https://www.npmjs.com/package/simple-git) などのライブラリを使って書くこともできますし、
 `node:child_process` から `execSync` をインポートして `execSync("git clone ...")` と書くこともできます。`
 
+この方法で実際に動いている例としてはサークルのホームページがそうです。
+
+<https://github.com/tuatmcc/tuatmcc.com>
+
+(私のこのブログも Astro Content Collection を使っていますが、マークダウンもリポジトリに含めてしまっているので参考にはならないです)
+
 ## おわりに
 
 クローン処理を完全にAstroに任せられるので、ビルド前にスクリプトを走らせる必要がなくなり、非常に幸せです。
 
 ```ts title="src/content/config.ts"
-loader: NODE.ENV === "development"
+loader: import.meta.env.DEV
     ? github("**/README.md", "./content")
-    : glob({ pattern: "**/README.md", base: "./content" }),
+    : glob({ pattern: "**/README.md", base: "./mock" }),
 ```
 
-みたいに、開発環境と本番環境でローダーを切り替えることも簡単にできます。
+といった風に、開発環境と本番環境でローダーを切り替えることも簡単にできます。
 
 ## まとめ
 
