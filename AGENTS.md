@@ -1,6 +1,6 @@
 # [blog.ojii3.dev](https://blog.ojii3.dev)
 
-このリポジトリは [Astro](https://astro.build/) を使用して構築されたパーソナルブログサイトである. Bun をパッケージマネージャ/ビルドランタイムとして使用し、Cloudflare Workers にデプロイされる.
+こ.リポジトリは [Astro](https://astro.build/) を使用して構築されたパーソナルブログサイトである. Bun をパッケージマネージャ/ビルドランタイムとして使用し、Cloudflare Workers にデプロイされる.
 
 ## 環境構築
 
@@ -16,19 +16,19 @@ GH_OAUTH_CLIENT_SECRET=dummy # dummy only for astro build
 SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt 
 ```
 
-以下のコマンドで自動的に読みこまれるようになる。
+以下のコマンドで自動的に読みこまれるようになる.
 
 ```sh
 direnv allow
 ```
 
-npmの依存関係をインストールする。
+npmの依存関係をインストールする.
 
 ```sh
 bun i
 ```
 
-ランタイムで使用される環境変数を設定する。
+ランタイムで使用される環境変数を設定する.
 
 ```sh
 # .dev.vars
@@ -53,12 +53,11 @@ Astro のソースは `src/` にある.
 ## ビルド、テスト、開発コマンド
 
 - `bun install` — Bun で依存関係をインストールする.
-- `bun run dev` — ホットリロードで Astro 開発サーバーを起動する.
+- `bun run dev` — ホットリロードで Astro 開発サーバーを起動する. Cloudflare Adapter を使用しているため、使用不可。
 - `bun run build` — `dist/` に最適化されたバンドルを生成する.
 - `bun run preview` — Cloudflare を模倣するためにバンドルをローカルで提供する.
 - `bun run check` — プロジェクト全体で Biome/Prettier のリント/フォーマットチェックを実行する.
 - `bun run format` — Biome/Prettier の修正をインプレースで適用する.
-- `bun run markdownlint` — Markdown ファイルのリンティングと修正を行う.
 
 ## コーディングスタイルと命名規則
 
@@ -68,17 +67,16 @@ Astro コンポーネントでは、Props に明示的な型を付ける. クラ
 
 ## テストガイドライン
 
-自動テストスイートはない. リンティングと手動検証に頼る. プッシュする前に、`bun run check`、`bun run build`、`bun run preview` を実行して、ランタイムエラー、レイアウトの問題、Cloudflare 固有のリグレッションを捕捉する. コンテンツの編集については、`bun run dev` を介して `http://localhost:4321/<slug>` を確認し、メタデータ (日付、OG 画像) が正しいことを確認する. レビューアが繰り返せるように、PR に手動 QA の手順を文書化する.
+自動テストは存在しない。`bun run check` を使用して、リンティングと型チェックを行い。動作確認が必要であれば、目的と確認箇所を明確にして提示すること.
 
 ## コミットとプルリクエストのガイドライン
 
-コミットは、緩やかな Conventional Commit スタイル (`feat:`, `chore:`, `fix:`) または短い命令形メッセージ (例: 「2025-11-17 の記事名を変更」) に従う. プッシュする前に、ノイズの多い WIP コミットをスカッシュする. プルリクエストには、概要、リンクされた課題、視覚的な調整のスクリーンショット、実行されたコマンド (`bun run check`, `bun run build`)、および設定またはコンテンツの移行に関するメモを含める必要がある. グローバルなレイアウトまたはデプロイ設定に影響する変更は、Astro メンテナーからのレビューをリクエストする必要がある.
-
-## デプロイと設定に関する注意事項
-
-Cloudflare の認証情報とルートは `wrangler.toml` にある. シークレットはソースに保存するのではなく、`bun run wrangler secret put` で更新する. `@astrojs/sitemap` はサイトマップを自動生成するため、必要に応じて新しい動的パスを `astro.config.mjs` に追加する. サードパーティースクリプトは、メインスレッドのパフォーマンスを保護するために `@astrojs/partytown` を通じてロードする.
+コミットメッセージは Conventional Commits に従う。機能ごとの小さな粒度で、`bun run format` を実行してからコミットを行う。コミットは手動で行うため、コミットメッセージの提案のみ生成して提示すること.
 
 ## その他
 
-- voicvox-mcp が利用可能であれば、タスクが進むごとに音声で報告すること.
-- MacOS であれば、タスク完了時に `open raycast://confetti` を実行すること.
+- ユーザーの確認・操作が必要な場合は、以下の方法で通知すること. 重複してよい.
+    - voicvox-mcp が利用可能であれば、音声で報告。
+    - MacOS であれば、`open raycast://confetti` を実行する.
+    - MacOS であれば `terminal-notifier`、Linux であれば `notify-send` を使用してデスクトップ通知を送信する.
+- 正確な情報を得るためにドキュメントのMCPを利用すること。
