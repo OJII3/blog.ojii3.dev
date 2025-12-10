@@ -13,9 +13,4 @@
 		"directory": "./dist",
 		"not_found_handling": "404-page"
 	},
-	"vars": {
-		"BETTER_AUTH_SECRET": "dummy_value",
-		"GH_OAUTH_CLIENT_SECRET": "dummy_value",
-		"GH_APP_CLIENT_SECRET": "dummy_value"
-	}
 }
