@@ -1,5 +1,108 @@
 ---
+import GlobalLayout from "../../features/_layouts/GlobalLayout.astro";
+import {
+	createContentClient,
+	type GitHubContentItem,
+	repoLabel,
+} from "../../features/admin/_lib/github";
+
 export const prerender = false;
+
+type ContentResult =
+	| { status: "ok"; entries: GitHubContentItem[]; fetchedAt: string }
+	| { status: "error"; message: string };
+
+let contentResult: ContentResult = {
+	status: "error",
+	message: "まだ GitHub API にアクセスしていません。",
+};
+
+const clientResult = await createContentClient(Astro.request.headers);
+if (clientResult.status === "error") {
+	contentResult = { status: "error", message: clientResult.message };
+} else {
+	const listing = await clientResult.data.listRepoPath("content");
+	if (listing.status === "error") {
+		contentResult = { status: "error", message: listing.message };
+	} else {
+		contentResult = {
+			status: "ok",
+			entries: listing.data,
+			fetchedAt: new Date().toISOString(),
+		};
+	}
+}
 ---
 
-<div>Hello</div>
+<GlobalLayout title="Admin | Content overview">
+	<main class="mx-auto flex max-w-4xl flex-col gap-4 p-4">
+		<header class="border-gray-2 border-b pb-3">
+			<p class="text-gray-5 text-sm">
+				ログインユーザー: {Astro.locals.user?.email ?? "不明"}
+			</p>
+			<h1 class="text-gray-7 text-xl font-semibold">GitHub API 動作確認</h1>
+			<p class="text-gray-5 text-sm">
+				GitHub ログインで取得したトークンを使って {repoLabel}/content
+				を呼び出します。
+			</p>
+		</header>
+
+		{
+			contentResult.status === "error" ? (
+				<div class="rounded-lg border border-red-300 bg-red-50 p-4 text-red-700">
+					<p class="font-semibold">GitHub API 呼び出しに失敗しました</p>
+					<p class="text-sm">{contentResult.message}</p>
+				</div>
+			) : (
+				<section class="border-gray-2 bg-gray-0 rounded-lg border shadow-sm">
+					<div class="border-gray-2 flex items-center justify-between border-b px-4 py-3">
+						<div>
+							<p class="text-gray-5 text-sm">Repository</p>
+							<p class="text-gray-7 font-semibold">{repoLabel}</p>
+						</div>
+						<p class="text-gray-5 text-xs">
+							Fetched at{" "}
+							{new Date(contentResult.fetchedAt).toLocaleString("ja-JP")}
+						</p>
+					</div>
+
+					<p class="text-gray-6 border-gray-2 bg-gray-1 border-b px-4 py-2 text-xs">
+						Path: content (repository root)
+					</p>
+
+					{contentResult.entries.length === 0 ? (
+						<p class="text-gray-6 px-4 py-3 text-sm">
+							ファイルが返ってきませんでした。
+						</p>
+					) : (
+						<ul class="divide-gray-2 divide-y">
+							{contentResult.entries.map((item) => (
+								<li class="flex items-center justify-between px-4 py-3">
+									<div class="flex items-center gap-3">
+										<span class="bg-gray-1 text-gray-6 rounded-full px-3 py-1 text-xs uppercase">
+											{item.type}
+										</span>
+										<div>
+											<p class="text-gray-7 font-medium">{item.name}</p>
+											<p class="text-gray-5 text-xs">{item.path}</p>
+										</div>
+									</div>
+									{item.html_url && (
+										<a
+											href={item.html_url}
+											target="_blank"
+											rel="noreferrer"
+											class="text-accent-600 hover:text-accent-700 text-sm font-semibold"
+										>
+											Open
+										</a>
+									)}
+								</li>
+							))}
+						</ul>
+					)}
+				</section>
+			)
+		}
+	</main>
+</GlobalLayout>
