@@ -1,7 +1,7 @@
 ---
 title: Astro Content Collection で外部の GitHub リポジトリを使うだけのローダー
 date: 2025-12-11
-draft: true
+draft: false
 ---
 
 [農工大アドベントカレンダー2025](https://qiita.com/advent-calendar/2025/tuat) 11日目の記事です。
