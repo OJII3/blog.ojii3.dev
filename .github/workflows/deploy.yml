@@ -82,12 +82,6 @@ jobs:
             --message "${{ github.event_name == 'pull_request' &&
             format('Preview deployment for PR #{0}',
             github.event.pull_request.number) || 'Release deployment' }}"
-          secrets: |
-            BETTER_AUTH_SECRET
-            GH_OAUTH_CLIENT_SECRET
-        env:
-          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
-          GH_OAUTH_CLIENT_SECRET: ${{ secrets.GH_OAUTH_CLIENT_SECRET }}
 
       - name: Finish | Post comment
         if: github.event_name == 'pull_request'
