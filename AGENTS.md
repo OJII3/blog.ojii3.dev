@@ -11,8 +11,8 @@ AstroやローカルのCLI用の環境変数を設定する.
 CLOUDFLARE_API_TOKEN=
 BETTER_AUTH_URL=http://localhost:4321
 BETTER_AUTH_SECRET=dummy # dummy only for astro build
-GH_OAUTH_CLIENT_ID=
-GH_OAUTH_CLIENT_SECRET=dummy # dummy only for astro build
+GH_APP_CLIENT_ID=
+GH_APP_CLIENT_SECRET=dummy # dummy only for astro build
 SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt 
 ```
 
@@ -33,7 +33,7 @@ bun i
 ```sh
 # .dev.vars
 BETTER_AUTH_SECRET=
-GH_OAUTH_CLIENT_SECRET=
+GH_APP_CLIENT_SECRET=
 ```
 
 ## プロジェクト構造とモジュール構成

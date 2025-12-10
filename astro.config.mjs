@@ -61,11 +61,11 @@ export default defineConfig({
 				access: "public",
 				optional: true,
 			}),
-			GH_OAUTH_CLIENT_ID: envField.string({
+			GH_APP_CLIENT_ID: envField.string({
 				context: "server",
 				access: "public",
 			}),
-			GH_OAUTH_CLIENT_SECRET: envField.string({
+			GH_APP_CLIENT_SECRET: envField.string({
 				context: "server",
 				access: "secret",
 			}),
