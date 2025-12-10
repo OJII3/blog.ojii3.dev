@@ -1,5 +1,5 @@
 ---
-title: Astro Content Collection で外部の GitHub リポジトリを使うだけのローダー
+title: Astro Content Collection で外部の GitHub リポジトリを使う
 date: 2025-12-11
 draft: false
 ---
