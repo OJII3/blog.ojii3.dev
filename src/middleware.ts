@@ -10,7 +10,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 		return next();
 	}
 
-	const auth = createAuth(context.locals.runtime.env.DB);
+	const auth = createAuth();
 	const sessionData = await auth.api.getSession({
 		headers: context.request.headers,
 	});

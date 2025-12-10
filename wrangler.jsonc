@@ -8,14 +8,6 @@
 	"observability": {
 		"enabled": true
 	},
-	"d1_databases": [
-		{
-			"binding": "DB",
-			"database_name": "blog-auth-db",
-			"database_id": "293fc19f-f74c-4d68-80d5-4d45a3bcbe6a",
-			"migrations_dir": "drizzle"
-		}
-	],
 	"assets": {
 		"binding": "ASSETS",
 		"directory": "./dist",
