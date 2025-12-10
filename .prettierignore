@@ -4,3 +4,4 @@ content
 **/*.md
 **/*.{js,jsx,ts,tsx}
 **/*.{m,c}js
+**/generated/**
