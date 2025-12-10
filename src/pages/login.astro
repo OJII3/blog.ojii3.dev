@@ -1,5 +1,5 @@
 ---
-import GlobalLayout from "../../features/_layouts/GlobalLayout.astro";
+import GlobalLayout from "../features/_layouts/GlobalLayout.astro";
 
 export const prerender = false;
 ---
@@ -12,7 +12,7 @@ export const prerender = false;
 
 	<script>
 		const { signIn, signOut } = await import(
-			"../../features/admin/_lib/auth-client"
+			"../features/admin/_lib/auth-client"
 		);
 		const loginButton = document.querySelector("#login");
 		const logoutButton = document.querySelector("#logout");
