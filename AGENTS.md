@@ -2,6 +2,40 @@
 
 このリポジトリは [Astro](https://astro.build/) を使用して構築されたパーソナルブログサイトである. Bun をパッケージマネージャ/ビルドランタイムとして使用し、Cloudflare Workers にデプロイされる.
 
+## 環境構築
+
+AstroやローカルのCLI用の環境変数を設定する.
+
+```sh
+# .env
+CLOUDFLARE_API_TOKEN=
+BETTER_AUTH_URL=http://localhost:4321
+BETTER_AUTH_SECRET=dummy # dummy only for astro build
+GH_OAUTH_CLIENT_ID=
+GH_OAUTH_CLIENT_SECRET=dummy # dummy only for astro build
+SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt 
+```
+
+以下のコマンドで自動的に読みこまれるようになる。
+
+```sh
+direnv allow
+```
+
+npmの依存関係をインストールする。
+
+```sh
+bun i
+```
+
+ランタイムで使用される環境変数を設定する。
+
+```sh
+# .dev.vars
+BETTER_AUTH_SECRET=
+GH_OAUTH_CLIENT_SECRET=
+```
+
 ## プロジェクト構造とモジュール構成
 
 Astro のソースは `src/` にある.
