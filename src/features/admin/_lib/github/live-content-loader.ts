@@ -21,6 +21,8 @@ const DEFAULT_BASE_PATH = "content";
 
 const normalizeBasePath = (path: string | undefined) => {
 	const cleaned = (path ?? DEFAULT_BASE_PATH)
+		.replace(/\\/g, "/")
+		.replace(/^\.\//, "")
 		.replace(/^\/+/, "")
 		.replace(/\/+$/, "");
 	return cleaned.length === 0 ? DEFAULT_BASE_PATH : cleaned;
@@ -34,9 +36,6 @@ const toEntryId = (fullPath: string, basePath: string) =>
 
 const ensureLeadingBase = (basePath: string, suffix?: string) =>
 	suffix ? `${basePath}/${suffix}` : basePath;
-
-const resolveToken = (token?: string) =>
-	token ?? process.env.GITHUB_TOKEN ?? process.env.GH_TOKEN ?? undefined;
 
 const buildEntries = async (
 	client: ContentClient,
@@ -78,15 +77,15 @@ export const githubLiveLoader = (
 		name: "github-live-loader",
 
 		loadCollection: async ({ filter }) => {
-			const token = resolveToken(filter?.token);
+			const token = filter?.token;
 			const clientResult = createContentClientFromToken(token);
 			if (clientResult.status === "error") {
-				return { error: new Error(clientResult.message) };
+				throw new Error(clientResult.message);
 			}
 
 			const rootPath = ensureLeadingBase(basePath, filter?.prefix);
 			const root = await clientResult.data.listRepoPath(rootPath);
-			if (root.status === "error") return { error: new Error(root.message) };
+			if (root.status === "error") throw new Error(root.message);
 
 			const readmePaths = root.data
 				.map((item) => {
@@ -117,17 +116,17 @@ export const githubLiveLoader = (
 		},
 
 		loadEntry: async ({ filter }) => {
-			const token =
-				typeof filter === "string" ? undefined : (filter.token ?? undefined);
+			const token = filter.token;
 			const clientResult = createContentClientFromToken(token);
 			if (clientResult.status === "error") {
-				return { error: new Error(clientResult.message) };
+				throw new Error(clientResult.message);
 			}
 
-			const id = typeof filter === "string" ? filter : filter.id;
+			const id = filter.id;
 			const path = `${basePath}/${id}/${README_NAME}`;
 			const entries = await buildEntries(clientResult.data, basePath, [path]);
-			return entries[0] ?? { error: new Error(`Entry not found: ${id}`) };
+			if (!entries[0]) throw new Error(`Entry not found: ${id}`);
+			return entries[0];
 		},
 	};
 };
