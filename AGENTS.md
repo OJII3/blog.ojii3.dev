@@ -1,6 +1,6 @@
 # [blog.ojii3.dev](https://blog.ojii3.dev)
 
-こ.リポジトリは [Astro](https://astro.build/) を使用して構築されたパーソナルブログサイトである. Bun をパッケージマネージャ/ビルドランタイムとして使用し、Cloudflare Workers にデプロイされる.
+このリポジトリは [Astro](https://astro.build/) を使用して構築されたパーソナルブログサイトである. Bun をパッケージマネージャ/ビルドランタイムとして使用し、Cloudflare Workers にデプロイされる.
 
 ## 環境構築
 
@@ -41,6 +41,8 @@ GH_APP_CLIENT_SECRET=
 Astro のソースは `src/` にある.
 
 - `pages/` はルートを定義する. ページになってしまうため、このディレクトリ内にコンポーネントを直接置くことはできない.
+  - `/admin/*` は管理者ページであり、BetterAuth を使用して認証される.
+  - 管理者ページでは、Experimental Live Collection および GitHub API を用いて動的にコンテンツを管理できる.
 - `features/` はFeatureベースのページ内モジュールを保持する. 以下ディレクトリはFeatureごとに作成される.
   - `_layouts/` はページレイアウトを定義する.
   - `_components/` は共有 UI を保持する.
@@ -53,25 +55,25 @@ Astro のソースは `src/` にある.
 ## ビルド、テスト、開発コマンド
 
 - `bun install` — Bun で依存関係をインストールする.
-- `bun run dev` — ホットリロードで Astro 開発サーバーを起動する. Cloudflare Adapter を使用しているため、使用不可。
+- `bun dev` — ホットリロードで Astro 開発サーバーを起動する. Cloudflare Adapter を使用しているため、使用不可。
 - `bun run build` — `dist/` に最適化されたバンドルを生成する.
-- `bun run preview` — Cloudflare を模倣するためにバンドルをローカルで提供する.
-- `bun run check` — プロジェクト全体で Biome/Prettier のリント/フォーマットチェックを実行する.
-- `bun run format` — Biome/Prettier の修正をインプレースで適用する.
+- `bun preview` — Cloudflare を模倣するためにバンドルをローカルで提供する.
+- `bun check` — プロジェクト全体で Biome/Prettier のリント/フォーマットチェックを実行する.
+- `bun typecheck` — プロジェクト全体で TypeScript の型チェックを実行する.
+- `bun format` — Biome/Prettier の修正をインプレースで適用する.
 
 ## コーディングスタイルと命名規則
 
-インデントにはタブ文字を使用し TypeScript 構文を使用する. コンポーネント、レイアウト、フックは PascalCase (`TopCard.astro`, `OGImage.tsx`) を使用し、ユーティリティや設定は、既存のファイルと一致する場合は lowerCamel または kebab-case のままにできる. Tailwind クラスは、リポジトリに既に存在するカスタムブレークポイントプレフィックス (`2x:`, `3x:`) を再利用する必要がある. コミットする前に `bun run format` を実行する.
+適宜 `bun format` と `bun typecheck` を実行する.
 
-Astro コンポーネントでは、Props に明示的な型を付ける. クライアントでの動的な処理は、`<script>` タグ内に記述する必要があり、基本的には TypeScript を使用するが、静的に評価できないスクリプトは `is:inline` 属性を使用して Astro の最適化から除外し、JavaScript で記述する必要がある.
+Tailwind CSS を使用してスタイリングする際は、デザイントークンを使用・更新して一貫性・再利用性を保つこと.
 
-## テストガイドライン
-
-自動テストは存在しない。`bun run check` を使用して、リンティングと型チェックを行い。動作確認が必要であれば、目的と確認箇所を明確にして提示すること.
+また、コードが複雑になる場合は、関数の切り出しをするまえに、適切なデータ構造を使用していることを確認すること.
 
 ## コミットとプルリクエストのガイドライン
 
-コミットメッセージは Conventional Commits に従う。機能ごとの小さな粒度で、`bun run format` を実行してからコミットを行う。コミットは手動で行うため、コミットメッセージの提案のみ生成して提示すること.
+コミットは手動で行うため、勝手にコミットを行なってはならない。
+チェックをしたのち Conventional Commits に従ったコミットメッセージのみ提示すること。
 
 ## その他
 
