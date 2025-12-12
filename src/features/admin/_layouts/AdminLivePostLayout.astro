@@ -1,15 +1,17 @@
 ---
+import { getLiveEntry } from "astro:content";
 import GlobalLayout from "../../_layouts/GlobalLayout.astro";
 
+type LiveBlogEntry = NonNullable<
+	Awaited<ReturnType<typeof getLiveEntry<"liveBlog">>>["entry"]
+>;
+
 type Props = {
-	title: string;
-	date?: string;
-	html: string;
-	path: string;
-	sha: string;
+	entry: LiveBlogEntry;
 };
 
-const { title, date, html, path, sha } = Astro.props;
+const { entry } = Astro.props;
+const { path, sha, html, title, dateString } = entry.data;
 ---
 
 <GlobalLayout title={`Admin | ${title}`}>
@@ -18,7 +20,7 @@ const { title, date, html, path, sha } = Astro.props;
 			<p class="text-gray-5 text-xs">Path: {path}</p>
 			<p class="text-gray-5 text-xs">SHA: {sha}</p>
 			<h1 class="text-gray-7 text-2xl font-semibold">{title}</h1>
-			{date && <p class="text-gray-5 text-sm">{date}</p>}
+			{dateString && <p class="text-gray-5 text-sm">{dateString}</p>}
 		</header>
 
 		<article

@@ -17,20 +17,18 @@ let contentResult: ContentResult = {
 	message: "まだ GitHub API にアクセスしていません。",
 };
 
-const clientResult = await createContentClient(Astro.request.headers);
-if (clientResult.status === "error") {
-	contentResult = { status: "error", message: clientResult.message };
-} else {
-	const listing = await clientResult.data.listRepoPath("content");
-	if (listing.status === "error") {
-		contentResult = { status: "error", message: listing.message };
-	} else {
-		contentResult = {
-			status: "ok",
-			entries: listing.data,
-			fetchedAt: new Date().toISOString(),
-		};
-	}
+try {
+	const client = await createContentClient(Astro.request.headers);
+	const listing = await client.listRepoPath("content");
+	contentResult = {
+		status: "ok",
+		entries: listing,
+		fetchedAt: new Date().toISOString(),
+	};
+} catch (error) {
+	const message =
+		error instanceof Error ? error.message : "未知のエラーが発生しました。";
+	contentResult = { status: "error", message };
 }
 ---
 

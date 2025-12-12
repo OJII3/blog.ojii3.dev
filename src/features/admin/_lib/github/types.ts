@@ -1,7 +1,3 @@
-export type Result<T> =
-	| { status: "ok"; data: T }
-	| { status: "error"; message: string };
-
 export type GitHubContentItem = {
 	type: "file" | "dir" | "symlink" | "submodule";
 	name: string;
@@ -45,4 +41,9 @@ export type GitHubFileContent = {
 	sha: string;
 	htmlUrl?: string | null;
 	content: string;
+};
+
+export type GlobFilesParams = {
+	pattern: string;
+	ref?: string;
 };

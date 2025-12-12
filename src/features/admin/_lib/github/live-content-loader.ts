@@ -1,31 +1,40 @@
+import { createMarkdownProcessor } from "@astrojs/markdown-remark";
 import type { LiveLoader } from "astro/loaders";
 import { repoLabel } from "./client";
 import { type ContentClient, createContentClientFromToken } from "./content";
+import type { GitHubContentItem } from "./types";
 
 type LiveLoaderOptions = {
-	basePath?: string;
+	owner: string;
+	repo: string;
+	ref?: string;
+	pattern: string;
+	basePath: string;
 };
 
 type EntryData = {
+	id: string;
 	path: string;
 	sha: string;
 	content: string;
 	htmlUrl?: string;
+	html: string;
+	title: string;
+	date: Date;
+	dateString: string;
+	draft?: boolean;
+	tags?: string[];
 };
 
 type EntryFilter = { id: string; token?: string };
 type CollectionFilter = { prefix?: string; token?: string };
 
-const README_NAME = "README.md";
-const DEFAULT_BASE_PATH = "content";
-
-const normalizeBasePath = (path: string | undefined) => {
-	const cleaned = (path ?? DEFAULT_BASE_PATH)
-		.replace(/\\/g, "/")
-		.replace(/^\.\//, "")
-		.replace(/^\/+/, "")
-		.replace(/\/+$/, "");
-	return cleaned.length === 0 ? DEFAULT_BASE_PATH : cleaned;
+let processor: Awaited<ReturnType<typeof createMarkdownProcessor>> | null =
+	null;
+const getProcessor = async () => {
+	if (processor) return processor;
+	processor = await createMarkdownProcessor({ syntaxHighlight: false });
+	return processor;
 };
 
 const toEntryId = (fullPath: string, basePath: string) =>
@@ -34,79 +43,78 @@ const toEntryId = (fullPath: string, basePath: string) =>
 		.replace(/\/README\.md$/i, "")
 		.replace(/\.md$/i, "");
 
-const ensureLeadingBase = (basePath: string, suffix?: string) =>
-	suffix ? `${basePath}/${suffix}` : basePath;
-
 const buildEntries = async (
 	client: ContentClient,
+	items: GitHubContentItem[],
 	basePath: string,
-	paths: string[],
 ) => {
+	const processor = await getProcessor();
 	const entries = await Promise.all(
-		paths.map(async (path) => {
-			const file = await client.getFile({ path });
-			if (file.status === "error") return undefined;
+		items.map(async (item) => {
+			try {
+				const file = await client.getFile({ path: item.path });
 
-			return {
-				id: toEntryId(path, basePath),
-				data: {
-					path,
-					sha: file.data.sha,
-					content: file.data.content,
-					htmlUrl: file.data.htmlUrl ?? undefined,
-				},
-				cacheHint: {
-					tags: [repoLabel, path],
-				},
-			};
+				const rendered = await processor.render(file.content);
+				const frontmatter = rendered.metadata?.frontmatter as Record<
+					string,
+					unknown
+				>;
+				const id = toEntryId(item.path, basePath);
+
+				// TODO: Use Zod for validation
+				const title = (frontmatter?.title as string) || "No Title";
+				const dateString =
+					(frontmatter?.date as string) || new Date().toISOString();
+				const date = new Date(dateString);
+				const tags = (frontmatter?.tags as string[]) || [];
+				const draft = (frontmatter?.draft as boolean) || false;
+
+				return {
+					id,
+					data: {
+						id,
+						path: item.path,
+						sha: file.sha,
+						content: file.content,
+						htmlUrl: file.htmlUrl ?? undefined,
+						html: rendered.code,
+						title,
+						date,
+						dateString,
+						tags,
+						draft,
+					},
+					cacheHint: {
+						tags: [repoLabel, item.path],
+					},
+				};
+			} catch (_e) {
+				return undefined;
+			}
 		}),
 	);
 
 	return entries.filter(
-		(entry): entry is NonNullable<(typeof entries)[number]> =>
-			entry !== undefined,
+		(entry): entry is NonNullable<typeof entry> => entry !== undefined,
 	);
 };
 
 export const githubLiveLoader = (
-	options?: LiveLoaderOptions,
-): LiveLoader<EntryData, EntryFilter, CollectionFilter> => {
-	const basePath = normalizeBasePath(options?.basePath);
+	options: LiveLoaderOptions,
+): LiveLoader<EntryData, EntryFilter, CollectionFilter, Error> => {
+	const { pattern, basePath } = options;
 
 	return {
 		name: "github-live-loader",
-
 		loadCollection: async ({ filter }) => {
 			const token = filter?.token;
-			const clientResult = createContentClientFromToken(token);
-			if (clientResult.status === "error") {
-				throw new Error(clientResult.message);
-			}
+			const client = createContentClientFromToken(token);
 
-			const rootPath = ensureLeadingBase(basePath, filter?.prefix);
-			const root = await clientResult.data.listRepoPath(rootPath);
-			if (root.status === "error") throw new Error(root.message);
+			const files = await client.globFiles({
+				pattern,
+			});
 
-			const readmePaths = root.data
-				.map((item) => {
-					if (
-						item.type === "file" &&
-						item.name.toLowerCase() === README_NAME.toLowerCase()
-					) {
-						return item.path;
-					}
-					if (item.type === "dir") {
-						return `${item.path}/${README_NAME}`;
-					}
-					return null;
-				})
-				.filter((path): path is string => !!path);
-
-			const entries = await buildEntries(
-				clientResult.data,
-				basePath,
-				readmePaths,
-			);
+			const entries = await buildEntries(client, files, basePath);
 			return {
 				entries,
 				cacheHint: {
@@ -117,14 +125,22 @@ export const githubLiveLoader = (
 
 		loadEntry: async ({ filter }) => {
 			const token = filter.token;
-			const clientResult = createContentClientFromToken(token);
-			if (clientResult.status === "error") {
-				throw new Error(clientResult.message);
-			}
+			const client = createContentClientFromToken(token);
 
 			const id = filter.id;
-			const path = `${basePath}/${id}/${README_NAME}`;
-			const entries = await buildEntries(clientResult.data, basePath, [path]);
+			// Since we don't have a direct map from ID to path, we glob all files and match.
+			// This is inefficient but functional for now.
+			const files = await client.globFiles({
+				pattern,
+			});
+
+			const matchedItem = files.find(
+				(item) => toEntryId(item.path, basePath) === id,
+			);
+
+			if (!matchedItem) throw new Error(`Entry not found: ${id}`);
+
+			const entries = await buildEntries(client, [matchedItem], basePath);
 			if (!entries[0]) throw new Error(`Entry not found: ${id}`);
 			return entries[0];
 		},

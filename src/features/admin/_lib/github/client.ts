@@ -1,6 +1,5 @@
 import { Octokit } from "@octokit/core";
 import { createAuth } from "../../../../auth";
-import type { Result } from "./types";
 
 const auth = createAuth();
 
@@ -21,47 +20,29 @@ export const createOctokit = (accessToken?: string) =>
 
 export const getGitHubAccessToken = async (
 	headers: Headers,
-): Promise<Result<string>> => {
-	try {
-		const response = await auth.api.getAccessToken({
-			headers,
-			body: { providerId: "github" },
-		});
+): Promise<string> => {
+	const response = await auth.api.getAccessToken({
+		headers,
+		body: { providerId: "github" },
+	});
 
-		const accessToken = response?.accessToken;
-		if (!accessToken) {
-			return {
-				status: "error",
-				message:
-					"GitHub のアクセストークンを取得できませんでした。再ログインしてください。",
-			};
-		}
-
-		return { status: "ok", data: accessToken };
-	} catch (error) {
-		const message =
-			error instanceof Error ? error.message : "未知のエラーが発生しました。";
-		return { status: "error", message };
+	const accessToken = response?.accessToken;
+	if (!accessToken) {
+		throw new Error(
+			"GitHub のアクセストークンを取得できませんでした。再ログインしてください。",
+		);
 	}
+
+	return accessToken;
 };
 
-export const createOctokitFromToken = (
-	accessToken?: string,
-): Result<Octokit> => {
-	try {
-		return { status: "ok", data: createOctokit(accessToken) };
-	} catch (error) {
-		const message =
-			error instanceof Error ? error.message : "未知のエラーが発生しました。";
-		return { status: "error", message };
-	}
+export const createOctokitFromToken = (accessToken?: string): Octokit => {
+	return createOctokit(accessToken);
 };
 
 export const createOctokitClient = async (
 	headers: Headers,
-): Promise<Result<Octokit>> => {
-	const tokenResult = await getGitHubAccessToken(headers);
-	if (tokenResult.status === "error") return tokenResult;
-
-	return { status: "ok", data: createOctokit(tokenResult.data) };
+): Promise<Octokit> => {
+	const accessToken = await getGitHubAccessToken(headers);
+	return createOctokit(accessToken);
 };

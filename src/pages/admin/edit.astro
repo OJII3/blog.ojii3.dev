@@ -1,6 +1,6 @@
 ---
 import { getLiveEntry } from "astro:content";
-import { createMarkdownProcessor } from "@astrojs/markdown-remark";
+import {} from "astro-icon";
 import AdminLivePostLayout from "../../features/admin/_layouts/AdminLivePostLayout.astro";
 import { getGitHubAccessToken } from "../../features/admin/_lib/github/client";
 
@@ -9,91 +9,42 @@ export const prerender = false;
 const searchParams = new URL(Astro.request.url).searchParams;
 const id = searchParams.get("id");
 
-type EntryState =
-	| { status: "missing" }
-	| { status: "error"; message: string }
-	| {
-			status: "ok";
-			title: string;
-			date?: string;
-			html: string;
-			path: string;
-			sha: string;
-	  };
+type LiveBlogEntry = NonNullable<
+	Awaited<ReturnType<typeof getLiveEntry<"liveBlog">>>["entry"]
+>;
 
-let state: EntryState = { status: "missing" };
+let entry: LiveBlogEntry | undefined;
+let errorMessage: string | undefined;
 
-if (id) {
-	const tokenResult = await getGitHubAccessToken(Astro.request.headers);
-	const token = tokenResult.status === "ok" ? tokenResult.data : undefined;
+if (!id) return Astro.redirect("/admin");
 
-	try {
-		const { entry } = await getLiveEntry("liveBlog", { id, token });
-		const content = entry ? entry.data.content : null;
+let token: string;
+try {
+	token = await getGitHubAccessToken(Astro.request.headers);
+} catch (e) {
+	return Astro.redirect("/admin");
+}
 
-		if (!entry || !content) {
-			state = {
-				status: "error",
-				message: "Entry not found or content missing.",
-			};
-		} else {
-			const processor = await createMarkdownProcessor({
-				syntaxHighlight: false,
-			});
-			const rendered = await processor.render(content);
-			const frontmatter = rendered.metadata.frontmatter ?? {};
+const result = await getLiveEntry("liveBlog", {
+	id,
+	token,
+});
 
-			const title =
-				typeof frontmatter.title === "string" && frontmatter.title.length > 0
-					? frontmatter.title
-					: id;
-
-			let date: string | undefined;
-			if (frontmatter.date) {
-				const parsed = new Date(frontmatter.date as string);
-				if (!Number.isNaN(parsed.valueOf())) {
-					date = parsed.toISOString().split("T")[0];
-				}
-			}
-
-			state = {
-				status: "ok",
-				title,
-				date,
-				html: rendered.code,
-				path: entry.data.path,
-				sha: entry.data.sha,
-			};
-		}
-	} catch (error) {
-		state = {
-			status: "error",
-			message:
-				error instanceof Error ? error.message : "未知のエラーが発生しました。",
-		};
-	}
+if (result.error) {
+	errorMessage = result.error.message;
+} else if (result.entry) {
+	entry = result.entry;
+} else {
+	errorMessage = "Entry not found.";
 }
 ---
 
 {
-	state.status === "ok" ? (
-		<AdminLivePostLayout
-			title={state.title}
-			date={state.date}
-			html={state.html}
-			path={state.path}
-			sha={state.sha}
-		/>
+	entry ? (
+		<AdminLivePostLayout entry={entry} />
 	) : (
-		<AdminLivePostLayout
-			title="Live entry"
-			path={id ?? "no id"}
-			sha="N/A"
-			html={
-				state.status === "missing"
-					? "<p>Query parameter <code>?id=...</code> を指定してください。</p>"
-					: `<p>読み込みに失敗しました: ${state.message}</p>`
-			}
-		/>
+		<div>
+			<p class="m-4 text-red-600">{errorMessage}</p>
+		</div>
 	)
 }

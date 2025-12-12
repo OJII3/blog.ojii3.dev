@@ -4,7 +4,7 @@ export {
 	createContentClient,
 	createContentClientFromToken,
 } from "./content";
-export { githubLiveLoader as createGitHubContentLiveLoader } from "./live-content-loader";
+export { githubLiveLoader } from "./live-content-loader";
 export type {
 	DeleteContentParams,
 	GetFileParams,
