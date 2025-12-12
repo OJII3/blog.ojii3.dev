@@ -1,5 +1,4 @@
 import type { Octokit } from "@octokit/core";
-import picomatch from "picomatch";
 import {
 	createOctokit,
 	createOctokitClient,
@@ -12,7 +11,6 @@ import type {
 	GitHubContentItem,
 	GitHubFileCommit,
 	GitHubFileContent,
-	GlobFilesParams,
 	UpsertContentParams,
 } from "./types";
 
@@ -23,7 +21,6 @@ export type ContentClient = {
 	upsertFile: (params: UpsertContentParams) => Promise<GitHubFileCommit>;
 	deleteFile: (params: DeleteContentParams) => Promise<GitHubFileCommit>;
 	getFile: (params: GetFileParams) => Promise<GitHubFileContent>;
-	globFiles: (params: GlobFilesParams) => Promise<GitHubContentItem[]>;
 };
 
 const normalizePath = (path: string) => {
@@ -163,44 +160,6 @@ const getFileWithOctokit = async (
 	};
 };
 
-const globFilesWithOctokit = async (
-	octokit: Octokit,
-	params: GlobFilesParams,
-): Promise<GitHubContentItem[]> => {
-	const { pattern, ref } = params;
-	// Get the default branch first if ref is not provided
-	const branchRef = ref || "HEAD";
-
-	// Get the tree recursively
-	const response = await octokit.request(
-		"GET /repos/{owner}/{repo}/git/trees/{tree_sha}",
-		{
-			owner: repoOwner,
-			repo: repoName,
-			tree_sha: branchRef,
-			recursive: "true",
-		},
-	);
-
-	if (!response.data.tree) {
-		throw new Error("Failed to fetch repository tree.");
-	}
-
-	// Filter files using picomatch
-	const isMatch = picomatch(pattern);
-	const matchedItems = response.data.tree
-		.filter((item) => item.type === "blob" && isMatch(item.path || ""))
-		.map((item) => ({
-			type: "file" as const,
-			path: item.path || "",
-			name: item.path?.split("/").pop() || "",
-			sha: item.sha || "",
-			htmlUrl: undefined,
-		}));
-
-	return matchedItems;
-};
-
 export const createContentClient = async (
 	headers: Headers,
 ): Promise<ContentClient> => {
@@ -213,8 +172,6 @@ export const createContentClient = async (
 		deleteFile: (params: DeleteContentParams) =>
 			deleteFileWithOctokit(octokit, params),
 		getFile: (params: GetFileParams) => getFileWithOctokit(octokit, params),
-		globFiles: (params: GlobFilesParams) =>
-			globFilesWithOctokit(octokit, params),
 	};
 
 	return client;
@@ -231,8 +188,6 @@ export const createContentClientFromToken = (
 		deleteFile: (params: DeleteContentParams) =>
 			deleteFileWithOctokit(octokit, params),
 		getFile: (params: GetFileParams) => getFileWithOctokit(octokit, params),
-		globFiles: (params: GlobFilesParams) =>
-			globFilesWithOctokit(octokit, params),
 	};
 	return client;
 };

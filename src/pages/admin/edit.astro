@@ -9,42 +9,23 @@ export const prerender = false;
 const searchParams = new URL(Astro.request.url).searchParams;
 const id = searchParams.get("id");
 
-type LiveBlogEntry = NonNullable<
-	Awaited<ReturnType<typeof getLiveEntry<"liveBlog">>>["entry"]
->;
-
-let entry: LiveBlogEntry | undefined;
-let errorMessage: string | undefined;
-
 if (!id) return Astro.redirect("/admin");
 
 let token: string;
 try {
 	token = await getGitHubAccessToken(Astro.request.headers);
 } catch (e) {
-	return Astro.redirect("/admin");
+	return Astro.redirect("/404");
 }
 
-const result = await getLiveEntry("liveBlog", {
+const { entry, error } = await getLiveEntry("liveBlog", {
 	id,
 	token,
 });
 
-if (result.error) {
-	errorMessage = result.error.message;
-} else if (result.entry) {
-	entry = result.entry;
-} else {
-	errorMessage = "Entry not found.";
+if (error) {
+	Astro.redirect("/404");
 }
 ---
 
-{
-	entry ? (
-		<AdminLivePostLayout entry={entry} />
-	) : (
-		<div>
-			<p class="m-4 text-red-600">{errorMessage}</p>
-		</div>
-	)
-}
+{entry ? <AdminLivePostLayout entry={entry} /> : <div />}

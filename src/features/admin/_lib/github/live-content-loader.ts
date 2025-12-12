@@ -8,12 +8,11 @@ type LiveLoaderOptions = {
 	owner: string;
 	repo: string;
 	ref?: string;
-	pattern: string;
+	filename: string;
 	basePath: string;
 };
 
 type EntryData = {
-	id: string;
 	path: string;
 	sha: string;
 	content: string;
@@ -61,7 +60,7 @@ const buildEntries = async (
 				>;
 				const id = toEntryId(item.path, basePath);
 
-				// TODO: Use Zod for validation
+				// バリデーションはスキーマ側で行うので、ここでは最低限の型変換のみ行う.
 				const title = (frontmatter?.title as string) || "No Title";
 				const dateString =
 					(frontmatter?.date as string) || new Date().toISOString();
@@ -72,7 +71,6 @@ const buildEntries = async (
 				return {
 					id,
 					data: {
-						id,
 						path: item.path,
 						sha: file.sha,
 						content: file.content,
@@ -102,7 +100,7 @@ const buildEntries = async (
 export const githubLiveLoader = (
 	options: LiveLoaderOptions,
 ): LiveLoader<EntryData, EntryFilter, CollectionFilter, Error> => {
-	const { pattern, basePath } = options;
+	const { filename, basePath } = options;
 
 	return {
 		name: "github-live-loader",
@@ -110,9 +108,17 @@ export const githubLiveLoader = (
 			const token = filter?.token;
 			const client = createContentClientFromToken(token);
 
-			const files = await client.globFiles({
-				pattern,
-			});
+			const dirs = await client.listRepoPath(basePath);
+
+			// Construct file paths for each directory
+			const files: GitHubContentItem[] = dirs
+				.filter((item) => item.type === "dir")
+				.map((item) => ({
+					type: "file",
+					path: `${item.path}/${filename}`,
+					name: filename,
+					sha: "", // sha is not known yet, but getFile will fetch it
+				}));
 
 			const entries = await buildEntries(client, files, basePath);
 			return {
@@ -128,19 +134,16 @@ export const githubLiveLoader = (
 			const client = createContentClientFromToken(token);
 
 			const id = filter.id;
-			// Since we don't have a direct map from ID to path, we glob all files and match.
-			// This is inefficient but functional for now.
-			const files = await client.globFiles({
-				pattern,
-			});
+			const path = `${basePath}/${id}/${filename}`;
 
-			const matchedItem = files.find(
-				(item) => toEntryId(item.path, basePath) === id,
-			);
+			const item: GitHubContentItem = {
+				type: "file",
+				path,
+				name: filename,
+				sha: "",
+			};
 
-			if (!matchedItem) throw new Error(`Entry not found: ${id}`);
-
-			const entries = await buildEntries(client, [matchedItem], basePath);
+			const entries = await buildEntries(client, [item], basePath);
 			if (!entries[0]) throw new Error(`Entry not found: ${id}`);
 			return entries[0];
 		},

@@ -42,8 +42,3 @@ export type GitHubFileContent = {
 	htmlUrl?: string | null;
 	content: string;
 };
-
-export type GlobFilesParams = {
-	pattern: string;
-	ref?: string;
-};

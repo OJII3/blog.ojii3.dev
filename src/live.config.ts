@@ -11,11 +11,10 @@ const liveBlog = defineLiveCollection({
 		owner: "OJII3",
 		repo: "blog.ojii3.dev",
 		basePath: "content",
-		pattern: "**/*.md",
+		filename: "README.md",
 	}),
 	schema: z
 		.object({
-			id: z.string(),
 			path: z.string(),
 			sha: z.string(),
 			content: z.string(),
