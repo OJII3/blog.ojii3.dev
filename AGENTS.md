@@ -91,6 +91,36 @@ GH_APP_CLIENT_SECRET=
   - `src/features/admin/editor/` といったディレクトリを切り、エディタ/プレビュー/ファイルツリー/アップロード UI を整理。
   - ルーティングは `/admin/*` 配下に追加。middleware での認証保護を継続。
   - 状態管理は極力ローカル（per-page state）で完結させ、API 呼び出し部分を薄い層に分離。
+- IndexedDB 中心でエディタを構成する際の配置案:
+  - `src/features/admin/editor/client/` — ブラウザ専用ロジック
+    - `db.ts` (or `storage.ts`): IndexedDB ラッパー (`openDB`/CRUD), `Draft` 型定義。
+    - `hash.ts`: `localSha` 計算。
+    - `markdown.ts` / `markdown-worker.ts`: クライアント変換 (Markdown→HTML; Worker 経由) とキャッシュ更新。
+    - `state.ts`: メモリ状態管理 (`loadDraft`, `applyEdit`, `markDirty`, `syncFromDB`)。
+    - `conflict.ts`: `serverSha` 突き合わせと `clean/dirty/conflict` 判定。
+  - `src/features/admin/editor/api/`
+    - `github.ts`: Octokit 経由で `fetchDraft(id)`, `saveDraft`, `deleteDraft`, `getLatestSha` など。D1/R2 への移行時はここを差し替える。
+  - `src/features/admin/editor/ui/`
+    - `EditorPane`, `PreviewPane`, `StatusBar`, `ConflictBanner`, `AssetUploader` 等の UI。`EditorLayout` で PC は左右分割、SP はタブ切替。
+  - `src/features/admin/editor/types.ts`
+    - `Draft` (id, content, frontmatter, html?, serverSha, localSha, status, updatedAt, fetchedAt), `Asset` (assetId, postId?, name, type, data, updatedAt) など。
+  - `src/pages/admin/editor.astro`
+    - `id` 指定があれば初期ロードで GitHub→IndexedDB に保存→`state.loadDraft`。以降の編集/プレビューはクライアント完結。保存時のみ GitHub に upsert。`conflict` 状態で警告。
+- エディタページ（`/admin/editor` 想定）の処理フロー案（prerender: false 推奨。認証が必要で、初期ロードでリモート取得があるため）:
+  1. URL から `id`（既存投稿）または新規フラグを読む。middleware で認証。
+  2. クライアント初期化: IndexedDB を開き、`id` のレコードがあれば読み込み。なければ GitHub から fetch して `drafts` に保存（`status:"clean"` にしてメモリへ）。
+  3. 編集: 入力デバウンスで `db.putDraft`（`status:"dirty"`, `localSha` 更新）。メモリ state も同期。
+  4. プレビュー: Markdown→HTML をクライアントで変換（Worker 経由推奨）。生成結果を state/必要に応じて `draft.html` に反映。
+  5. 保存: `getLatestSha` でリモート sha を再確認→一致しなければ `status:"conflict"` を表示。問題なければ upsert→返却 sha を `serverSha` に更新し `status:"clean"`。
+  6. 新規作成: 日付+連番で `id` 発番した空ドラフトを IndexedDB に作成後、そのまま編集。保存時に新規コミット。
+  7. 削除: GitHub で削除成功後に `drafts` を削除、または `status:"deleted"` に。
+  8. UI ケア: `beforeunload` で dirty 警告、オフライン表示、`StatusBar/ConflictBanner` で `clean/dirty/conflict` を明示。
+- エディタページ実装の配置指針（`.astro` は薄く保つ）:
+  - `src/pages/admin/editor.astro` — prerender:false。認証チェックと最小限の HTML/CSS 骨格のみ。`<EditorLayout client:load>` などでクライアントコンポーネントを呼ぶ。
+  - クライアントのエントリコンポーネント（例: `src/features/admin/editor/ui/EditorApp.tsx`）で `state`/`db`/`markdown` を組み合わせ、左右分割やタブ切替を制御。
+  - サーバーサイド API（必要なら）を `src/pages/api/admin/editor/*.ts` に用意し、Octokit/D1 などの I/O は `src/features/admin/editor/api/github.ts` 等に隔離。Astro ページ側からは直接 Octokit を呼ばず API 経由にするか、SSR フック（`Astro.request.headers`）経由でトークンを渡して `api/github.ts` を呼ぶ。
+  - 共通ユーティリティ（hash/markdown/Zod スキーマ）は `client/` とは分離し、ブラウザ・サーバー双方で再利用できるよう副作用のないモジュールにまとめる。
+  - クライアントの副作用（`beforeunload`、オンライン/オフライン検知、デバウンス保存）は `ui` 側の小さな hooks/ヘルパーに分離し、JS ロジックを `.astro` に直書きしない。
 
 ## ビルド、テスト、開発コマンド
 
