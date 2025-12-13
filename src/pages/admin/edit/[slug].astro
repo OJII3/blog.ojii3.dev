@@ -1,0 +1,69 @@
+---
+import matter from "gray-matter";
+import GlobalLayout from "../../../features/_layouts/GlobalLayout.astro";
+import { getGitHubAccessToken } from "../../../features/admin/_lib/github/client";
+import { createContentClientFromToken } from "../../../features/admin/_lib/github/content";
+import EditPost from "../../../features/admin/editor/_components/EditPost.astro";
+
+export const prerender = false;
+
+const { slug } = Astro.params;
+const accessToken = await getGitHubAccessToken(Astro.request.headers);
+
+if (!accessToken) {
+	return Astro.redirect("/login");
+}
+
+if (!slug) {
+	return Astro.redirect("/admin");
+}
+
+let postData = { frontmatter: "", body: "", sha: "" };
+let errorMsg = "";
+
+try {
+	const client = createContentClientFromToken(accessToken);
+	const path = `content/${slug}/README.md`;
+	const file = await client.getFile({ path });
+
+	const { data, content: body } = matter(file.content);
+
+	const yamlBlock = matter.stringify("", data);
+	const frontmatter = yamlBlock
+		.replace(/^---\n/, "")
+		.replace(/---\n$/, "")
+		.trim();
+
+	postData = {
+		frontmatter,
+		body: body.trim(),
+		sha: file.sha,
+	};
+} catch (e) {
+	errorMsg = e instanceof Error ? e.message : "Failed to load post";
+}
+---
+
+<GlobalLayout title={`Edit: ${slug}`}>
+	<main class="mx-auto flex min-h-dvh w-full max-w-7xl flex-col p-4">
+		<div class="mb-4 flex items-center justify-between">
+			<h1 class="text-gray-7 text-xl font-bold">Edit: {slug}</h1>
+		</div>
+
+		{
+			errorMsg ? (
+				<div class="rounded-lg border border-red-300 bg-red-50 p-4 text-red-700">
+					<p class="font-semibold">Error loading post</p>
+					<p>{errorMsg}</p>
+					<a href="/admin" class="mt-2 inline-block text-sm underline">
+						Back to Admin
+					</a>
+				</div>
+			) : (
+				<div class="flex min-h-0 flex-1 flex-col">
+					<EditPost slug={slug} initialData={postData} />
+				</div>
+			)
+		}
+	</main>
+</GlobalLayout>

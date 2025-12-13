@@ -52,7 +52,7 @@ export default defineConfig({
 	adapter: cloudflare({
 		routes: {
 			extend: {
-				include: [{ pattern: "/admin/*" }],
+				include: [{ pattern: "/admin/*" }, { pattern: "/api/*" }],
 			},
 		},
 		imageService: "passthrough",

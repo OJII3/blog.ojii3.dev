@@ -1,0 +1,112 @@
+---
+interface Props {
+	slug: string;
+	initialData: {
+		frontmatter: string;
+		body: string;
+		sha: string;
+	};
+}
+
+const { slug, initialData } = Astro.props;
+---
+
+<form
+	id="edit-form"
+	class="flex h-full flex-col gap-4"
+	data-slug={slug}
+	data-sha={initialData.sha}
+>
+	<div class="grid min-h-[500px] flex-1 grid-cols-1 gap-4 md:grid-cols-2">
+		<div class="flex flex-col gap-2">
+			<label for="frontmatter" class="text-gray-7 text-sm font-bold"
+				>Frontmatter (YAML)</label
+			>
+			<textarea
+				id="frontmatter"
+				name="frontmatter"
+				class="border-gray-2 bg-gray-0 text-gray-7 focus:ring-accent-500 flex-1 resize-none rounded border p-2 font-mono text-sm outline-none focus:ring-2"
+				spellcheck="false">{initialData.frontmatter}</textarea
+			>
+		</div>
+
+		<div class="flex flex-col gap-2">
+			<label for="body" class="text-gray-7 text-sm font-bold"
+				>Body (Markdown)</label
+			>
+			<textarea
+				id="body"
+				name="body"
+				class="border-gray-2 bg-gray-0 text-gray-7 focus:ring-accent-500 flex-1 resize-none rounded border p-2 font-mono text-sm outline-none focus:ring-2"
+				spellcheck="false">{initialData.body}</textarea
+			>
+		</div>
+	</div>
+
+	<div class="border-gray-2 flex justify-end gap-4 border-t py-2">
+		<a
+			href="/admin"
+			class="text-gray-6 border-gray-2 hover:bg-gray-1 flex items-center rounded border px-4 py-2 text-sm font-medium"
+		>
+			Cancel
+		</a>
+		<button
+			type="submit"
+			class="bg-accent-600 hover:bg-accent-700 flex cursor-pointer items-center gap-2 rounded px-4 py-2 text-sm font-bold text-white shadow-sm disabled:cursor-not-allowed disabled:opacity-50"
+		>
+			<span id="btn-text">Save Changes</span>
+		</button>
+	</div>
+</form>
+
+<script>
+	const form = document.getElementById("edit-form") as HTMLFormElement;
+	const btnText = document.getElementById("btn-text");
+
+	form?.addEventListener("submit", async (e) => {
+		e.preventDefault();
+		if (!form || !btnText) return;
+
+		// Loading state
+		const originalText = btnText.textContent;
+		btnText.textContent = "Saving...";
+		const submitBtn = form.querySelector(
+			'button[type="submit"]',
+		) as HTMLButtonElement;
+		submitBtn.disabled = true;
+
+		const formData = new FormData(form);
+		const slug = form.dataset.slug;
+		const sha = form.dataset.sha;
+		const frontmatter = formData.get("frontmatter");
+		const body = formData.get("body");
+
+		try {
+			const res = await fetch(`/api/admin/content/${slug}`, {
+				method: "PUT",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					frontmatter,
+					body,
+					sha,
+				}),
+			});
+
+			if (res.ok) {
+				window.location.href = `/admin/preview/${slug}`;
+			} else {
+				const err = (await res.json()) as { message: string };
+				alert(`Error: ${err.message}`);
+				btnText.textContent = originalText;
+				submitBtn.disabled = false;
+			}
+		} catch (err) {
+			alert("Network error");
+			console.error(err);
+			btnText.textContent = originalText;
+			submitBtn.disabled = false;
+		}
+	});
+</script>

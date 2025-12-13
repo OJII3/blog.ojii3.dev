@@ -1,8 +1,7 @@
 ---
 import { getLiveEntry } from "astro:content";
-import {} from "astro-icon";
-import AdminLivePostLayout from "../../../features/admin/_layouts/AdminLivePostLayout.astro";
 import { getGitHubAccessToken } from "../../../features/admin/_lib/github/client";
+import PostShell from "../../../features/posts/_components/PostShell.astro";
 
 export const prerender = false;
 
@@ -27,4 +26,17 @@ if (error) {
 }
 ---
 
-{entry ? <AdminLivePostLayout entry={entry} /> : <div />}
+{
+	entry ? (
+		<PostShell
+			title={entry.data.title}
+			dateString={entry.data.dateString}
+			color={entry.data.color}
+			tags={entry.data.tags}
+			draft={entry.data.draft}
+			html={entry.data.html}
+		/>
+	) : (
+		<div />
+	)
+}

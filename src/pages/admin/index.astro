@@ -87,12 +87,20 @@ try {
 									</div>
 									<div class="flex items-center gap-4">
 										{item.type === "dir" && (
-											<a
-												href={`/admin/preview/${item.name}`}
-												class="text-accent-600 hover:text-accent-700 text-sm font-semibold"
-											>
-												Preview
-											</a>
+											<>
+												<a
+													href={`/admin/preview/${item.name}`}
+													class="text-accent-600 hover:text-accent-700 text-sm font-semibold"
+												>
+													Preview
+												</a>
+												<a
+													href={`/admin/edit/${item.name}`}
+													class="text-gray-5 hover:text-gray-7 text-sm font-semibold"
+												>
+													Edit
+												</a>
+											</>
 										)}
 										{item.htmlUrl && (
 											<a

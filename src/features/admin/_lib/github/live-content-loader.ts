@@ -1,5 +1,6 @@
 import { createMarkdownProcessor } from "@astrojs/markdown-remark";
 import type { LiveLoader } from "astro/loaders";
+import graymatter from "gray-matter";
 import { repoLabel } from "./client";
 import { type ContentClient, createContentClientFromToken } from "./content";
 import type { GitHubContentItem } from "./types";
@@ -32,7 +33,10 @@ let processor: Awaited<ReturnType<typeof createMarkdownProcessor>> | null =
 	null;
 const getProcessor = async () => {
 	if (processor) return processor;
-	processor = await createMarkdownProcessor({ syntaxHighlight: false });
+	processor = await createMarkdownProcessor({
+		syntaxHighlight: false,
+		gfm: true,
+	});
 	return processor;
 };
 
@@ -52,28 +56,29 @@ const buildEntries = async (
 		items.map(async (item) => {
 			try {
 				const file = await client.getFile({ path: item.path });
-
-				const rendered = await processor.render(file.content);
-				const frontmatter = rendered.metadata?.frontmatter as Record<
-					string,
-					unknown
-				>;
+				const { data, content } = graymatter(file.content);
+				const rendered = await processor.render(content);
 				const id = toEntryId(item.path, basePath);
 
 				// バリデーションはスキーマ側で行うので、ここでは最低限の型変換のみ行う.
-				const title = (frontmatter?.title as string) || "No Title";
-				const dateString =
-					(frontmatter?.date as string) || new Date().toISOString();
-				const date = new Date(dateString);
-				const tags = (frontmatter?.tags as string[]) || [];
-				const draft = (frontmatter?.draft as boolean) || false;
+				const title = (data?.title as string) || "No Title";
+
+				const rawDate = data?.date;
+				const dateObj = rawDate
+					? new Date(rawDate as string | number | Date)
+					: new Date();
+				const date = Number.isNaN(dateObj.getTime()) ? new Date() : dateObj;
+				const dateString = date.toISOString().split("T")[0];
+
+				const tags = (data?.tags as string[]) || [];
+				const draft = (data?.draft as boolean) || false;
 
 				return {
 					id,
 					data: {
 						path: item.path,
 						sha: file.sha,
-						content: file.content,
+						content: content,
 						htmlUrl: file.htmlUrl ?? undefined,
 						html: rendered.code,
 						title,
