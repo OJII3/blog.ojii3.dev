@@ -66,61 +66,29 @@ GH_APP_CLIENT_SECRET=
 - UI/スタイリング: Tailwind v4 テーマのカスタムトークンを利用し、追加 CSS は最小限（コードブロック記号消し）。View Transitions の名前は `constants/transition.ts` に集約、`ClientRouter` が `<head>` で有効化。ダークモードは localStorage + `documentElement` クラスで管理。
 - Analytics/Partytown: GA タグは Partytown (`type="text/partytown"`) 経由でロード。
 
-## 今後の拡張（Netlify CMS 風の管理 UI 構想）
+## 今後の拡張（管理画面: エディタとプレビューの分離）
 
 - 目的: 認証済み（自分のみ想定）の管理 UI から Markdown 投稿の編集・追加・削除を行い、GitHub の `content` と整合を取る。
-- Markdown エディタ候補:
-  - 軽量: シンプルな `<textarea>` + プレビュー。キーボード中心で十分。
-  - ミドル: Milkdown/TipTap など。リッチ性は不要なので依存を増やし過ぎない。
-  - どれでも frontmatter を分離して保持できる構造にしておく。
-  - ファイルアップロード（画像など）は別ハンドラ/ドラッグ&ドロップで検討。
-  - 可能なら `astro:content.render` 相当のパイプラインを再利用してプレビューを生成（Live Collection をプレビュー用に活用）。
-- Live Collection の活用:
-  - GitHub Live Loader で読み込んだ生データをエディタ側に渡し、プレビュー用に `astro:content` と同じ Markdown パーサー/コンポーネントを使う。
-  - 編集セッションでは Live Collection とは別に「編集中データ」を持ち、保存時に GitHub へ upsert/delete。
-  - Draft の扱いを厳密に（`draft: true` ⇔ `data-pagefind-ignore`）。
-- 一時保存と永続化:
-  - GitHub に毎回コミットは頻度が過多になるため、まずはブラウザ IndexedDB にオフライン下書きを保存。
-  - 代替案として Cloudflare D1/R2 などサーバー側に下書きストレージを置き、アクセストークンと紐付ける（要スキーマ設計とローテーション）。
-  - いずれの場合も GitHub との「最終コミット SHA」を保持し、衝突検知/警告を入れる。
+- アプローチの変更:
+  - 以前はリアルタイムプレビュー（クライアントサイド変換）を検討していたが、実装複雑度を下げるため廃止。
+  - **「編集（テキストのみ）」→「保存（GitHubへコミット）」→「プレビュー（Live Collection）」** というシンプルなサイクルを採用する。
+- 構成要素:
+  1. **エディタ画面 (`/admin/edit/[slug]`)**:
+     - シンプルなテキストエリア、または軽量な Markdown エディタ（frontmatter と本文を分離して編集可能にする）。
+     - **機能**: ロード（GitHubから取得）、編集、保存（GitHubへプッシュ）。
+     - **状態管理**: 編集中の内容は IndexedDB に一時保存し、ブラウザクラッシュや誤操作によるデータ損失を防ぐ（あくまでバックアップ用）。
+  2. **プレビュー画面 (`/admin/preview/[slug]`)**:
+     - 保存完了後、このページへ遷移する。
+     - 既存の `AdminLivePostLayout` を利用し、GitHub 上の最新データ（今保存したもの）をサーバーサイド（Astro + GitHub Live Loader）でレンダリングして表示。
+     - これにより、本番環境とほぼ同一の見た目を保証しつつ、クライアントサイドでの Markdown 変換ロジックを不要にする。
 - GitHub 反映フロー:
   - BetterAuth で取得した GitHub アクセストークン + Octokit で `content/YYYY-MM-DD-n/README.md` を upsert/delete。
   - 新規作成時はディレクトリ命名（日時+連番）ルールをユーティリティ化して再利用。
   - コミットメッセージ規約をローカルで統一（例: `chore(content): update post <slug>`）。
 - 管理 UI の配置と責務:
-  - `src/features/admin/editor/` といったディレクトリを切り、エディタ/プレビュー/ファイルツリー/アップロード UI を整理。
-  - ルーティングは `/admin/*` 配下に追加。middleware での認証保護を継続。
-  - 状態管理は極力ローカル（per-page state）で完結させ、API 呼び出し部分を薄い層に分離。
-- IndexedDB 中心でエディタを構成する際の配置案:
-  - `src/features/admin/editor/client/` — ブラウザ専用ロジック
-    - `db.ts` (or `storage.ts`): IndexedDB ラッパー (`openDB`/CRUD), `Draft` 型定義。
-    - `hash.ts`: `localSha` 計算。
-    - `markdown.ts` / `markdown-worker.ts`: クライアント変換 (Markdown→HTML; Worker 経由) とキャッシュ更新。
-    - `state.ts`: メモリ状態管理 (`loadDraft`, `applyEdit`, `markDirty`, `syncFromDB`)。
-    - `conflict.ts`: `serverSha` 突き合わせと `clean/dirty/conflict` 判定。
-  - `src/features/admin/editor/api/`
-    - `github.ts`: Octokit 経由で `fetchDraft(id)`, `saveDraft`, `deleteDraft`, `getLatestSha` など。D1/R2 への移行時はここを差し替える。
-  - `src/features/admin/editor/ui/`
-    - `EditorPane`, `PreviewPane`, `StatusBar`, `ConflictBanner`, `AssetUploader` 等の UI。`EditorLayout` で PC は左右分割、SP はタブ切替。
-  - `src/features/admin/editor/types.ts`
-    - `Draft` (id, content, frontmatter, html?, serverSha, localSha, status, updatedAt, fetchedAt), `Asset` (assetId, postId?, name, type, data, updatedAt) など。
-  - `src/pages/admin/editor.astro`
-    - `id` 指定があれば初期ロードで GitHub→IndexedDB に保存→`state.loadDraft`。以降の編集/プレビューはクライアント完結。保存時のみ GitHub に upsert。`conflict` 状態で警告。
-- エディタページ（`/admin/editor` 想定）の処理フロー案（prerender: false 推奨。認証が必要で、初期ロードでリモート取得があるため）:
-  1. URL から `id`（既存投稿）または新規フラグを読む。middleware で認証。
-  2. クライアント初期化: IndexedDB を開き、`id` のレコードがあれば読み込み。なければ GitHub から fetch して `drafts` に保存（`status:"clean"` にしてメモリへ）。
-  3. 編集: 入力デバウンスで `db.putDraft`（`status:"dirty"`, `localSha` 更新）。メモリ state も同期。
-  4. プレビュー: Markdown→HTML をクライアントで変換（Worker 経由推奨）。生成結果を state/必要に応じて `draft.html` に反映。
-  5. 保存: `getLatestSha` でリモート sha を再確認→一致しなければ `status:"conflict"` を表示。問題なければ upsert→返却 sha を `serverSha` に更新し `status:"clean"`。
-  6. 新規作成: 日付+連番で `id` 発番した空ドラフトを IndexedDB に作成後、そのまま編集。保存時に新規コミット。
-  7. 削除: GitHub で削除成功後に `drafts` を削除、または `status:"deleted"` に。
-  8. UI ケア: `beforeunload` で dirty 警告、オフライン表示、`StatusBar/ConflictBanner` で `clean/dirty/conflict` を明示。
-- エディタページ実装の配置指針（`.astro` は薄く保つ）:
-  - `src/pages/admin/editor.astro` — prerender:false。認証チェックと最小限の HTML/CSS 骨格のみ。`<EditorLayout client:load>` などでクライアントコンポーネントを呼ぶ。
-  - クライアントのエントリコンポーネント（例: `src/features/admin/editor/ui/EditorApp.tsx`）で `state`/`db`/`markdown` を組み合わせ、左右分割やタブ切替を制御。
-  - サーバーサイド API（必要なら）を `src/pages/api/admin/editor/*.ts` に用意し、Octokit/D1 などの I/O は `src/features/admin/editor/api/github.ts` 等に隔離。Astro ページ側からは直接 Octokit を呼ばず API 経由にするか、SSR フック（`Astro.request.headers`）経由でトークンを渡して `api/github.ts` を呼ぶ。
-  - 共通ユーティリティ（hash/markdown/Zod スキーマ）は `client/` とは分離し、ブラウザ・サーバー双方で再利用できるよう副作用のないモジュールにまとめる。
-  - クライアントの副作用（`beforeunload`、オンライン/オフライン検知、デバウンス保存）は `ui` 側の小さな hooks/ヘルパーに分離し、JS ロジックを `.astro` に直書きしない。
+  - `src/features/admin/editor/` にエディタ関連のロジックを集約。
+  - `src/pages/admin/edit/[slug].astro` はエディタ、`src/pages/admin/preview/[slug].astro` はプレビューを担当。
+  - 共通の GitHub 操作ロジック（Octokit ラッパー）は `src/features/admin/_lib/github/` を再利用・拡張する。
 
 ## ビルド、テスト、開発コマンド
 
@@ -139,6 +107,8 @@ GH_APP_CLIENT_SECRET=
 Tailwind CSS を使用してスタイリングする際は、デザイントークンを使用・更新して一貫性・再利用性を保つこと.
 
 また、コードが複雑になる場合は、関数の切り出しをするまえに、適切なデータ構造を使用していることを確認すること.
+
+UI ライブラリ（例: React, Vue, Svelte）は、やむを得ない理由がある場合を除き使用しないこと。使用が必要な場合は、その理由を明確にしてユーザーの確認を取ること。
 
 ## デプロイ/その他
 

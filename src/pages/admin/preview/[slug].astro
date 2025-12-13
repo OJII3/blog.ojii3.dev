@@ -1,15 +1,14 @@
 ---
 import { getLiveEntry } from "astro:content";
 import {} from "astro-icon";
-import AdminLivePostLayout from "../../features/admin/_layouts/AdminLivePostLayout.astro";
-import { getGitHubAccessToken } from "../../features/admin/_lib/github/client";
+import AdminLivePostLayout from "../../../features/admin/_layouts/AdminLivePostLayout.astro";
+import { getGitHubAccessToken } from "../../../features/admin/_lib/github/client";
 
 export const prerender = false;
 
-const searchParams = new URL(Astro.request.url).searchParams;
-const id = searchParams.get("id");
+const { slug } = Astro.params;
 
-if (!id) return Astro.redirect("/admin");
+if (!slug) return Astro.redirect("/admin");
 
 let token: string;
 try {
@@ -19,12 +18,12 @@ try {
 }
 
 const { entry, error } = await getLiveEntry("liveBlog", {
-	id,
+	id: slug,
 	token,
 });
 
 if (error) {
-	Astro.redirect("/404");
+	return Astro.redirect("/404");
 }
 ---
 
