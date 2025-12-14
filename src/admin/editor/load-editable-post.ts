@@ -1,6 +1,6 @@
-import matter from "gray-matter";
 import { getGitHubAccessToken } from "@admin/github/client";
 import { createContentClientFromToken } from "@admin/github/content";
+import matter from "gray-matter";
 import type { EditableFrontmatter, LoadEditablePostResult } from "./types";
 
 const POST_PATH = (slug: string) => `content/${slug}/README.md`;

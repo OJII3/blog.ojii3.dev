@@ -1,6 +1,6 @@
+import { HEX_COLORS, type VitaColor } from "@shared/constants";
 import type { FC } from "react";
 import wordmark from "../../assets/wordmark-for-og.svg?inline";
-import { HEX_COLORS, type VitaColor } from "@shared/constants";
 
 type Props = {
 	title: string;

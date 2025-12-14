@@ -1,6 +1,6 @@
 import { defineLiveCollection, z } from "astro:content";
-import { getColorIndex } from "./shared/utils/color";
 import { githubLiveLoader } from "./admin/github";
+import { getColorIndex } from "./shared/utils/color";
 
 const liveBlog = defineLiveCollection({
 	loader: githubLiveLoader({
