@@ -1,10 +1,6 @@
 import { defineCollection, z } from "astro:content";
 import { glob } from "astro/loaders";
-import type { VitaColor } from "./constants";
-
-export const getColorIndex = (date: Date): VitaColor => {
-	return date.getDate() % 7; // 0-6 for 7 colors
-};
+import { getColorIndex } from "./shared/utils/color";
 
 const blog = defineCollection({
 	loader: glob({

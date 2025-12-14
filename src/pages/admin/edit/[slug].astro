@@ -1,0 +1,55 @@
+---
+import EditPost from "@/admin/editor/_components/EditPost.astro";
+import { loadEditablePost } from "@/admin/editor/load-editable-post";
+import type { EditablePost } from "@/admin/editor/types";
+import GlobalLayout from "@/app/layouts/GlobalLayout.astro";
+
+export const prerender = false;
+
+const { slug } = Astro.params;
+
+if (!slug) {
+	return Astro.redirect("/admin");
+}
+
+let postData: EditablePost = { frontmatter: {}, body: "", sha: "" };
+let errorMsg = "";
+
+const loadResult = await loadEditablePost(slug, Astro.request.headers);
+
+if (loadResult.status === "unauthorized") {
+	return Astro.redirect("/login");
+}
+
+if (loadResult.status === "error") {
+	errorMsg = loadResult.message;
+}
+
+if (loadResult.status === "ok") {
+	postData = loadResult.post;
+}
+---
+
+<GlobalLayout title={`Edit: ${slug}`}>
+	<main class="mx-auto flex min-h-dvh w-full max-w-7xl flex-col p-4">
+		<div class="mb-4 flex items-center justify-between">
+			<h1 class="text-gray-7 text-xl font-bold">Edit: {slug}</h1>
+		</div>
+
+		{
+			errorMsg ? (
+				<div class="rounded-lg border border-red-300 bg-red-50 p-4 text-red-700">
+					<p class="font-semibold">Error loading post</p>
+					<p>{errorMsg}</p>
+					<a href="/admin" class="mt-2 inline-block text-sm underline">
+						Back to Admin
+					</a>
+				</div>
+			) : (
+				<div class="flex min-h-0 flex-1 flex-col">
+					<EditPost slug={slug} initialData={postData} />
+				</div>
+			)
+		}
+	</main>
+</GlobalLayout>

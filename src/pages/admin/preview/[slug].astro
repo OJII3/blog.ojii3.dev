@@ -1,0 +1,42 @@
+---
+import { getLiveEntry } from "astro:content";
+import { getGitHubAccessToken } from "@/admin/github/client";
+import PostShell from "@/blog/ui/PostShell.astro";
+
+export const prerender = false;
+
+const { slug } = Astro.params;
+
+if (!slug) return Astro.redirect("/admin");
+
+let token: string;
+try {
+	token = await getGitHubAccessToken(Astro.request.headers);
+} catch (e) {
+	return Astro.redirect("/404");
+}
+
+const { entry, error } = await getLiveEntry("liveBlog", {
+	id: slug,
+	token,
+});
+
+if (error) {
+	return Astro.redirect("/404");
+}
+---
+
+{
+	entry ? (
+		<PostShell
+			title={entry.data.title}
+			dateString={entry.data.dateString}
+			color={entry.data.color}
+			tags={entry.data.tags}
+			draft={entry.data.draft}
+			html={entry.data.html}
+		/>
+	) : (
+		<div />
+	)
+}

@@ -1,0 +1,139 @@
+---
+import "../styles/override.css";
+import { type CollectionEntry } from "astro:content";
+import GlobalLayout from "@/app/layouts/GlobalLayout.astro";
+import {
+	H2_BORDER_COLORS,
+	SITE_NAME,
+	SITE_URL,
+	TEXT_COLORS,
+	type VitaColor,
+} from "@/shared/constants";
+import PostHeader from "./PostHeader.astro";
+import PostPrevNext from "./PostPrevNext.astro";
+
+export interface Props {
+	title: string;
+	dateString: string;
+	color: VitaColor;
+	tags?: string[];
+	draft?: boolean;
+	postId?: string; // If present, enables view transitions and OG image
+	prevPost?: CollectionEntry<"blog"> | null;
+	nextPost?: CollectionEntry<"blog"> | null;
+	html?: string; // For preview content
+}
+
+const {
+	title,
+	dateString,
+	color,
+	tags,
+	draft,
+	postId,
+	prevPost,
+	nextPost,
+	html,
+} = Astro.props;
+
+const titleText = `${title} | ${SITE_NAME}`;
+// postId がある場合のみ OG 画像 URL を生成
+const ogImage = postId ? `${SITE_URL}/${postId}/og-image.png` : undefined;
+---
+
+<GlobalLayout title={titleText} ogImage={ogImage}>
+	<div class="mx-auto max-w-[80ch]">
+		<PostHeader color={color} />
+
+		<main transition:name={postId} class="w-full p-4">
+			<h1
+				class="mt-4 text-2xl font-bold sm:text-3xl"
+				data-pagefind-meta={postId ? "title" : undefined}
+				data-pagefind-ignore={draft}
+			>
+				{title}
+			</h1>
+
+			<div class="mt-2 mb-8 flex items-center gap-2">
+				<span
+					aria-hidden="true"
+					class="text-sm"
+					data-pagefind-meta={postId ? "date" : undefined}
+					data-pagefind-ignore={draft}>{dateString}</span
+				>
+			</div>
+
+			<article
+				class:list={[
+					"prose dark:prose-invert mx-auto mb-16 max-w-none overflow-hidden",
+					"prose-code:rounded-sm prose-code:px-1 prose-code:bg-gray-2",
+					"prose-h2:pl-2 prose-h2:border-l-4",
+					H2_BORDER_COLORS[color],
+				]}
+				data-pagefind-body={!draft && postId ? true : undefined}
+				data-pagefind-ignore={draft}
+			>
+				{html ? <Fragment set:html={html} /> : <slot />}
+			</article>
+
+			{
+				tags && tags.length > 0 && (
+					<ul class="my-8 flex flex-wrap gap-2">
+						{tags.map((tag) => (
+							<li>
+								<a
+									href={`/search?tag=${tag}`}
+									class:list={["px-1 hover:underline", TEXT_COLORS[color]]}
+								>
+									#
+									<span data-pagefind-filter="tag" data-pagefind-ignore={draft}>
+										{tag}
+									</span>
+								</a>
+							</li>
+						))}
+					</ul>
+				)
+			}
+
+			{/* postId（本番記事）の場合のみ前後リンクを表示 */}
+			{
+				postId && (
+					<div
+						data-pagefind-ignore="all"
+						class="grid grid-cols-1 gap-4 pt-8 pb-4 sm:grid-cols-2"
+					>
+						{prevPost ? (
+							<PostPrevNext
+								originalPost={
+									{
+										id: postId,
+										data: { title, color },
+									} as CollectionEntry<"blog">
+								}
+								targetPost={prevPost}
+								isPrev
+							/>
+						) : (
+							<div />
+						)}
+						{nextPost ? (
+							<PostPrevNext
+								originalPost={
+									{
+										id: postId,
+										data: { title, color },
+									} as CollectionEntry<"blog">
+								}
+								targetPost={nextPost}
+								isNext
+							/>
+						) : (
+							<div />
+						)}
+					</div>
+				)
+			}
+		</main>
+	</div>
+</GlobalLayout>

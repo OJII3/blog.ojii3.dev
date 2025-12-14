@@ -1,0 +1,25 @@
+---
+import { Icon } from "astro-icon/components";
+import DarkModeButton from "@/app/components/DarkModeButton.astro";
+import { BG_COLORS, VitaColor } from "@/shared/constants";
+
+export interface Props {
+	color: VitaColor;
+}
+
+const { color } = Astro.props;
+---
+
+<header class="p-4 pb-0">
+	<h2 class:list={["flex rounded-2xl", BG_COLORS[color]]}>
+		<a
+			href="/"
+			class="font-hachimaru top-4 left-4 z-10 flex h-12 flex-auto items-center px-4 py-2 text-white"
+		>
+			晴れときどき崩壊ブログ
+		</a>
+		<DarkModeButton class="px-4" aria-label="Toggle theme">
+			<Icon name="tabler:sun" class="h-6 w-6 text-white" />
+		</DarkModeButton>
+	</h2>
+</header>

@@ -38,6 +38,9 @@ export default defineConfig({
 		sitemap(),
 		pagefind(),
 	],
+	experimental: {
+		liveContentCollections: true,
+	},
 	markdown: {
 		gfm: true,
 		rehypePlugins: [],
@@ -49,7 +52,7 @@ export default defineConfig({
 	adapter: cloudflare({
 		routes: {
 			extend: {
-				include: [{ pattern: "/admin/*" }],
+				include: [{ pattern: "/admin/*" }, { pattern: "/api/*" }],
 			},
 		},
 		imageService: "passthrough",

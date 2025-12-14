@@ -1,10 +1,10 @@
 # [blog.ojii3.dev](https://blog.ojii3.dev)
 
-こ.リポジトリは [Astro](https://astro.build/) を使用して構築されたパーソナルブログサイトである. Bun をパッケージマネージャ/ビルドランタイムとして使用し、Cloudflare Workers にデプロイされる.
+このリポジトリは [Astro](https://astro.build/) + Cloudflare Workers（`@astrojs/cloudflare` アダプター）で構築されたパーソナルブログサイト。パッケージマネージャ/ビルドランタイムは Bun。
 
 ## 環境構築
 
-AstroやローカルのCLI用の環境変数を設定する.
+- Astro やローカル CLI 用の環境変数を `.env` に設定する.
 
 ```sh
 # .env
@@ -16,19 +16,14 @@ GH_APP_CLIENT_SECRET=dummy # dummy only for astro build
 SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt 
 ```
 
-以下のコマンドで自動的に読みこまれるようになる.
-
-```sh
-direnv allow
-```
-
-npmの依存関係をインストールする.
+- `direnv allow` で自動読み込み。
+- 依存関係をインストールする.
 
 ```sh
 bun i
 ```
 
-ランタイムで使用される環境変数を設定する.
+- Wrangler でのローカル実行用に `.dev.vars` を設定する.
 
 ```sh
 # .dev.vars
@@ -36,42 +31,109 @@ BETTER_AUTH_SECRET=
 GH_APP_CLIENT_SECRET=
 ```
 
-## プロジェクト構造とモジュール構成
+## プロジェクト構造/主要ファイル
 
-Astro のソースは `src/` にある.
+- `astro.config.mjs` — Tailwind CSS v4 (`@tailwindcss/vite`), astro-pagefind, expressive-code, partytown、astro-icon、sitemap を有効化。Cloudflare adapter で `/admin/*` をルーティングし、`liveContentCollections` を experimental で ON。`GOOGLE_ANALYTICS_ID` は client/public、GitHub/BETTER_AUTH 系は server/secret。
+- `src/pages/`（Astro 制約でページ専用; ルートのみ）
+  - `index.astro` — 記事一覧グリッド。`getCollection("blog")` を日付降順で表示。
+  - `[slug]/index.astro` — 各記事ページ。prev/next を算出してレイアウトに渡す。`/[slug]/og-image.png.ts` で Satori+Resvg による OG 画像生成（`src/assets/MPLUSRounded1c-Bold.ttf` を同梱）。
+  - `search.astro` — Pagefind クライアント検索画面。タグ絞り込み UI と結果表示。
+  - `login.astro` — BetterAuth クライアント（GitHub ソーシャル）でログイン/ログアウト。
+  - `admin/index.astro` — ログインユーザーの GitHub トークンを使い、リポジトリの `content` を Octokit で一覧表示（prerender: false）。`admin/edit/[slug].astro` で編集、`admin/preview/[slug].astro` でライブプレビュー。
+  - `api/auth/[...all].ts` — BetterAuth の API ハンドラ（prerender: false）。
+- `src/actions/`（Astro 制約でサーバーアクション専用; ルートのみ）
+  - `index.ts` — `updatePost` サーバーアクション（GitHub upsert）。
+- `src/app/` — グローバルレイヤー
+  - `layouts/GlobalLayout.astro` — GA（Partytown 経由）、ClientRouter/Transitions、Favicon/Manifest 設定。
+  - `components/` — ダークモード管理/ボタン、GA スニペット。
+  - `styles/global.css` — Tailwind テーマ定義（フォント Hachi Maru Pop、breakpoint/spacing トークン、グレー/アクセントカラー、ダークモードトークン）、preflight 相当、コード装飾の override。
+  - `middleware.ts` — `/admin` と `/api/auth` のみ BetterAuth でセッション取得し、未ログインは `/login` へ、ログイン済みの `/login` アクセスは `/admin` にリダイレクト。`Astro.locals` に `user`/`session` を格納。（Astro の探索のためエントリは `src/middleware.ts` に残すか re-export）
+- `src/shared/` — 横断的な定数・型・ユーティリティ
+  - `constants/` — サイト名/URL、7 色の `VitaColor` と HEX/TEXT/BORDER/BG/H2 ボーダーのマッピング。View Transitions 用の名前定数。
+  - `types/` — Pagefind 型定義、`window._searchUrlChangeHandler` の global augment。
+  - `utils/` — 日付→色計算などの純関数を集約。
+- `src/blog/` — 公開ブログ UI
+  - `layouts/PostLayout.astro`
+  - `ui/` — Card/PostShell/PostHeader/PostPrevNext/TopCard/BottomCard、OGImage.tsx など。
+  - `styles/override.css` — コードブロック記号を消す。
+- `src/search/` — 検索機能
+  - `ui/{SearchForm,SearchResult}.astro`
+  - `client.ts` — `/pagefind/pagefind.js` を動的 import し、URL パラメータ同期 + 結果 DOM 生成。
+  - `lib/{getAllTags,getPostBorderColorFromDate}.ts` — タグ集計/境界色計算。
+- `src/admin/` — 管理/認証/GitHub 連携
+  - `auth/auth-client.ts` — BetterAuth クライアント。
+  - `github/{client,content,types,live-content-loader}.ts` — Octokit ラッパーと Live Loader。
+  - `content-service/blog-service.ts` (+ test) — GitHub への CRUD。
+  - `editor/{load-editable-post.ts,edit-post.client.ts,types.ts,_components/*.astro}` — エディタ UI とロジック。
+- `src/config/`
+  - `auth.ts` — BetterAuth サーバーセットアップ（GitHub ソーシャルプロバイダ）。
+- `src/content.config.ts` — 静的コレクション `blog` を `content/**/README.md` から生成（frontmatter: `title`/`date`/`tags`/`draft`）。`dateString` 生成と `getDate() % 7` で `color` 付与、`draft` は `true/undefined` に正規化。（Astro の制約で `src/` 直下に配置）
+- `src/live.config.ts` — GitHub Live Loader で `content/*/README.md` を動的取得。BetterAuth の GitHub アクセストークンを渡す。（Astro の制約で `src/` 直下に配置）
+- `content/` — `YYYY-MM-DD-n/README.md` 形式の投稿。`data-pagefind-ignore` 用に draft を true/undefined で扱う。`.markdownlint.jsonc` で MD013/MD033 を無効化。
+- `public/` — Favicon、manifest などの静的配布物。
+- `dist/` — ビルド成果物。Worker エントリは `dist/_worker.js/index.js`（`wrangler.jsonc` で参照）。
 
-- `pages/` はルートを定義する. ページになってしまうため、このディレクトリ内にコンポーネントを直接置くことはできない.
-- `features/` はFeatureベースのページ内モジュールを保持する. 以下ディレクトリはFeatureごとに作成される.
-  - `_layouts/` はページレイアウトを定義する.
-  - `_components/` は共有 UI を保持する.
-  - `_styles/` はカスタムスタイルを保持する. あまり使用しないこと. 可能な限り Tailwind を使用し、デザイントークンに追加修正して使用すること.
-  - `_lib/` はヘルパーを保持する. ヘルパー関数を書く前に、適切なデータ構造を使用していることを確認すること.
-- `constants/` はアプリケーション全体で使用される定数を保持する.
+## 主な機能のメモ
 
-共有のビジュアルは `assets/` に属する. Markdown の記事は `content/` 配下の日付ディレクトリ (例: `2025-01-01-0/`) 内の `README.md` として配置され、`src/content.config.ts` からスキーマを継承する. 静的ファイルは `public/` を通じて配布する. 本番環境の出力は `dist/` に配置され、`wrangler.jsonc` の Worker 設定を通じてデプロイされる.
+- 投稿データ: 日付の `getDate() % 7` で色決定 (`VitaColor`)。`PostLayout` は `astro:content.render` で md を描画し、タグは `data-pagefind-filter="tag"` で検索用に付与。OG 画像はルートで生成。
+- 検索: `astro-pagefind` がビルド時に `/pagefind` バンドルを生成。`features/search/client.ts` が URL パラメータと結果 DOM を同期し、タグフィルタも対応。draft は `data-pagefind-ignore` で除外。
+- 認証/管理: BetterAuth + GitHub ソーシャル。`getGitHubAccessToken` でアクセストークンを取得し、Octokit で `content` ディレクトリを CRUD。Live Collection 用 GitHub ローダーが frontmatter を読み込み、`AdminLivePostLayout` で HTML を表示。
+- UI/スタイリング: Tailwind v4 テーマのカスタムトークンを利用し、追加 CSS は最小限（コードブロック記号消し）。View Transitions の名前は `constants/transition.ts` に集約、`ClientRouter` が `<head>` で有効化。ダークモードは localStorage + `documentElement` クラスで管理。
+- Analytics/Partytown: GA タグは Partytown (`type="text/partytown"`) 経由でロード。
+
+## 今後の拡張（管理画面: エディタとプレビューの分離）
+
+- 目的: 認証済み（自分のみ想定）の管理 UI から Markdown 投稿の編集・追加・削除を行い、GitHub の `content` と整合を取る。
+- アプローチの変更:
+  - 以前はリアルタイムプレビュー（クライアントサイド変換）を検討していたが、実装複雑度を下げるため廃止。
+  - **「編集（テキストのみ）」→「保存（GitHubへコミット）」→「プレビュー（Live Collection）」** というシンプルなサイクルを採用する。
+- 構成要素:
+  1. **エディタ画面 (`/admin/edit/[slug]`)**:
+     - シンプルなテキストエリア、または軽量な Markdown エディタ（frontmatter と本文を分離して編集可能にする）。
+     - **機能**: ロード（GitHubから取得）、編集、保存（GitHubへプッシュ）。
+     - **状態管理**: 編集中の内容は IndexedDB に一時保存し、ブラウザクラッシュや誤操作によるデータ損失を防ぐ（あくまでバックアップ用）。
+  2. **プレビュー画面 (`/admin/preview/[slug]`)**:
+     - 保存完了後、このページへ遷移する。
+     - 既存の `AdminLivePostLayout` を利用し、GitHub 上の最新データ（今保存したもの）をサーバーサイド（Astro + GitHub Live Loader）でレンダリングして表示。
+     - これにより、本番環境とほぼ同一の見た目を保証しつつ、クライアントサイドでの Markdown 変換ロジックを不要にする。
+- GitHub 反映フロー:
+  - BetterAuth で取得した GitHub アクセストークン + Octokit で `content/YYYY-MM-DD-n/README.md` を upsert/delete。
+  - 新規作成時はディレクトリ命名（日時+連番）ルールをユーティリティ化して再利用。
+  - コミットメッセージ規約をローカルで統一（例: `chore(content): update post <slug>`）。
+- 管理 UI の配置と責務:
+  - `src/features/admin/editor/` にエディタ関連のロジックを集約。
+  - `src/pages/admin/edit/[slug].astro` はエディタ、`src/pages/admin/preview/[slug].astro` はプレビューを担当。
+  - 共通の GitHub 操作ロジック（Octokit ラッパー）は `src/features/admin/_lib/github/` を再利用・拡張する。
 
 ## ビルド、テスト、開発コマンド
 
-- `bun install` — Bun で依存関係をインストールする.
-- `bun run dev` — ホットリロードで Astro 開発サーバーを起動する. Cloudflare Adapter を使用しているため、使用不可。
-- `bun run build` — `dist/` に最適化されたバンドルを生成する.
-- `bun run preview` — Cloudflare を模倣するためにバンドルをローカルで提供する.
-- `bun run check` — プロジェクト全体で Biome/Prettier のリント/フォーマットチェックを実行する.
-- `bun run format` — Biome/Prettier の修正をインプレースで適用する.
+- `bun install` — 依存関係をインストールする.
+- `bun run build` — `dist/` に最適化バンドルを生成。
+- `bun preview` — `wrangler dev --port 4321` で Cloudflare 環境を模倣（開発時はこれを使用）。`bun dev` は Cloudflare adapter のため利用不可。
+- `bun check` — Biome/Prettier の lint/format チェック。
+- `bun typecheck` — `astro check` + `tsc --noEmit`。
+- `bun format` — Biome + Prettier を書き込みモードで実行。
+- `bun markdownlint` — `content/**/*.md` の MarkdownLint を修正モードで実行。
 
 ## コーディングスタイルと命名規則
 
-インデントにはタブ文字を使用し TypeScript 構文を使用する. コンポーネント、レイアウト、フックは PascalCase (`TopCard.astro`, `OGImage.tsx`) を使用し、ユーティリティや設定は、既存のファイルと一致する場合は lowerCamel または kebab-case のままにできる. Tailwind クラスは、リポジトリに既に存在するカスタムブレークポイントプレフィックス (`2x:`, `3x:`) を再利用する必要がある. コミットする前に `bun run format` を実行する.
+適宜 `bun format` と `bun typecheck` を実行する.
 
-Astro コンポーネントでは、Props に明示的な型を付ける. クライアントでの動的な処理は、`<script>` タグ内に記述する必要があり、基本的には TypeScript を使用するが、静的に評価できないスクリプトは `is:inline` 属性を使用して Astro の最適化から除外し、JavaScript で記述する必要がある.
+Tailwind CSS を使用してスタイリングする際は、デザイントークンを使用・更新して一貫性・再利用性を保つこと.
 
-## テストガイドライン
+また、コードが複雑になる場合は、関数の切り出しをするまえに、適切なデータ構造を使用していることを確認すること.
 
-自動テストは存在しない。`bun run check` を使用して、リンティングと型チェックを行い。動作確認が必要であれば、目的と確認箇所を明確にして提示すること.
+UI ライブラリ（例: React, Vue, Svelte）は、やむを得ない理由がある場合を除き使用しないこと。使用が必要な場合は、その理由を明確にしてユーザーの確認を取ること。
+
+## デプロイ/その他
+
+- Cloudflare Workers へのデプロイを前提に `wrangler.jsonc` でエントリ/アセットバインドを定義済み。
+- 画像ドメイン許可は `raw.githubusercontent.com`/`github.com`/`*.s3.amazonaws.com` を許可（OG 用など）。
 
 ## コミットとプルリクエストのガイドライン
 
-コミットメッセージは Conventional Commits に従う。機能ごとの小さな粒度で、`bun run format` を実行してからコミットを行う。コミットは手動で行うため、コミットメッセージの提案のみ生成して提示すること.
+コミットは手動で行うため、勝手にコミットを行なってはならない。
+チェックをしたのち Conventional Commits に従ったコミットメッセージのみ提示すること。
 
 ## その他
 
