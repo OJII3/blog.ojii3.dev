@@ -66,7 +66,7 @@ jobs:
           GOOGLE_ANALYTICS_ID: ${{ secrets.GOOGLE_ANALYTICS_ID }}
           GH_APP_CLIENT_ID: ${{ secrets.GH_APP_CLIENT_ID }}
           GH_APP_CLIENT_SECRET: dummy_value
-          BETTER_AUTH_SECRET: dummy_value
+          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
 
       - name: Run | Deploy
         # v3.14.1
