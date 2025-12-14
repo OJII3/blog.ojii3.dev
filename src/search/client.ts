@@ -1,4 +1,4 @@
-import type { PagefindResult } from "@shared/types/pagefind";
+import type { PagefindResult } from "@/shared/types/pagefind";
 import { getPostBorderColorFromDate } from "./lib/getPostBorderColorFromDate";
 
 const createResultElement = async (

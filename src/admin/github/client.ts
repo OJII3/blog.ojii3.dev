@@ -1,5 +1,5 @@
-import { createAuth } from "@config/auth";
 import { Octokit } from "@octokit/core";
+import { createAuth } from "@/config/auth";
 
 const auth = createAuth();
 

@@ -1,5 +1,5 @@
 import { defineMiddleware } from "astro:middleware";
-import { createAuth } from "@config/auth";
+import { createAuth } from "@/config/auth";
 
 export const onRequest = defineMiddleware(async (context, next) => {
 	const url = new URL(context.request.url);

@@ -1,5 +1,5 @@
-import { HEX_COLORS, type VitaColor } from "@shared/constants";
 import type { FC } from "react";
+import { HEX_COLORS, type VitaColor } from "@/shared/constants";
 import wordmark from "../../assets/wordmark-for-og.svg?inline";
 
 type Props = {

@@ -3,8 +3,8 @@ import {
 	createContentClient,
 	type GitHubContentItem,
 	repoLabel,
-} from "@admin/github";
-import GlobalLayout from "@app/layouts/GlobalLayout.astro";
+} from "@/admin/github";
+import GlobalLayout from "@/app/layouts/GlobalLayout.astro";
 
 export const prerender = false;
 
@@ -134,7 +134,7 @@ try {
 </GlobalLayout>
 
 <script>
-	const { signOut } = await import("@admin/auth/auth-client");
+	const { signOut } = await import("@/admin/auth/auth-client");
 	const logoutBtn = document.getElementById("admin-logout-btn");
 	logoutBtn?.addEventListener("click", async () => {
 		await signOut({

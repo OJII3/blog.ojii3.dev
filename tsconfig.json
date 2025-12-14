@@ -5,12 +5,7 @@
 	"compilerOptions": {
 		"paths": {
 			"/pagefind/pagefind.js": ["./src/shared/types/pagefind.d.ts"],
-			"@app/*": ["./src/app/*"],
-			"@shared/*": ["./src/shared/*"],
-			"@blog/*": ["./src/blog/*"],
-			"@search/*": ["./src/search/*"],
-			"@admin/*": ["./src/admin/*"],
-			"@config/*": ["./src/config/*"]
+			"@/*": ["./src/*"]
 		},
 		"jsx": "react-jsx",
 		"jsxImportSource": "react"
