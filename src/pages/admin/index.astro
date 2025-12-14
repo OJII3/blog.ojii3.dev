@@ -34,7 +34,9 @@ try {
 
 <GlobalLayout title="Admin | Content overview">
 	<main class="mx-auto flex max-w-4xl flex-col gap-4 p-4">
-		<header class="border-gray-2 border-b pb-3 flex justify-between items-start">
+		<header
+			class="border-gray-2 flex items-start justify-between border-b pb-3"
+		>
 			<div>
 				<p class="text-gray-5 text-sm">
 					ログインユーザー: {Astro.locals.user?.email ?? "不明"}
@@ -47,7 +49,7 @@ try {
 			</div>
 			<button
 				id="admin-logout-btn"
-				class="text-gray-6 hover:text-red-600 text-sm font-medium border border-gray-300 rounded px-3 py-1 hover:bg-gray-50 transition-colors"
+				class="text-gray-6 rounded border border-gray-300 px-3 py-1 text-sm font-medium transition-colors hover:bg-gray-50 hover:text-red-600"
 			>
 				Logout
 			</button>

@@ -1,15 +1,19 @@
 ---
 interface Props {
-	value: string | Date;
+	value?: string | Date;
 }
 
 const { value } = Astro.props;
 
 // Format date to YYYY-MM-DDTHH:mm for datetime-local input
-const dateVal = value instanceof Date ? value : new Date(value);
+const dateVal = value
+	? value instanceof Date
+		? value
+		: new Date(value)
+	: undefined;
 const pad = (n: number) => n.toString().padStart(2, "0");
 const formatted =
-	!isNaN(dateVal.getTime())
+	dateVal && !Number.isNaN(dateVal.getTime())
 		? `${dateVal.getFullYear()}-${pad(dateVal.getMonth() + 1)}-${pad(dateVal.getDate())}T${pad(dateVal.getHours())}:${pad(dateVal.getMinutes())}`
 		: "";
 ---

@@ -1,0 +1,97 @@
+type SubmitState = {
+	button?: HTMLButtonElement | null;
+	label?: HTMLElement | null;
+	originalText?: string;
+};
+
+const parseTags = (value: FormDataEntryValue | null) => {
+	if (typeof value !== "string") return [] as string[];
+
+	return value
+		.split(",")
+		.map((tag) => tag.trim())
+		.filter(Boolean);
+};
+
+const buildFrontmatter = (formData: FormData) => {
+	const draft = formData.get("draft") === "on";
+
+	return {
+		title: formData.get("title"),
+		date: formData.get("date"),
+		tags: parseTags(formData.get("tags")),
+		draft: draft ? true : undefined,
+	};
+};
+
+const toggleSubmitState = (state: SubmitState, isSubmitting: boolean) => {
+	if (!state.button || !state.label || !state.originalText) return;
+	state.button.disabled = isSubmitting;
+	state.label.textContent = isSubmitting ? "Saving..." : state.originalText;
+};
+
+const readSubmitState = (form: HTMLFormElement): SubmitState => {
+	const button = form.querySelector(
+		'button[type="submit"]',
+	) as HTMLButtonElement | null;
+	const label = form.querySelector<HTMLElement>("#btn-text");
+
+	return {
+		button,
+		label,
+		originalText: label?.textContent ?? undefined,
+	};
+};
+
+const getFormMetadata = (form: HTMLFormElement) => {
+	const slug = form.dataset.slug;
+	const sha = form.dataset.sha;
+
+	return { slug, sha };
+};
+
+export const setupEditPostForm = (formId = "edit-form") => {
+	const form = document.getElementById(formId) as HTMLFormElement | null;
+	if (!form) return;
+
+	const submitState = readSubmitState(form);
+	const { slug, sha } = getFormMetadata(form);
+
+	if (!slug) {
+		console.warn("Missing slug on edit form; aborting setup.");
+		return;
+	}
+
+	form.addEventListener("submit", async (event) => {
+		event.preventDefault();
+
+		toggleSubmitState(submitState, true);
+
+		const formData = new FormData(form);
+		const frontmatter = buildFrontmatter(formData);
+		const body = formData.get("body");
+
+		try {
+			const response = await fetch(`/api/admin/content/${slug}`, {
+				method: "PUT",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({ frontmatter, body, sha }),
+			});
+
+			if (response.ok) {
+				window.location.href = `/admin/preview/${slug}`;
+				return;
+			}
+
+			const error = (await response.json()) as { message?: string };
+			alert(`Error: ${error.message ?? "Failed to save"}`);
+		} catch (error) {
+			console.error(error);
+			alert("Network error");
+		} finally {
+			toggleSubmitState(submitState, false);
+		}
+	});
+};

@@ -1,40 +1,32 @@
 ---
-import matter from "gray-matter";
 import GlobalLayout from "../../../features/_layouts/GlobalLayout.astro";
-import { getGitHubAccessToken } from "../../../features/admin/_lib/github/client";
-import { createContentClientFromToken } from "../../../features/admin/_lib/github/content";
 import EditPost from "../../../features/admin/editor/_components/EditPost.astro";
+import { loadEditablePost } from "../../../features/admin/editor/load-editable-post";
+import type { EditablePost } from "../../../features/admin/editor/types";
 
 export const prerender = false;
 
 const { slug } = Astro.params;
-const accessToken = await getGitHubAccessToken(Astro.request.headers);
-
-if (!accessToken) {
-	return Astro.redirect("/login");
-}
 
 if (!slug) {
 	return Astro.redirect("/admin");
 }
 
-let postData = { data: {}, body: "", sha: "" };
+let postData: EditablePost = { frontmatter: {}, body: "", sha: "" };
 let errorMsg = "";
 
-try {
-	const client = createContentClientFromToken(accessToken);
-	const path = `content/${slug}/README.md`;
-	const file = await client.getFile({ path });
+const loadResult = await loadEditablePost(slug, Astro.request.headers);
 
-	const { data, content: body } = matter(file.content);
+if (loadResult.status === "unauthorized") {
+	return Astro.redirect("/login");
+}
 
-	postData = {
-		data,
-		body: body.trim(),
-		sha: file.sha,
-	};
-} catch (e) {
-	errorMsg = e instanceof Error ? e.message : "Failed to load post";
+if (loadResult.status === "error") {
+	errorMsg = loadResult.message;
+}
+
+if (loadResult.status === "ok") {
+	postData = loadResult.post;
 }
 ---
 
