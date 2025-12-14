@@ -1,5 +1,5 @@
 import matter from "gray-matter";
-import { createContentClientFromToken } from "./github/content";
+import { createContentClientFromToken } from "@admin/github/content";
 
 export interface UpdatePostParams {
 	slug: string;

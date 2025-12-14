@@ -4,8 +4,8 @@ import {
 	defineAction,
 } from "astro:actions";
 import { z } from "astro:schema";
-import { updatePostCore } from "../features/admin/_lib/blog-service";
-import { getGitHubAccessToken } from "../features/admin/_lib/github/client";
+import { updatePostCore } from "@admin/content-service/blog-service";
+import { getGitHubAccessToken } from "@admin/github/client";
 
 const updatePostInput = z.object({
 	slug: z.string(),

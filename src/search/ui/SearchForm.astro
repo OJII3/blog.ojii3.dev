@@ -1,8 +1,8 @@
 ---
 import { getCollection } from "astro:content";
 import { Icon } from "astro-icon/components";
-import { SEARCH_ICON_TRANSITION_NAME } from "../../../constants";
-import { getAllTags } from "../_lib/getAllTags";
+import { SEARCH_ICON_TRANSITION_NAME } from "@shared/constants";
+import { getAllTags } from "../lib/getAllTags";
 
 const allPosts = await getCollection("blog");
 const allTags = getAllTags(allPosts);

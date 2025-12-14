@@ -1,10 +1,6 @@
 import { defineLiveCollection, z } from "astro:content";
-import type { VitaColor } from "./constants";
-import { githubLiveLoader } from "./features/admin/_lib/github";
-
-export const getColorIndex = (date: Date): VitaColor => {
-	return date.getDate() % 7; // 0-6 for 7 colors
-};
+import { getColorIndex } from "./shared/utils/color";
+import { githubLiveLoader } from "./admin/github";
 
 const liveBlog = defineLiveCollection({
 	loader: githubLiveLoader({

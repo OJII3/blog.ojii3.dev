@@ -1,4 +1,4 @@
-import { BORDER_COLORS, type VitaColor } from "../../../constants";
+import { BORDER_COLORS, type VitaColor } from "@shared/constants";
 
 export const getPostBorderColorFromDate = (dateString: string): string => {
 	const dateNumber = new Date(dateString).getDate();

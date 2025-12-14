@@ -4,7 +4,13 @@
 	"exclude": ["dist"],
 	"compilerOptions": {
 		"paths": {
-			"/pagefind/pagefind.js": ["./src/types/pagefind.d.ts"]
+			"/pagefind/pagefind.js": ["./src/shared/types/pagefind.d.ts"],
+			"@app/*": ["./src/app/*"],
+			"@shared/*": ["./src/shared/*"],
+			"@blog/*": ["./src/blog/*"],
+			"@search/*": ["./src/search/*"],
+			"@admin/*": ["./src/admin/*"],
+			"@config/*": ["./src/config/*"]
 		},
 		"jsx": "react-jsx",
 		"jsxImportSource": "react"

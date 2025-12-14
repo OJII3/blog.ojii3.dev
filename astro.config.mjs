@@ -1,5 +1,6 @@
 // @ts-check
 
+import { fileURLToPath } from "node:url";
 import cloudflare from "@astrojs/cloudflare";
 import partytown from "@astrojs/partytown";
 import sitemap from "@astrojs/sitemap";
@@ -14,6 +15,16 @@ export default defineConfig({
 	site: "https://blog.ojii3.dev",
 	vite: {
 		plugins: [tailwindcss()],
+		resolve: {
+			alias: {
+				"@app": fileURLToPath(new URL("./src/app", import.meta.url)),
+				"@shared": fileURLToPath(new URL("./src/shared", import.meta.url)),
+				"@blog": fileURLToPath(new URL("./src/blog", import.meta.url)),
+				"@search": fileURLToPath(new URL("./src/search", import.meta.url)),
+				"@admin": fileURLToPath(new URL("./src/admin", import.meta.url)),
+				"@config": fileURLToPath(new URL("./src/config", import.meta.url)),
+			},
+		},
 		build: {
 			rollupOptions: {
 				external: [

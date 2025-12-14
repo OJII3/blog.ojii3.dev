@@ -1,5 +1,5 @@
 ---
-import "../_styles/override.css";
+import "../styles/override.css";
 import { type CollectionEntry } from "astro:content";
 import {
 	H2_BORDER_COLORS,
@@ -7,8 +7,8 @@ import {
 	SITE_URL,
 	TEXT_COLORS,
 	type VitaColor,
-} from "../../../constants";
-import GlobalLayout from "../../_layouts/GlobalLayout.astro";
+} from "@shared/constants";
+import GlobalLayout from "@app/layouts/GlobalLayout.astro";
 import PostHeader from "./PostHeader.astro";
 import PostPrevNext from "./PostPrevNext.astro";
 
