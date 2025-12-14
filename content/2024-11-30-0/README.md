@@ -1,9 +1,9 @@
 ---
 title: ブログを用意した
-date: 2024-11-30
-tags: [astro]
+date: '2024-11-30T09:00'
+tags:
+  - astro
 ---
-
 Astro Starlight で簡単に作ったなのです。
 
 ブログというよりドキュメント用みたいなのですが,
