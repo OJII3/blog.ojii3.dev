@@ -15,6 +15,8 @@ mock.module("astro:schema", () => ({
 	z: {
 		object: (schema: any) => schema,
 		string: () => ({ optional: () => {} }),
+		boolean: () => ({ optional: () => {} }),
+		array: () => ({ optional: () => {} }),
 		record: () => {},
 		unknown: () => {},
 	},

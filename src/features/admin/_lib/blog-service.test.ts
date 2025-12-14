@@ -1,25 +1,5 @@
 import { describe, expect, it, mock } from "bun:test";
-
-// Mock Astro virtual modules BEFORE importing the file under test
-mock.module("astro:actions", () => ({
-	defineAction: (config: any) => config,
-	ActionError: class extends Error {
-		code: string;
-		constructor({ code, message }: { code: string; message: string }) {
-			super(message);
-			this.code = code;
-		}
-	},
-}));
-
-mock.module("astro:schema", () => ({
-	z: {
-		object: (schema: any) => schema,
-		string: () => ({ optional: () => {} }),
-		record: () => {},
-		unknown: () => {},
-	},
-}));
+import { updatePostCore } from "./blog-service";
 
 // Mock dependencies
 const mockUpsertFile = mock(() =>
@@ -33,29 +13,14 @@ const mockUpsertFile = mock(() =>
 	}),
 );
 
-mock.module("../features/admin/_lib/github/client", () => ({
-	getGitHubAccessToken: () => Promise.resolve("mock-token"),
-}));
-
-mock.module("../features/admin/_lib/github/content", () => ({
+mock.module("./github/content", () => ({
 	createContentClientFromToken: () => ({
 		upsertFile: mockUpsertFile,
 	}),
 }));
 
-// Now import the file under test
-import { updatePostHandler } from "./index";
-
-describe("updatePost action", () => {
+describe("updatePostCore", () => {
 	it("should update post with correct frontmatter formatting", async () => {
-		const handler = updatePostHandler;
-
-		const context = {
-			request: {
-				headers: new Headers(),
-			},
-		};
-
 		const input = {
 			slug: "test-slug",
 			frontmatter: {
@@ -65,21 +30,10 @@ describe("updatePost action", () => {
 			},
 			body: "Test Body",
 			sha: "old-sha",
+			accessToken: "mock-token",
 		};
 
-		const result = await handler(input, context as any);
-
-		expect(result).toEqual({
-			success: true,
-			data: {
-				content: {
-					name: "README.md",
-					path: "content/slug/README.md",
-					sha: "new-sha",
-				},
-				commit: { sha: "commit-sha" },
-			},
-		});
+		await updatePostCore(input);
 
 		// Verify that the file content passed to upsertFile has the correct date format (no quotes)
 		const calls = mockUpsertFile.mock.calls as any;
@@ -100,8 +54,6 @@ describe("updatePost action", () => {
 	});
 
 	it("should truncate time from date string", async () => {
-		const handler = updatePostHandler;
-		const context = { request: { headers: new Headers() } };
 		const input = {
 			slug: "test-slug-time",
 			frontmatter: {
@@ -111,12 +63,13 @@ describe("updatePost action", () => {
 			},
 			body: "",
 			sha: "old-sha",
+			accessToken: "mock-token",
 		};
 
-		await handler(input, context as any);
+		await updatePostCore(input);
 
 		const calls = mockUpsertFile.mock.calls as any;
-		// Get the latest call (since previous test also called it)
+		// Get the latest call
 		const args = calls[calls.length - 1][0] as any;
 
 		// Should be strictly YYYY-MM-DD

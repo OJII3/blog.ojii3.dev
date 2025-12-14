@@ -17,10 +17,12 @@ const parseTags = (value: FormDataEntryValue | null) => {
 
 const buildFrontmatter = (formData: FormData) => {
 	const draft = formData.get("draft") === "on";
+	const title = formData.get("title");
+	const date = formData.get("date");
 
 	return {
-		title: formData.get("title"),
-		date: formData.get("date"),
+		title: typeof title === "string" ? title : "",
+		date: typeof date === "string" ? date : "",
 		tags: parseTags(formData.get("tags")),
 		draft: draft ? true : undefined,
 	};
