@@ -1,3 +1,5 @@
+import { actions } from "astro:actions";
+
 type SubmitState = {
 	button?: HTMLButtonElement | null;
 	label?: HTMLElement | null;
@@ -72,21 +74,19 @@ export const setupEditPostForm = (formId = "edit-form") => {
 		const body = formData.get("body");
 
 		try {
-			const response = await fetch(`/api/admin/content/${slug}`, {
-				method: "PUT",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({ frontmatter, body, sha }),
+			const { error } = await actions.updatePost({
+				slug,
+				frontmatter,
+				body: typeof body === "string" ? body : "",
+				sha,
 			});
 
-			if (response.ok) {
+			if (!error) {
 				window.location.href = `/admin/preview/${slug}`;
 				return;
 			}
 
-			const error = (await response.json()) as { message?: string };
-			alert(`Error: ${error.message ?? "Failed to save"}`);
+			alert(`Error: ${error.message}`);
 		} catch (error) {
 			console.error(error);
 			alert("Network error");
