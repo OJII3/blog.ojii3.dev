@@ -12,6 +12,7 @@ export const createAuth = () =>
 			github: {
 				clientId: GH_APP_CLIENT_ID,
 				clientSecret: GH_APP_CLIENT_SECRET,
+				scope: ["repo", "user:email"],
 			},
 		},
 	});

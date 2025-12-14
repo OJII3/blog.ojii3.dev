@@ -7,7 +7,7 @@ import { createContentClientFromToken } from "../../../../features/admin/_lib/gi
 export const prerender = false;
 
 type UpdateRequestBody = {
-	frontmatter?: string;
+	frontmatter?: string | Record<string, unknown>;
 	body?: string;
 	sha?: string;
 };
@@ -32,14 +32,18 @@ export const PUT: APIRoute = async ({ params, request }) => {
 		const { frontmatter, body, sha } = bodyJson;
 
 		let data = {};
-		if (frontmatter && typeof frontmatter === "string") {
-			try {
-				data = yaml.load(frontmatter) as object;
-			} catch (_e) {
-				return new Response(
-					JSON.stringify({ message: "Invalid YAML in frontmatter" }),
-					{ status: 400 },
-				);
+		if (frontmatter) {
+			if (typeof frontmatter === "string") {
+				try {
+					data = yaml.load(frontmatter) as object;
+				} catch (_e) {
+					return new Response(
+						JSON.stringify({ message: "Invalid YAML in frontmatter" }),
+						{ status: 400 },
+					);
+				}
+			} else {
+				data = frontmatter;
 			}
 		}
 

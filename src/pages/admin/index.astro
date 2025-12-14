@@ -34,15 +34,23 @@ try {
 
 <GlobalLayout title="Admin | Content overview">
 	<main class="mx-auto flex max-w-4xl flex-col gap-4 p-4">
-		<header class="border-gray-2 border-b pb-3">
-			<p class="text-gray-5 text-sm">
-				ログインユーザー: {Astro.locals.user?.email ?? "不明"}
-			</p>
-			<h1 class="text-gray-7 text-xl font-semibold">GitHub API 動作確認</h1>
-			<p class="text-gray-5 text-sm">
-				GitHub ログインで取得したトークンを使って {repoLabel}/content
-				を呼び出します。
-			</p>
+		<header class="border-gray-2 border-b pb-3 flex justify-between items-start">
+			<div>
+				<p class="text-gray-5 text-sm">
+					ログインユーザー: {Astro.locals.user?.email ?? "不明"}
+				</p>
+				<h1 class="text-gray-7 text-xl font-semibold">GitHub API 動作確認</h1>
+				<p class="text-gray-5 text-sm">
+					GitHub ログインで取得したトークンを使って {repoLabel}/content
+					を呼び出します。
+				</p>
+			</div>
+			<button
+				id="admin-logout-btn"
+				class="text-gray-6 hover:text-red-600 text-sm font-medium border border-gray-300 rounded px-3 py-1 hover:bg-gray-50 transition-colors"
+			>
+				Logout
+			</button>
 		</header>
 
 		{
@@ -122,3 +130,17 @@ try {
 		}
 	</main>
 </GlobalLayout>
+
+<script>
+	const { signOut } = await import("../../features/admin/_lib/auth-client");
+	const logoutBtn = document.getElementById("admin-logout-btn");
+	logoutBtn?.addEventListener("click", async () => {
+		await signOut({
+			fetchOptions: {
+				onSuccess: () => {
+					window.location.href = "/login";
+				},
+			},
+		});
+	});
+</script>

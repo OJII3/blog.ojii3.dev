@@ -1,8 +1,13 @@
 ---
+import EditDate from "./EditDate.astro";
+import EditDraft from "./EditDraft.astro";
+import EditTags from "./EditTags.astro";
+import EditTitle from "./EditTitle.astro";
+
 interface Props {
 	slug: string;
 	initialData: {
-		frontmatter: string;
+		data: Record<string, any>;
 		body: string;
 		sha: string;
 	};
@@ -18,16 +23,14 @@ const { slug, initialData } = Astro.props;
 	data-sha={initialData.sha}
 >
 	<div class="grid min-h-[500px] flex-1 grid-cols-1 gap-4 md:grid-cols-2">
-		<div class="flex flex-col gap-2">
-			<label for="frontmatter" class="text-gray-7 text-sm font-bold"
-				>Frontmatter (YAML)</label
-			>
-			<textarea
-				id="frontmatter"
-				name="frontmatter"
-				class="border-gray-2 bg-gray-0 text-gray-7 focus:ring-accent-500 flex-1 resize-none rounded border p-2 font-mono text-sm outline-none focus:ring-2"
-				spellcheck="false">{initialData.frontmatter}</textarea
-			>
+		<div class="flex flex-col gap-4">
+			<div class="flex flex-col gap-4 rounded border border-gray-200 bg-white p-4">
+				<h2 class="text-lg font-bold text-gray-700">Metadata</h2>
+				<EditTitle value={initialData.data.title} />
+				<EditDate value={initialData.data.date} />
+				<EditTags value={initialData.data.tags} />
+				<EditDraft value={initialData.data.draft} />
+			</div>
 		</div>
 
 		<div class="flex flex-col gap-2">
@@ -78,8 +81,26 @@ const { slug, initialData } = Astro.props;
 		const formData = new FormData(form);
 		const slug = form.dataset.slug;
 		const sha = form.dataset.sha;
-		const frontmatter = formData.get("frontmatter");
+		
+		const title = formData.get("title");
+		const date = formData.get("date");
+		const tagsStr = formData.get("tags") as string;
+		const draft = formData.get("draft") === "on";
 		const body = formData.get("body");
+
+		const tags = tagsStr
+			? tagsStr
+					.split(",")
+					.map((t) => t.trim())
+					.filter(Boolean)
+			: [];
+
+		const frontmatter = {
+			title,
+			date,
+			tags,
+			draft: draft ? true : undefined, // clean up false to undefined if preferred, or just keep boolean
+		};
 
 		try {
 			const res = await fetch(`/api/admin/content/${slug}`, {

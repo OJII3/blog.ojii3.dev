@@ -18,7 +18,7 @@ if (!slug) {
 	return Astro.redirect("/admin");
 }
 
-let postData = { frontmatter: "", body: "", sha: "" };
+let postData = { data: {}, body: "", sha: "" };
 let errorMsg = "";
 
 try {
@@ -28,14 +28,8 @@ try {
 
 	const { data, content: body } = matter(file.content);
 
-	const yamlBlock = matter.stringify("", data);
-	const frontmatter = yamlBlock
-		.replace(/^---\n/, "")
-		.replace(/---\n$/, "")
-		.trim();
-
 	postData = {
-		frontmatter,
+		data,
 		body: body.trim(),
 		sha: file.sha,
 	};
