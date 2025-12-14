@@ -1,7 +1,10 @@
 import { mock } from "bun:test";
 
+const identity = <T>(value: T): T => value;
+const optional = () => ({ optional: () => ({}) });
+
 mock.module("astro:actions", () => ({
-	defineAction: (config: any) => config,
+	defineAction: identity,
 	ActionError: class extends Error {
 		code: string;
 		constructor({ code, message }: { code: string; message: string }) {
@@ -13,12 +16,12 @@ mock.module("astro:actions", () => ({
 
 mock.module("astro:schema", () => ({
 	z: {
-		object: (schema: any) => schema,
-		string: () => ({ optional: () => {} }),
-		boolean: () => ({ optional: () => {} }),
-		array: () => ({ optional: () => {} }),
-		record: () => {},
-		unknown: () => {},
+		object: identity,
+		string: optional,
+		boolean: optional,
+		array: optional,
+		record: () => ({}),
+		unknown: () => ({}),
 	},
 }));
 

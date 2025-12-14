@@ -1,6 +1,5 @@
 // @ts-check
 
-import { fileURLToPath } from "node:url";
 import cloudflare from "@astrojs/cloudflare";
 import partytown from "@astrojs/partytown";
 import sitemap from "@astrojs/sitemap";
