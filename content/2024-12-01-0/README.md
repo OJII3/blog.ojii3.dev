@@ -1,10 +1,10 @@
 ---
 title: HoYoverse ゲームを Linux に入れるなのです
 date: 2024-12-01
-draft: false
-tags: [linux, honkai]
+tags:
+  - linux
+  - honkai
 ---
-
 ## 原神・崩壊3rd・崩壊スターレイル・Zenless Zone Zero on Linux
 
 wineprefix や winecfg が大変なので、直で wine には触らないなのです。`Bottles` という wineprefix やら winecfg をいい感じに設定できるようなソフトを使うなのです。前に使っていた `Lutris` より良い感じな気がするなのです。
