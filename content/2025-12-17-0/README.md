@@ -1,5 +1,5 @@
 ---
-title: AstroでCMSを作りたい vol.1
+title: AstroでCMSを作りたい
 date: 2025-12-17
 tags:
   - nix
@@ -26,5 +26,3 @@ AI Agent の流行りで注目されてるので、"git worktree" と調べる�
 Claude Code の Common Workflows にも載っています。
 
 <https://code.claude.com/docs/en/common-workflows#run-parallel-claude-code-sessions-with-git-worktrees>
-
-
