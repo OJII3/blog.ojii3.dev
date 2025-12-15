@@ -13,11 +13,7 @@ draft: true
 
 Git worktree を ghq のような使い勝手にするやつです。
 
-## Nix とはなんぞや
-
-Unix系のOSなら大抵どこでもで使えるパッケージマネージャーです。大変お気に入り。
-
-気になる方はこちらをどうぞ[https://zenn.dev/asa1984/books/nix-introduction/viewer/02-what-is-nix](Nixとは何か)
+ghq、弊サークル(MCC)では知らないor使ってない人がほとんどかと思いますが、とても便利なのでターミナルをよく使う人にオススメです。
 
 
 
