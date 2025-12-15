@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
-      success: ${{ steps.deploy-preview.outputs.command-stderr == '' }}
+      success: ${{ steps.deploy-preview.outcome == 'success' }}
       version_tag: ${{ steps.get-version.outputs.version }}
     steps:
       - name: Setup | Checkout
