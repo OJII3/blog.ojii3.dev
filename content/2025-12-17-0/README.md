@@ -1,5 +1,5 @@
 ---
-title: AstroでCMSを作りたい
+title: gwq を nix で入れる
 date: 2025-12-17
 tags:
   - nix
