@@ -3,7 +3,6 @@ title: gwq を nix で入れる
 date: 2025-12-17
 tags:
   - nix
-draft: false
 ---
 [農工大アドベントカレンダー](https://qiita.com/advent-calendar/2025/tuat)17日目です。書くことが溢れてきたので勝手にシリーズ2を生やしました。
 
@@ -67,7 +66,7 @@ Go 言語のプロジェクトをNixでビルドする方法については以�
 
 ### 実際のコード
 
-これらのことを踏まえて ChatGPT に書いてもらったのが以下のコードです(え)。
+これらのことを踏まえて書いたものが以下のコードです。
 
 Nix言語の簡単な説明は[こちらの記事](https://zenn.dev/asa1984/books/nix-introduction/viewer/09-nix-lang)をどうぞ.
 
@@ -134,7 +133,7 @@ buildGoModule rec {
 }
 ```
 
-記憶が曖昧ですが、たしか一発で動かなかくて手直しした気がします。
+ハッシュ値は、一旦空のままビルドすると正しいハッシュ値を教えてくれるのでそれをコピペします。
 
 このコードを `gwq.nix` など適当な名前で`dotfiles`に追加して、`home-manager` の設定ファイルの適当な箇所に追加します。
 
@@ -166,7 +165,7 @@ buildGoModule rec {
 2. `gwq add -b <branch-name>` で `~/worktrees/<repo-name>/<branch-name>` に git worktree を作成
 3. `gwq exec <branch-name> -- codex` で作成した worktree 上で `codex` コマンドを実行
 
-手元に複数タスクを並列に進められる規模のプロジェクトが無いので、Codex と Gemini CLI に同じタスクを並列でやらせてみました。結果は覚えてません(え)。
+手元に複数タスクを並列に進められる規模のプロジェクトが無いので、Codex と Gemini CLI に同じタスクを並列でやらせてみました。結果は覚えてません。
 
 worktree を作成した場所を覚えておく必要が無いのと、全デフォルトで全く別の場所に worktree を作成してくれるのでリポジトリに謎フォルダが増えないのが良いですね。
 
@@ -175,4 +174,4 @@ worktree を作成した場所を覚えておく必要が無いのと、全デ�
 
 ## まとめ
 
-`gwq` も AI も使いこなせるようになりたいなのです。
+`gwq` も AI も使いこなせるようになりたいものです。
