@@ -13,11 +13,11 @@ draft: false
 
 git worktree を [ghq](https://github.com/x-motemen/ghq) のような使い勝手にするやつです。
 
-ghq、弊サークル(MCC)では知らない&使ってない人がほとんどかと思いますが、とても便利なのでターミナルをよく使う人にオススメです。
+弊サークル(MCC)では ghq を知らない&使ってない人がほとんどかと思いますが、とても便利なのでターミナルをよく使う人にオススメです。
 
-ghqの紹介記事↓この辺とか
+紹介記事↓この辺とか
 
-<https://qiita.com/tomoyamachi/items/e51d2906a5bb24cf1684>
+[6歳娘｢パパ、プロジェクトフォルダを見つけるのに何時間かけるの？｣【ghq+fzf+zsh】](https://qiita.com/tomoyamachi/items/e51d2906a5bb24cf1684)
 
 ## git worktree とは
 
@@ -33,34 +33,22 @@ git worktree を使うと一つのリポジトリで複数のブランチに同�
 
 ## gwq を nix で入れる
 
-私は `home-manager` を使っているので、`home-manager` の設定ファイルに書きます。
+gwq は `nixpkgs` に入っていませんので、他の一般的なアプリケーションよりもひと手間がかかります。
 
-一般的に、`nixpkgs` に入っているパッケージは以下のようにインストールできます。
-
-```nix
-home.packages = with pkgs; [
-  git
-  gh
-  ghq
-];
-```
-
-しかし、gwq は `nixpkgs` に入っていませんので、自分でnixをちょこちょこ書く必要があります。
-
-まずは[gwqのGitHubリポジトリ](https://github.com/d-kuro/gwq)を見に行って、インストール方法を検討しましょう。
+まずは[gwq の GitHubリポジトリ](https://github.com/d-kuro/gwq)を見に行って、インストール方法を検討しましょう。
 
 パッと思いつく限り2通りありそうですね。
 
 - Release の URL からビルド成果物の`tar.gz`をダウンロードして展開する
 - ソースコードをダウンロードしてビルドする
 
-前者だと `fetchTarball` などを使えばできそうで、一見楽に見えますが、プラットフォームごとにバイナリが違うのを分ける必要がありますし、なにより Nix の良さがあまり活かせません。
+前者だと一見楽に見えますが、プラットフォームごとにバイナリが違うのを分ける必要がありますし、なにより Nix の良さがあまり活かせません。
 
 後者を採用します。
 
 ### Nixで書くための方針
 
-幸いとても Nix で扱いやすい構成で、`nixpkgs` のビルドヘルパーを使えば簡単に書けます。
+幸い gwq はとても Nix で扱いやすい構成なので、`nixpkgs` のビルドヘルパーを使えば簡単に書けます。
 
 - GitHub からソースコードをダウンロードする →  `fetchFromGitHub` 関数
 - Go 言語のプロジェクトをビルドする(`go.mod`ファイルを含む) → `buildGoModule` 関数
@@ -159,7 +147,7 @@ buildGoModule rec {
       gomi
       bun
       uv
-      (callPackage ./packages/gwq.nix { })
+      (callPackage ../../../packages/gwq.nix { })
     ]
     ++ lib.lists.optionals (pkgs.stdenv.hostPlatform.isDarwin) [
       terminal-notifier
@@ -178,7 +166,7 @@ buildGoModule rec {
 2. `gwq add -b <branch-name>` で `~/worktrees/<repo-name>/<branch-name>` に git worktree を作成
 3. `gwq exec <branch-name> -- codex` で作成した worktree 上で `codex` コマンドを実行
 
-手元に複数タスクを並列に進められる規模のプロジェクトが無いので、Codex と Gemini CLI に同じタスクを並列でやらせてみましたが、結果は覚えてません(え)。
+手元に複数タスクを並列に進められる規模のプロジェクトが無いので、Codex と Gemini CLI に同じタスクを並列でやらせてみました。結果は覚えてません(え)。
 
 worktree を作成した場所を覚えておく必要が無いのと、全デフォルトで全く別の場所に worktree を作成してくれるのでリポジトリに謎フォルダが増えないのが良いですね。
 
