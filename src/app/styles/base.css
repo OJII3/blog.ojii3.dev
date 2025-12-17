@@ -43,8 +43,6 @@
 		--text-h4: var(--text-base);
 		--text-h5: var(--text-sm);
 		--text-h6: var(--text-xs);
-		--text-code: var(--text-sm);
-		--text-code-sm: var(--text-xs);
 
 		--color-bg-inline-code: var(--color-gray-2);
 		--details-border-color: var(--color-gray-6);
