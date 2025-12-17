@@ -76,7 +76,7 @@ const ogImage = postId ? `${SITE_URL}/${postId}/og-image.png` : undefined;
 				{html ? <Fragment set:html={html} /> : <slot />}
 			</article>
 
-			<div class="my-8 flex items-end justify-between">
+			<div class="my-8 flex items-start justify-between">
 				{
 					tags && tags.length > 0 && (
 						<ul class="flex flex-wrap gap-2">
