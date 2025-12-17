@@ -6,11 +6,10 @@ import {
 	SITE_HEADER_TRANSITION_NAME,
 	TITLE_TRANSITION_NAME,
 } from "@/shared/constants";
-import Card from "./Card.astro";
 ---
 
-<Card
-	class="flex-col justify-between gap-2"
+<section
+	class="card card-stack-tight"
 	transition:name={SITE_HEADER_TRANSITION_NAME}
 >
 	<h1
@@ -42,4 +41,4 @@ import Card from "./Card.astro";
 			/>
 		</a>
 	</div>
-</Card>
+</section>

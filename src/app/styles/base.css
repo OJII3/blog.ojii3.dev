@@ -1,0 +1,59 @@
+@layer base {
+	/* Restore crucial styles from Tailwind Preflight: https://tailwindcss.com/docs/preflight */
+	/* Allow adding a border to an element by just adding a border-width. (https://github.com/tailwindcss/tailwindcss/pull/116) */
+	*,
+	::after,
+	::before {
+		border: 0 solid;
+	}
+	/* Keep base font-family styles even in non-Starlight pages. */
+	html,
+	:host {
+		font-family: var(--font-sans);
+	}
+	code,
+	kbd,
+	samp,
+	pre {
+		font-family: var(--font-mono);
+	}
+
+	.dark {
+		--color-gray-0: var(--color-gray-900);
+		--color-gray-1: var(--color-gray-800);
+		--color-gray-2: var(--color-gray-700);
+		--color-gray-3: var(--color-gray-500);
+		--color-gray-4: var(--color-gray-400);
+		--color-gray-5: var(--color-gray-300);
+		--color-gray-6: var(--color-gray-200);
+		--color-gray-7: var(--color-gray-100);
+		--color-gray-10: var(--color-white);
+		--color-accent-low: var(--color-accent-200, #c7d2fe);
+		--color-accent: var(--color-accent-600, #4f46e5);
+		--color-accent-high: var(--color-accent-900, #312e81);
+
+		/* --cursor-default: url("/circle-darkmode.svg"), default; */
+		/* --cursor-pointer: url("/circle-darkmode.svg"), default; */
+	}
+
+	:root {
+		--text-h1: var(--text-2xl);
+		--text-h2: var(--text-xl);
+		--text-h3: var(--text-lg);
+		--text-h4: var(--text-base);
+		--text-h5: var(--text-sm);
+		--text-h6: var(--text-xs);
+		--text-code: var(--text-sm);
+		--text-code-sm: var(--text-xs);
+
+		--color-bg-inline-code: var(--color-gray-2);
+		--details-border-color: var(--color-gray-6);
+		--details-border-color--hover: var(--color-slate-500);
+
+		--line-height-headings: 1.2;
+	}
+
+	.expressive-code {
+		margin-block: 1.25em;
+	}
+}
