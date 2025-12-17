@@ -14,4 +14,7 @@ export const auth = betterAuth({
 			clientSecret: GH_APP_CLIENT_SECRET,
 		},
 	},
+	session: {
+		expiresIn: 60 * 60 * 24 * 7, // 7 days
+	},
 });

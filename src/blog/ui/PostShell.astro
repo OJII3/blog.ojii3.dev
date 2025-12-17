@@ -1,5 +1,6 @@
 ---
 import { type CollectionEntry } from "astro:content";
+import { Icon } from "astro-icon/components";
 import GlobalLayout from "@/app/layouts/GlobalLayout.astro";
 import {
 	H2_BORDER_COLORS,
@@ -75,25 +76,39 @@ const ogImage = postId ? `${SITE_URL}/${postId}/og-image.png` : undefined;
 				{html ? <Fragment set:html={html} /> : <slot />}
 			</article>
 
-			{
-				tags && tags.length > 0 && (
-					<ul class="my-8 flex flex-wrap gap-2">
-						{tags.map((tag) => (
-							<li>
-								<a
-									href={`/search?tag=${tag}`}
-									class:list={["px-1 hover:underline", TEXT_COLORS[color]]}
-								>
-									#
-									<span data-pagefind-filter="tag" data-pagefind-ignore={draft}>
-										{tag}
-									</span>
-								</a>
-							</li>
-						))}
-					</ul>
-				)
-			}
+			<div class="my-8 flex items-end justify-between">
+				{
+					tags && tags.length > 0 && (
+						<ul class="flex flex-wrap gap-2">
+							{tags.map((tag) => (
+								<li>
+									<a
+										href={`/search?tag=${tag}`}
+										class:list={["px-1 hover:underline", TEXT_COLORS[color]]}
+									>
+										#
+										<span
+											data-pagefind-filter="tag"
+											data-pagefind-ignore={draft}
+										>
+											{tag}
+										</span>
+									</a>
+								</li>
+							))}
+						</ul>
+					)
+				}
+				<div class="flex">
+					<a
+						href=`/admin/preview/${postId}`
+						class="bg-gray-1 hover:bg-gray-2 flex gap-2 rounded-2xl p-2 px-4"
+					>
+						<Icon name="tabler:edit" class="h-6 w-6 align-middle" />
+						Edit
+					</a>
+				</div>
+			</div>
 
 			{/* postId（本番記事）の場合のみ前後リンクを表示 */}
 			{
