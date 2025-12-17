@@ -1,7 +1,5 @@
 import { Octokit } from "@octokit/core";
-import { createAuth } from "@/config/auth";
-
-const auth = createAuth();
+import { auth } from "@/auth";
 
 export const repoOwner = "ojii3";
 export const repoName = "blog.ojii3.dev";

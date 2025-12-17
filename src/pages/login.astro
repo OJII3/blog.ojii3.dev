@@ -19,10 +19,13 @@ export const prerender = false;
 			throw new Error("Login or Logout button not found");
 		}
 
+		const urlParams = new URLSearchParams(window.location.search);
+		const redirectTo = urlParams.get("redirectTo") ?? "/admin";
+
 		loginButton.addEventListener("click", () =>
 			signIn.social({
 				provider: "github",
-				callbackURL: "/admin",
+				callbackURL: redirectTo,
 			}),
 		);
 		logoutButton.addEventListener("click", () => signOut());
