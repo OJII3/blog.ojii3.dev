@@ -1,0 +1,13 @@
+@layer components {
+	.card {
+		@apply 2x:w-[200px] 2x:h-[200px] 2x:max-w-[200px] flex h-[calc(50dvw-32px)] max-w-full min-w-full overflow-hidden rounded-2xl p-4 duration-200;
+	}
+
+	.card-stack-tight {
+		@apply flex-col justify-between gap-2;
+	}
+
+	.card-stack-relaxed {
+		@apply flex-col justify-between gap-4;
+	}
+}

@@ -65,8 +65,7 @@ GH_APP_CLIENT_SECRET=
   - `github/{client,content,types,live-content-loader}.ts` — Octokit ラッパーと Live Loader。
   - `content-service/blog-service.ts` (+ test) — GitHub への CRUD。
   - `editor/{load-editable-post.ts,edit-post.client.ts,types.ts,_components/*.astro}` — エディタ UI とロジック。
-- `src/config/`
-  - `auth.ts` — BetterAuth サーバーセットアップ（GitHub ソーシャルプロバイダ）。
+- `src/auth.ts` — BetterAuth サーバー(Auth クライアント)セットアップ（GitHub ソーシャルプロバイダ）。
 - `src/content.config.ts` — 静的コレクション `blog` を `content/**/README.md` から生成（frontmatter: `title`/`date`/`tags`/`draft`）。`dateString` 生成と `getDate() % 7` で `color` 付与、`draft` は `true/undefined` に正規化。（Astro の制約で `src/` 直下に配置）
 - `src/live.config.ts` — GitHub Live Loader で `content/*/README.md` を動的取得。BetterAuth の GitHub アクセストークンを渡す。（Astro の制約で `src/` 直下に配置）
 - `content/` — `YYYY-MM-DD-n/README.md` 形式の投稿。`data-pagefind-ignore` 用に draft を true/undefined で扱う。`.markdownlint.jsonc` で MD013/MD033 を無効化。

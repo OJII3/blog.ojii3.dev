@@ -1,10 +1,9 @@
 ---
 import { Image } from "astro:assets";
 import { Icon } from "astro-icon/components";
-import Card from "./Card.astro";
 ---
 
-<Card class="flex-col justify-between gap-4">
+<section class="card card-stack-relaxed">
 	<div class="flex flex-col gap-3">
 		<div class="flex items-start gap-3">
 			<a
@@ -31,9 +30,16 @@ import Card from "./Card.astro";
 			>
 				<Icon name="tabler:brand-github-filled" class="h-8 w-8" />
 			</a>
+			<a
+				href="/admin"
+				class="cursor-pointer rounded-full duration-200 hover:rotate-30"
+				aria-label="GitHubリポジトリへ"
+			>
+				<Icon name="tabler:settings" class="h-8 w-8" />
+			</a>
 		</div>
 	</div>
-	<p class="font-hachimaru text-xs leading-relaxed">
+	<p class="font-hachimaru text-[0.6rem] leading-relaxed">
 		May you, the beauty of this world, always shine...
 	</p>
-</Card>
+</section>
