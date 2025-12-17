@@ -1,5 +1,5 @@
 import { defineMiddleware } from "astro:middleware";
-import { createAuth } from "@/config/auth";
+import { auth } from "@/auth";
 
 export const onRequest = defineMiddleware(async (context, next) => {
 	const url = new URL(context.request.url);
@@ -10,7 +10,6 @@ export const onRequest = defineMiddleware(async (context, next) => {
 		return next();
 	}
 
-	const auth = createAuth();
 	const sessionData = await auth.api.getSession({
 		headers: context.request.headers,
 	});
