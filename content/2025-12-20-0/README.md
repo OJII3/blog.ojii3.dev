@@ -19,6 +19,7 @@ Robot Operating System (通称ROS) でございます。
 こちら5万年ぶりに触っています。苦しい。
 
 苦しいポイントたくさん
+
 - 公式サポート環境がUbuntu
   - しかもUbuntuのバージョンとROS 2のバージョンが密接に結びついているので、`ros2-humble` を使いたければ Ubuntu 22.04、`ros2-jazzy` なら Ubuntu 24.04 など。
   - あらゆるパッケージが古い。古い Ubuntu を使うとなると当然さらに古い。開発だけでも最新の環境が欲しい。
@@ -43,4 +44,3 @@ Robot Operating System (通称ROS) でございます。
 Want to use ROS, but don't want to run Ubuntu? This project uses the power of Nix make to it possible to develop and run ROS packages in the same way on any Linux machine.
 
 最高じゃあないですか。早速使わせていただきましょう。
-
