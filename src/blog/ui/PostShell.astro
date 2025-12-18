@@ -123,7 +123,7 @@ const ogImage = postId ? `${SITE_URL}/${postId}/og-image.png` : undefined;
 									{
 										id: postId,
 										data: { title, color },
-									} as CollectionEntry<"blog">
+									} as CollectionEntry
 								}
 								targetPost={prevPost}
 								isPrev
@@ -137,7 +137,7 @@ const ogImage = postId ? `${SITE_URL}/${postId}/og-image.png` : undefined;
 									{
 										id: postId,
 										data: { title, color },
-									} as CollectionEntry<"blog">
+									} as CollectionEntry
 								}
 								targetPost={nextPost}
 								isNext
