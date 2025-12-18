@@ -29,7 +29,13 @@ Robot Operating System (通称ROS) でございます。
   - Ubuntu の Python っとガッツリ紐づいているため、uv との相性はイマイチ
 - ビジュアライザなどのGUIアプリケーションも組めるよううなツールが揃っており、下手するとそこら辺の依存のバージョンが Blender の依存と衝突したりする
 
+などなど。ROS にわかの身ですみません……
+
 ## nix-ros-overlay
 
-そんなこんなで Ubuntu に `home-manager` を導入して誤魔化したりしていたところ、[nix-ros-overlay]() と出会いました。
+そんなこんなで Ubuntu に `home-manager` を導入して誤魔化したりしていたところ、[nix-ros-overlay](https://github.com/lopsided98/nix-ros-overlay) と出会いました。
 
+> Easily install the Robot Operating System (ROS) on any Linux distribution
+Want to use ROS, but don't want to run Ubuntu? This project uses the power of Nix make to it possible to develop and run ROS packages in the same way on any Linux machine.
+
+最高じゃあないですか。早速使わせていただきましょう。
