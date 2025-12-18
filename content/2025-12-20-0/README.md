@@ -28,3 +28,7 @@ Robot Operating System (通称ROS) でございます。
   - ament_cmake という拡張 cmake によるパッケージ管理とビルド
   - Ubuntu の Python っとガッツリ紐づいているため、uv との相性はイマイチ
 - ビジュアライザなどのGUIアプリケーションも組めるよううなツールが揃っており、下手するとそこら辺の依存のバージョンが Blender の依存と衝突したりする
+
+## nix-ros-overlay
+
+先日 [nix-ros-overlay]() と出会いました。
