@@ -172,4 +172,10 @@ in
 
 これで `home-manager switch` を実行すれば、ROS 2 Humble 環境がセットアップされた UnityHub がインストールされます。アプリケーションメニューに、「Unity Hub (ROS 2 Humble)」が表示されていて、これを起動してプレイできれば OK です。
 
-![]()
+![Dual UnityHub in Applications Menu](dual-unityhub.png)
+
+ちなみにこれは NixOS で動かしていて、ちゃんと Android ビルドもできました。やったね！
+
+## まとめ
+
+あなたも Nix で幸せになりませんか？
