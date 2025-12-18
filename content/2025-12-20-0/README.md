@@ -31,4 +31,5 @@ Robot Operating System (通称ROS) でございます。
 
 ## nix-ros-overlay
 
-先日 [nix-ros-overlay]() と出会いました。
+そんなこんなで Ubuntu に `home-manager` を導入して誤魔化したりしていたところ、[nix-ros-overlay]() と出会いました。
+
