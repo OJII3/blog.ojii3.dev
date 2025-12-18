@@ -1,10 +1,6 @@
 ---
-import {
-	createContentClient,
-	type GitHubContentItem,
-	repoLabel,
-} from "@/admin/github";
-import GlobalLayout from "@/app/layouts/GlobalLayout.astro";
+import { createContentClient, type GitHubContentItem } from "@/admin/github";
+import AdminLayout from "@/admin/layouts/AdminLayout.astro";
 
 export const prerender = false;
 
@@ -17,12 +13,21 @@ let contentResult: ContentResult = {
 	message: "まだ GitHub API にアクセスしていません。",
 };
 
+// YYYY-MM-DD-n format
+const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}-\d+$/;
+
 try {
 	const client = await createContentClient(Astro.request.headers);
 	const listing = await client.listRepoPath("content");
+
+	// Filter for directories matching the date pattern
+	const filteredEntries = listing
+		.filter((item) => item.type === "dir" && DATE_PATTERN.test(item.name))
+		.sort((a, b) => b.name.localeCompare(a.name)); // Sort by date descending
+
 	contentResult = {
 		status: "ok",
-		entries: listing,
+		entries: filteredEntries,
 		fetchedAt: new Date().toISOString(),
 	};
 } catch (error) {
@@ -32,106 +37,75 @@ try {
 }
 ---
 
-<GlobalLayout title="Admin | Content overview">
-	<main class="mx-auto flex max-w-4xl flex-col gap-4 p-4">
+<AdminLayout title="Admin | Content overview">
+	<main class="container mx-auto max-w-5xl p-4">
 		<header
-			class="border-gray-2 flex items-start justify-between border-b pb-3"
+			class="navbar bg-base-100 rounded-box border-base-200 mb-6 border shadow-sm"
 		>
-			<div>
-				<p class="text-gray-5 text-sm">
-					ログインユーザー: {Astro.locals.user?.email ?? "不明"}
-				</p>
-				<h1 class="text-gray-7 text-xl font-semibold">GitHub API 動作確認</h1>
-				<p class="text-gray-5 text-sm">
-					GitHub ログインで取得したトークンを使って {repoLabel}/content
-					を呼び出します。
-				</p>
+			<div class="flex-1">
+				<a class="btn btn-ghost text-xl">Admin Dashboard</a>
 			</div>
-			<button
-				id="admin-logout-btn"
-				class="text-gray-6 rounded border border-gray-300 px-3 py-1 text-sm font-medium transition-colors hover:bg-gray-50 hover:text-red-600"
-			>
-				Logout
-			</button>
+			<div class="flex-none items-center gap-4 px-2">
+				<button id="admin-logout-btn" class="btn btn-sm btn-error btn-outline">
+					Logout
+				</button>
+			</div>
 		</header>
 
 		{
 			contentResult.status === "error" ? (
-				<div class="rounded-lg border border-red-300 bg-red-50 p-4 text-red-700">
-					<p class="font-semibold">GitHub API 呼び出しに失敗しました</p>
-					<p class="text-sm">{contentResult.message}</p>
+				<div role="alert" class="alert alert-error">
+					<h3 class="font-bold">Error fetching content</h3>
+					<div class="text-xs">{contentResult.message}</div>
 				</div>
 			) : (
-				<section class="border-gray-2 bg-gray-0 rounded-lg border shadow-sm">
-					<div class="border-gray-2 flex items-center justify-between border-b px-4 py-3">
-						<div>
-							<p class="text-gray-5 text-sm">Repository</p>
-							<p class="text-gray-7 font-semibold">{repoLabel}</p>
+				<div class="card bg-base-100 border-base-200 h-full">
+					<div class="card-body p-0">
+						<div class="overflow-x-auto">
+							<table class="table-zebra table w-full">
+								<thead>
+									<tr>
+										<th>Post ID</th>
+										<th class="text-right">Actions</th>
+									</tr>
+								</thead>
+								<tbody>
+									{contentResult.entries.length === 0 ? (
+										<tr>
+											<td colspan="2" class="py-8 text-center opacity-60">
+												No posts found.
+											</td>
+										</tr>
+									) : (
+										contentResult.entries.map((item) => (
+											<tr>
+												<td class="font-mono font-bold">{item.name}</td>
+												<td class="flex justify-end gap-2">
+													<a
+														href={`/admin/edit/${item.name}`}
+														class="btn btn-sm btn-primary"
+													>
+														Edit
+													</a>
+													<a
+														href={`/admin/preview/${item.name}`}
+														class="btn btn-sm btn-secondary btn-outline"
+													>
+														Preview
+													</a>
+												</td>
+											</tr>
+										))
+									)}
+								</tbody>
+							</table>
 						</div>
-						<p class="text-gray-5 text-xs">
-							Fetched at{" "}
-							{new Date(contentResult.fetchedAt).toLocaleString("ja-JP")}
-						</p>
 					</div>
-
-					<p class="text-gray-6 border-gray-2 bg-gray-1 border-b px-4 py-2 text-xs">
-						Path: content (repository root)
-					</p>
-
-					{contentResult.entries.length === 0 ? (
-						<p class="text-gray-6 px-4 py-3 text-sm">
-							ファイルが返ってきませんでした。
-						</p>
-					) : (
-						<ul class="divide-gray-2 divide-y">
-							{contentResult.entries.map((item) => (
-								<li class="flex items-center justify-between px-4 py-3">
-									<div class="flex items-center gap-3">
-										<span class="bg-gray-1 text-gray-6 rounded-full px-3 py-1 text-xs uppercase">
-											{item.type}
-										</span>
-										<div>
-											<p class="text-gray-7 font-medium">{item.name}</p>
-											<p class="text-gray-5 text-xs">{item.path}</p>
-										</div>
-									</div>
-									<div class="flex items-center gap-4">
-										{item.type === "dir" && (
-											<>
-												<a
-													href={`/admin/preview/${item.name}`}
-													class="text-accent-600 hover:text-accent-700 text-sm font-semibold"
-												>
-													Preview
-												</a>
-												<a
-													href={`/admin/edit/${item.name}`}
-													class="text-gray-5 hover:text-gray-7 text-sm font-semibold"
-												>
-													Edit
-												</a>
-											</>
-										)}
-										{item.htmlUrl && (
-											<a
-												href={item.htmlUrl}
-												target="_blank"
-												rel="noreferrer"
-												class="text-gray-5 hover:text-gray-7 text-sm"
-											>
-												GitHub
-											</a>
-										)}
-									</div>
-								</li>
-							))}
-						</ul>
-					)}
-				</section>
+				</div>
 			)
 		}
 	</main>
-</GlobalLayout>
+</AdminLayout>
 
 <script>
 	const { signOut } = await import("@/admin/auth/auth-client");

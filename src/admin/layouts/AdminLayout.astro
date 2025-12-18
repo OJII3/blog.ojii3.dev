@@ -1,0 +1,29 @@
+---
+import "@/app/styles/admin.css";
+
+import DarkModeManager from "@/app/components/DarkModeManager.astro";
+
+type Props = {
+	title?: string;
+	ogImage?: string;
+};
+
+const { title } = Astro.props;
+---
+
+<!doctype html>
+<html lang="ja" class="min-h-dvh">
+	<head>
+		<DarkModeManager />
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" href="/favicon.ico" sizes="32x32" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+		<link rel="manifest" href="/site.webmanifest" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+	</head>
+	<body class="bg-base-100 text-base-content min-h-dvh">
+		<slot />
+	</body>
+</html>

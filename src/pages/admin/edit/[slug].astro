@@ -2,7 +2,7 @@
 import EditPost from "@/admin/editor/_components/EditPost.astro";
 import { loadEditablePost } from "@/admin/editor/load-editable-post";
 import type { EditablePost } from "@/admin/editor/types";
-import GlobalLayout from "@/app/layouts/GlobalLayout.astro";
+import AdminLayout from "@/admin/layouts/AdminLayout.astro";
 
 export const prerender = false;
 
@@ -30,8 +30,10 @@ if (loadResult.status === "ok") {
 }
 ---
 
-<GlobalLayout title={`Edit: ${slug}`}>
-	<main class="mx-auto flex min-h-dvh w-full max-w-7xl flex-col p-4">
+<AdminLayout title={`Edit: ${slug}`}>
+	<main
+		class="container mx-auto grid min-h-dvh max-w-5xl grid-rows-[auto_1fr] p-4"
+	>
 		<div class="mb-4 flex items-center justify-between">
 			<h1 class="text-gray-7 text-xl font-bold">Edit: {slug}</h1>
 		</div>
@@ -46,10 +48,10 @@ if (loadResult.status === "ok") {
 					</a>
 				</div>
 			) : (
-				<div class="flex min-h-0 flex-1 flex-col">
+				<div class="bottom-0 h-full flex-1">
 					<EditPost slug={slug} initialData={postData} />
 				</div>
 			)
 		}
 	</main>
-</GlobalLayout>
+</AdminLayout>

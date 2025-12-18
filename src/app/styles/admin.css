@@ -1,0 +1,11 @@
+@import "tailwindcss";
+@import "./theme.css";
+@import "./base.css";
+@import "./components.css";
+@import "./override.css";
+
+@plugin "@tailwindcss/typography";
+@plugin "daisyui";
+
+@custom-variant dark (&:where(.dark, .dark *));
+@layer base, override;

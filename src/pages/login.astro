@@ -1,13 +1,13 @@
 ---
-import GlobalLayout from "@/app/layouts/GlobalLayout.astro";
+import AdminLayout from "@/admin/layouts/AdminLayout.astro";
 
 export const prerender = false;
 ---
 
-<GlobalLayout>
-	<div class="flex gap-2 p-2">
-		<button class="bg-lime-500 p-2" id="login">Login</button>
-		<button class="bg-lime-500 p-2" id="logout">Logout</button>
+<AdminLayout>
+	<div class="flex min-h-dvh items-center justify-center gap-4">
+		<button class="btn btn-primary" id="login">Login</button>
+		<button class="btn btn-secondary" id="logout">Logout</button>
 	</div>
 
 	<script>
@@ -30,4 +30,4 @@ export const prerender = false;
 		);
 		logoutButton.addEventListener("click", () => signOut());
 	</script>
-</GlobalLayout>
+</AdminLayout>

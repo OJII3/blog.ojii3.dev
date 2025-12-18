@@ -28,6 +28,7 @@
 		"astro-icon": "^1.1.5",
 		"astro-pagefind": "^1.8.5",
 		"better-auth": "^1.4.7",
+		"daisyui": "^5.5.14",
 		"gray-matter": "^4.0.3",
 		"js-yaml": "^4.1.1",
 		"markdownlint-cli2": "^0.20.0",
