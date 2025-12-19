@@ -8,17 +8,17 @@ draft: true
 ---
 [農工大アドベントカレンダー2025](https://qiita.com/advent-calendar/2025/tuat) の記事です。
 
-Unity の話だと思って見にきた方、すみません。Nix と ROS 2 の話です。
+学生ロボコンの頃以来、5万年ぶりにROS 2を触っています。Unity の話だと思って見にきた方、すみません。ほとんど Nix と ROS 2 の話です。
 
 ## ROSとは
 
-Robot Operating System (通称ROS) でございます。
+Robot Operating System (通称ROS) です。IT用語のOSではないです。
 
-ロボット作りに便利で優秀なオープンソースなミドルウェアでございます。「ROS」だと前身の「ROS(無印)」と紛らわしいのでちゃんと「_2」をつけてます。
+ロボット作りに便利で優秀なオープンソースなミドルウェアで、ROS 2 はその名の通り2代目のROSです。
 
 ## ROS 2 は QOL が下がる
 
-NHK学生オボコンの頃以来で、こちら5万年ぶりにROS 2を触っています。苦しい。
+苦しい。
 
 苦しいポイント！
 
@@ -36,35 +36,37 @@ NHK学生オボコンの頃以来で、こちら5万年ぶりにROS 2を触っ�
 
 ## Ros 2 For Unity
 
-まだ続きます。
+……まだ続きます。
 
-色々なことができる Unity 上で ROS 2 を動かしたい、という需要もあります。なにせコントローラーでもシュミレーターでもビジュアライザーでも、3Dアプリケーションが簡単に作れてしまうので。色々なところが Unity と ROS 2 の連携を試みていますが、[ros2-for-unity](https://github.com/RobotecAI/ros2-for-unity)はネイティブで ROS 2 が動くので最高でしょ
+色々なことができる Unity 上で ROS 2 を動かしたい、という需要もあります。なにせコントローラーでもシュミレーターでもビジュアライザーでも、3Dアプリケーションが簡単に作れてしまうので。
+
+色々なところが Unity と ROS 2 の連携を試みていますが、[ros2-for-unity](https://github.com/RobotecAI/ros2-for-unity)はネイティブで ROS 2 が動くので最高です。
 
 - [ROS2 for Unityで始めるUnityとROS2間の高速データ通信](https://zenn.dev/hakuturu583/articles/ros2_for_unity)
 
-しかし、この ROS 2 For Unity、Ubuntu でしか動きません。Android で動かしたいじゃん、ということで某技科大の方がAndroid対応させた [ROS2 for Unity](https://github.com/Kotakku/ros2-for-unity) があります。ありがたや。一方で Unity に愛想を尽かした模様の本家の ros2-for-unity さん。う～ん。
+しかし、この ROS 2 For Unity、Ubuntu でしか動きません。Android で動かしたいじゃん、ということで某技科大の方がAndroid対応させた [Android 対応版 ROS 2 for Unity](https://github.com/Kotakku/ros2-for-unity) があります。ありがたや。一方で Unity に愛想を尽かした模様の本家の ros2-for-unity さん。う～ん。
 
 > This project is officially supported for AWSIM users of Autoware. However, the Robotec team is unable to provide support and maintain the project for the general community. If you are looking for an alternative to Unity3D, Open 3D Engine (O3DE) is a great, open-source and free simulation engine with excellent ROS 2 integration, which Robotec is actively supporting and developing.
 
-ちなみに、どちらの ROS 2 For Unity もビルドするには対応する ROS 2 環境が必要です。振り出しに戻ってきた感。
+ちなみに、どちらの ROS 2 For Unity もビルドするには対応する ROS 2 環境が必要です。振り出しに戻る。
 
-幸い Android 対応版は `.unitypackage` を配布してくれているので、ビルドしなくてもとりあえずは動かせます。ありがたや2。
+幸い Android 対応版は `.unitypackage` を配布してくれているので、ビルドしなくてもとりあえずは動かせます。(本格的に使うとなると自前ビルドは必須)
 
 ここでまた苦しいポイント
 
 - ROS 2 環境を用意し、ROS 2 のライブラリが環境変数に読み込まれた状態で Unity を起動しないといけない (`librcl.so` が見つからないエラーが出る)
 - Ubuntu 22.04 で apt で入れた UnityHub が正しく動作しないことがある (依存が足りてない？)
 
-## nix-ros-overlay
+## Nix で QOL を上げる
 
-そんなこんなで Ubuntu に `home-manager` を導入して誤魔化したりしていたところ、[nix-ros-overlay](https://github.com/lopsided98/nix-ros-overlay) と出会いました。
+そんなこんなで Ubuntu にとりあえず `home-manager` を導入して誤魔化したりしていたところ、[nix-ros-overlay](https://github.com/lopsided98/nix-ros-overlay) と出会いました。
 
 > Easily install the Robot Operating System (ROS) on any Linux distribution
 Want to use ROS, but don't want to run Ubuntu? This project uses the power of Nix make to it possible to develop and run ROS packages in the same way on any Linux machine.
 
 最高じゃあないですか。早速使わせていただきましょう。
 
-色んなところで使えて、examples を見る限り主にROSワークスペース単位やパッケージ単位での導入が想定されているようですが、今回はこちらを使って ROS 2 Humble 専用の UnityHub パッケージを作りたいと思います。Nix と `home-manager` さえあれば、普通の UnityHub、 ROS 2 Hubmle 用の UnityHub、ROS 2 Jazzy 用の UnityHub など、複数の UnityHub を簡単に切り替えて使える、なんてことができたら幸せになれそうじゃないですか。
+examples を見る限り主にROSワークスペース単位やパッケージ単位での導入が想定されているようです。しかし、今回はこちらを使って、 ROS 2 Humble 専用の UnityHub パッケージを作り、`home-manager` 環境に組み込みたいと思います。Nix と `home-manager` さえあれば、普通の UnityHub、 ROS 2 Hubmle 用の UnityHub、ROS 2 Jazzy 用の UnityHub など、複数の UnityHub を簡単に切り替えて使える、なんてことができたら幸せになれそうじゃないですか。
 
 じゃあ Nix を書いていきます。まずは、`dotfiles` の `flake.nix` の `inputs` に `nix-ros-overlay` を追加します。
 
