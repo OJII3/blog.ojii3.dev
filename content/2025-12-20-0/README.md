@@ -55,6 +55,8 @@ Robot Operating System (通称ROS) です。IT用語のOSではないです。
 ここでまた苦しいポイント
 
 - ROS 2 環境を用意し、ROS 2 のライブラリが環境変数に読み込まれた状態で Unity を起動しないといけない (`librcl.so` が見つからないエラーが出る)
+  - グローバル環境を汚染したくないので、GUIセッションで読み込む、ということはやりたくない
+  - 毎度ターミナルでパスを通してから `unityhub > /dev/null 2&>1` するのも不便
 - Ubuntu 22.04 で apt で入れた UnityHub が正しく動作しないことがある (依存が足りてない？)
 
 ## Nix で QOL を上げる
@@ -66,7 +68,13 @@ Want to use ROS, but don't want to run Ubuntu? This project uses the power of Ni
 
 最高じゃあないですか。早速使わせていただきましょう。
 
-examples を見る限り主にROSワークスペース単位やパッケージ単位での導入が想定されているようです。しかし、今回はこちらを使って、 ROS 2 Humble 専用の UnityHub パッケージを作り、`home-manager` 環境に組み込みたいと思います。Nix と `home-manager` さえあれば、普通の UnityHub、 ROS 2 Hubmle 用の UnityHub、ROS 2 Jazzy 用の UnityHub など、複数の UnityHub を簡単に切り替えて使える、なんてことができたら幸せになれそうじゃないですか。
+examples を見る限り主にROSワークスペース単位やパッケージ単位での導入が想定されているようです。しかし、今回はこちらを使って、 ROS 2 Humble 専用の UnityHub パッケージを作り、`home-manager` 環境に組み込みたいと思います。Nix と `home-manager` さえあれば、
+
+- 普通の UnityHub
+-  ROS 2 Hubmle 用の UnityHub
+- ROS 2 Jazzy 用の UnityHub
+
+など、複数の UnityHub を簡単に切り替えて使えてしまう、なんてことができたら幸せになれそうじゃないですか。
 
 じゃあ Nix を書いていきます。まずは、`dotfiles` の `flake.nix` の `inputs` に `nix-ros-overlay` を追加します。
 
