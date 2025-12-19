@@ -4,7 +4,6 @@ date: 2025-12-20
 tags:
   - nix
   - ros2
-draft: true
 ---
 [農工大アドベントカレンダー2025](https://qiita.com/advent-calendar/2025/tuat) の記事です。
 
