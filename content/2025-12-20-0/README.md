@@ -184,7 +184,7 @@ in
 
 ![Dual UnityHub in Applications Menu](dual-unityhub.png)
 
-ちなみにこれは NixOS で動かしていて、ちゃんと Android ビルドもできました。やったね！
+これは Ubuntu ではなく NixOS で動かしていて、ちゃんと Android ビルドもできました。やったね！
 
 ## まとめ
 
