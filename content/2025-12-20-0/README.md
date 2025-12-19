@@ -71,7 +71,7 @@ Want to use ROS, but don't want to run Ubuntu? This project uses the power of Ni
 examples を見る限り主にROSワークスペース単位やパッケージ単位での導入が想定されているようです。しかし、今回はこちらを使って、 ROS 2 Humble 専用の UnityHub パッケージを作り、`home-manager` 環境に組み込みたいと思います。Nix と `home-manager` さえあれば、
 
 - 普通の UnityHub
--  ROS 2 Hubmle 用の UnityHub
+- ROS 2 Hubmle 用の UnityHub
 - ROS 2 Jazzy 用の UnityHub
 
 など、複数の UnityHub を簡単に切り替えて使えてしまう、なんてことができたら幸せになれそうじゃないですか。
