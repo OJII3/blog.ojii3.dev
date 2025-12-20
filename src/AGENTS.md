@@ -2,40 +2,33 @@
 
 - `astro.config.mjs` — Tailwind CSS v4 (`@tailwindcss/vite`), astro-pagefind, expressive-code, partytown、astro-icon、sitemap を有効化。Cloudflare adapter で `/admin/*` をルーティングし、`liveContentCollections` を experimental で ON。`GOOGLE_ANALYTICS_ID` は client/public、GitHub/BETTER_AUTH 系は server/secret。
 - `src/pages/`（Astro 制約でページ専用; ルートのみ）
-  - `index.astro` — 記事一覧グリッド。`getCollection("blog")` を日付降順で表示。
-  - `[slug]/index.astro` — 各記事ページ。prev/next を算出してレイアウトに渡す。`/[slug]/og-image.png.ts` で Satori+Resvg による OG 画像生成（`src/assets/MPLUSRounded1c-Bold.ttf` を同梱）。
-  - `search.astro` — Pagefind クライアント検索画面。タグ絞り込み UI と結果表示。
-  - `login.astro` — BetterAuth クライアント（GitHub ソーシャル）でログイン/ログアウト。
-  - `admin/index.astro` — ログインユーザーの GitHub トークンを使い、リポジトリの `content` を Octokit で一覧表示（prerender: false）。`admin/edit/[slug].astro` で編集、`admin/preview/[slug].astro` でライブプレビュー。
-  - `api/auth/[...all].ts` — BetterAuth の API ハンドラ（prerender: false）。
-- `src/actions/`（Astro 制約でサーバーアクション専用; ルートのみ）
-  - `index.ts` — `updatePost` サーバーアクション（GitHub upsert）。
-- `src/app/` — グローバルレイヤー
-  - `layouts/GlobalLayout.astro` — GA（Partytown 経由）、ClientRouter/Transitions、Favicon/Manifest 設定。
-  - `components/` — ダークモード管理/ボタン、GA スニペット。
-  - `styles/global.css` — Tailwind テーマ定義（フォント Hachi Maru Pop、breakpoint/spacing トークン、グレー/アクセントカラー、ダークモードトークン）、preflight 相当、コード装飾の override。
-  - `middleware.ts` — `/admin` と `/api/auth` のみ BetterAuth でセッション取得し、未ログインは `/login` へ、ログイン済みの `/login` アクセスは `/admin` にリダイレクト。`Astro.locals` に `user`/`session` を格納。（Astro の探索のためエントリは `src/middleware.ts` に残すか re-export）
-- `src/shared/` — 横断的な定数・型・ユーティリティ
-  - `constants/` — サイト名/URL、7 色の `VitaColor` と HEX/TEXT/BORDER/BG/H2 ボーダーのマッピング。View Transitions 用の名前定数。
-  - `types/` — Pagefind 型定義、`window._searchUrlChangeHandler` の global augment。
-  - `utils/` — 日付→色計算などの純関数を集約。
-- `src/blog/` — 公開ブログ UI
-  - `layouts/PostLayout.astro`
-  - `ui/` — Card/PostShell/PostHeader/PostPrevNext/TopCard/BottomCard、OGImage.tsx など。
-  - `styles/override.css` — コードブロック記号を消す。
-- `src/search/` — 検索機能
-  - `ui/{SearchForm,SearchResult}.astro`
-  - `client.ts` — `/pagefind/pagefind.js` を動的 import し、URL パラメータ同期 + 結果 DOM 生成。
-  - `lib/{getAllTags,getPostBorderColorFromDate}.ts` — タグ集計/境界色計算。
-- `src/admin/` — 管理/認証/GitHub 連携
-  - `auth/auth-client.ts` — BetterAuth クライアント。
-  - `github/{client,content,types,live-content-loader}.ts` — Octokit ラッパーと Live Loader。
-  - `content-service/blog-service.ts` (+ test) — GitHub への CRUD。
-  - `editor/{load-editable-post.ts,edit-post.client.ts,types.ts,_components/*.astro}` — エディタ UI とロジック。
-- `src/auth.ts` — BetterAuth サーバー(Auth クライアント)セットアップ（GitHub ソーシャルプロバイダ）。
-- `src/content.config.ts` — 静的コレクション `blog` を `content/**/README.md` から生成（frontmatter: `title`/`date`/`tags`/`draft`）。`dateString` 生成と `getDate() % 7` で `color` 付与、`draft` は `true/undefined` に正規化。（Astro の制約で `src/` 直下に配置）
-- `src/live.config.ts` — GitHub Live Loader で `content/*/README.md` を動的取得。BetterAuth の GitHub アクセストークンを渡す。（Astro の制約で `src/` 直下に配置）
-- `content/` — `YYYY-MM-DD-n/README.md` 形式の投稿。`data-pagefind-ignore` 用に draft を true/undefined で扱う。`.markdownlint.jsonc` で MD013/MD033 を無効化。
-- `public/` — Favicon、manifest などの静的配布物。
-- `dist/` — ビルド成果物。Worker エントリは `dist/_worker.js/index.js`（`wrangler.jsonc` で参照）。
-
+  - `_components/` — アプリケーション共通またはメイン機能（ブログ）の UI コンポーネント。`blog/` ディレクトリ配下にブログ専用コンポーネントを配置。
+  - `_layouts/` — レイアウトファイル。`GlobalLayout` (全ページ共通), `PostLayout` (ブログ記事), `AdminLayout` (管理画面)。
+  - `_lib/` — 共通ロジック、型定義、ユーティリティ、ミドルウェアロジック。
+  - `_styles/` — グローバルスタイル定義 (Tailwind, Theme, etc)。
+  - `index.astro` — 記事一覧グリッド。
+  - `[slug]/index.astro` — 各記事ページ。
+  - `search/`
+    - `index.astro` — 検索画面。
+    - `_components/` — 検索専用コンポーネント。
+    - `_lib/` — 検索専用ロジック。
+    - `_client.ts` — 検索クライアントロジック。
+  - `login/`
+    - `index.astro` — ログイン画面。
+  - `admin/`
+    - `index.astro` — 管理ダッシュボード。
+    - `edit/[slug].astro` — 記事編集画面。
+    - `preview/[slug].astro` — ライブプレビュー画面。
+    - `_components/` — 管理画面専用コンポーネント（エディタ UI など）。
+    - `_layouts/` — 管理画面専用レイアウト（実体は `src/pages/admin/_layouts/AdminLayout.astro`）。
+    - `_lib/` — 管理画面用ロジック（認証、GitHub API、編集ロジック）。
+  - `api/auth/[...all].ts` — BetterAuth API。
+- `src/actions/`（Astro 制約でサーバーアクション専用）
+  - `index.ts` — `updatePost` サーバーアクション。
+- `src/middleware.ts` — Astro エントリーポイント。実処理は `src/pages/_lib/middleware.ts` に委譲。
+- `src/auth.ts` — BetterAuth サーバー設定。
+- `src/content.config.ts` — コンテンツコレクション定義。
+- `src/live.config.ts` — Live Content Loader 定義。
+- `content/` — ブログ記事マークダウン。
+- `public/` — 静的ファイル。
+- `dist/` — ビルド成果物。

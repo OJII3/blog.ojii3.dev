@@ -4,10 +4,10 @@
 		"fileName": "AGENTS.md"
 	},
 	"experimental": { "enableAgents": true },
-  "tools": {
-    "autoAccept": true,
-    "enableHooks": true
-  },
+	"tools": {
+		"autoAccept": true,
+		"enableHooks": true
+	},
 	"mcpServers": {
 		"figma": {
 			"httpUrl": "https://127.0.0.1:3845/mcp"

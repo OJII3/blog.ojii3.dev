@@ -4,7 +4,7 @@ import { Resvg } from "@resvg/resvg-js";
 import type { APIRoute } from "astro";
 import { createElement } from "react";
 import satori from "satori";
-import { OGImage } from "@/blog/ui/OGImage";
+import { OGImage } from "@/pages/_components/blog/OGImage";
 
 export const GET: APIRoute = async ({ params }) => {
 	const { slug } = params;

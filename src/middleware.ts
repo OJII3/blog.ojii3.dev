@@ -1,1 +1,1 @@
-export { onRequest } from "./app/middleware";
+export { onRequest } from "./pages/_lib/middleware";

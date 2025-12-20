@@ -1,6 +1,9 @@
 ---
-import { createContentClient, type GitHubContentItem } from "@/admin/github";
-import AdminLayout from "@/admin/layouts/AdminLayout.astro";
+import AdminLayout from "@/pages/admin/_layouts/AdminLayout.astro";
+import {
+	createContentClient,
+	type GitHubContentItem,
+} from "@/pages/admin/_lib/github";
 
 export const prerender = false;
 
@@ -108,7 +111,7 @@ try {
 </AdminLayout>
 
 <script>
-	const { signOut } = await import("@/admin/auth/auth-client");
+	const { signOut } = await import("@/pages/admin/_lib/auth/auth-client");
 	const logoutBtn = document.getElementById("admin-logout-btn");
 	logoutBtn?.addEventListener("click", async () => {
 		await signOut({

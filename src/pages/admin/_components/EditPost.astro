@@ -1,5 +1,5 @@
 ---
-import type { EditablePost } from "../types";
+import type { EditablePost } from "@/pages/admin/_lib/types";
 import EditDate from "./EditDate.astro";
 import EditDraft from "./EditDraft.astro";
 import EditTags from "./EditTags.astro";
@@ -61,6 +61,6 @@ const { slug, initialData } = Astro.props;
 </form>
 
 <script>
-	import { setupEditPostForm } from "../edit-post.client";
+	import { setupEditPostForm } from "@/pages/admin/_lib/edit-post.client";
 	setupEditPostForm();
 </script>

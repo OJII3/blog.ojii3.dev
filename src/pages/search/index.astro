@@ -1,7 +1,7 @@
 ---
-import GlobalLayout from "@/app/layouts/GlobalLayout.astro";
-import SearchForm from "@/search/ui/SearchForm.astro";
-import SearchResult from "@/search/ui/SearchResult.astro";
+import GlobalLayout from "@/pages/_layouts/GlobalLayout.astro";
+import SearchForm from "./_components/SearchForm.astro";
+import SearchResult from "./_components/SearchResult.astro";
 ---
 
 <GlobalLayout title="Search">
@@ -14,7 +14,7 @@ import SearchResult from "@/search/ui/SearchResult.astro";
 </GlobalLayout>
 
 <script>
-	import { initSearch } from "@/search/client";
+	import { initSearch } from "./_client";
 	document.addEventListener("astro:after-swap", initSearch);
 	initSearch();
 </script>

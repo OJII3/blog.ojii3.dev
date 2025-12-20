@@ -1,5 +1,5 @@
 ---
-import AdminLayout from "@/admin/layouts/AdminLayout.astro";
+import AdminLayout from "@/pages/admin/_layouts/AdminLayout.astro";
 
 export const prerender = false;
 ---
@@ -11,7 +11,8 @@ export const prerender = false;
 	</div>
 
 	<script>
-		const { signIn, signOut } = await import("@/admin/auth/auth-client");
+		const { signIn, signOut } =
+			await import("@/pages/admin/_lib/auth/auth-client");
 		const loginButton = document.querySelector("#login");
 		const logoutButton = document.querySelector("#logout");
 

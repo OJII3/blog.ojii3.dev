@@ -1,6 +1,6 @@
 import { defineCollection, z } from "astro:content";
 import { glob } from "astro/loaders";
-import { getColorIndex } from "./shared/utils/color";
+import { getColorIndex } from "./pages/_lib/utils/color";
 
 const blog = defineCollection({
 	loader: glob({
