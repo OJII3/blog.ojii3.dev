@@ -1,0 +1,34 @@
+## プロジェクト構造/主要ファイル
+
+- `astro.config.mjs` — Tailwind CSS v4 (`@tailwindcss/vite`), astro-pagefind, expressive-code, partytown、astro-icon、sitemap を有効化。Cloudflare adapter で `/admin/*` をルーティングし、`liveContentCollections` を experimental で ON。`GOOGLE_ANALYTICS_ID` は client/public、GitHub/BETTER_AUTH 系は server/secret。
+- `src/pages/`（Astro 制約でページ専用; ルートのみ）
+  - `_components/` — アプリケーション共通またはメイン機能（ブログ）の UI コンポーネント。`blog/` ディレクトリ配下にブログ専用コンポーネントを配置。
+  - `_layouts/` — レイアウトファイル。`GlobalLayout` (全ページ共通), `PostLayout` (ブログ記事), `AdminLayout` (管理画面)。
+  - `_lib/` — 共通ロジック、型定義、ユーティリティ、ミドルウェアロジック。
+  - `_styles/` — グローバルスタイル定義 (Tailwind, Theme, etc)。
+  - `index.astro` — 記事一覧グリッド。
+  - `[slug]/index.astro` — 各記事ページ。
+  - `search/`
+    - `index.astro` — 検索画面。
+    - `_components/` — 検索専用コンポーネント。
+    - `_lib/` — 検索専用ロジック。
+    - `_client.ts` — 検索クライアントロジック。
+  - `login/`
+    - `index.astro` — ログイン画面。
+  - `admin/`
+    - `index.astro` — 管理ダッシュボード。
+    - `edit/[slug].astro` — 記事編集画面。
+    - `preview/[slug].astro` — ライブプレビュー画面。
+    - `_components/` — 管理画面専用コンポーネント（エディタ UI など）。
+    - `_layouts/` — 管理画面専用レイアウト（実体は `src/pages/admin/_layouts/AdminLayout.astro`）。
+    - `_lib/` — 管理画面用ロジック（認証、GitHub API、編集ロジック）。
+  - `api/auth/[...all].ts` — BetterAuth API。
+- `src/actions/`（Astro 制約でサーバーアクション専用）
+  - `index.ts` — `updatePost` サーバーアクション。
+- `src/middleware.ts` — Astro エントリーポイント。実処理は `src/pages/_lib/middleware.ts` に委譲。
+- `src/auth.ts` — BetterAuth サーバー設定。
+- `src/content.config.ts` — コンテンツコレクション定義。
+- `src/live.config.ts` — Live Content Loader 定義。
+- `content/` — ブログ記事マークダウン。
+- `public/` — 静的ファイル。
+- `dist/` — ビルド成果物。

@@ -1,0 +1,27 @@
+---
+import { BORDER_COLORS, type VitaColor } from "@/pages/_lib/constants";
+
+type Props = {
+	id: string;
+	href: string;
+	title: string;
+	date: string;
+	color: VitaColor;
+};
+
+const { id, title, date, href, color } = Astro.props;
+---
+
+<a
+	transition:name={id}
+	class:list={[
+		"card card-stack-tight cursor-pointer border-2",
+		BORDER_COLORS[color],
+	]}
+	href={href}
+>
+	<h2 class="2x:text-lg inline-block text-sm overflow-ellipsis md:text-lg">
+		{title}
+	</h2>
+	<p class="2x:text-sm text-xs overflow-ellipsis">{date}</p>
+</a>

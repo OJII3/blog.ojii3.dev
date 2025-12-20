@@ -20,6 +20,7 @@ export default defineConfig({
 					"/pagefind/pagefind.js",
 					"@resvg/resvg-js",
 					"node:fs/promises",
+					"node:async_hooks",
 				],
 			},
 		},

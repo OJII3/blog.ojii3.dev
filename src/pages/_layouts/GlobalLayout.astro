@@ -1,0 +1,42 @@
+---
+import "@/styles/global.css";
+
+import { GOOGLE_ANALYTICS_ID } from "astro:env/client";
+import { ClientRouter } from "astro:transitions";
+import DarkModeManager from "@/pages/_components/DarkModeManager.astro";
+import GoogleAnalytics from "@/pages/_components/GoogleAnalytics.astro";
+
+type Props = {
+	title?: string;
+	ogImage?: string;
+};
+
+const { title, ogImage } = Astro.props;
+---
+
+<!doctype html>
+<html lang="ja" class="min-h-dvh">
+	<head>
+		<DarkModeManager />
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" href="/favicon.ico" sizes="32x32" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+		<link rel="manifest" href="/site.webmanifest" />
+		<meta name="generator" content={Astro.generator} />
+		{GOOGLE_ANALYTICS_ID && <GoogleAnalytics id={GOOGLE_ANALYTICS_ID} />}
+		<title>{title}</title>
+
+		<meta property="og:title" content={title} />
+		<meta property="og:url" content={Astro.site?.toString()} />
+		<meta property="og:image" content={ogImage} />
+		<meta property="og:type" content="website" />
+		<meta property="twitter:card" content="summary_large_image" />
+		<link rel="sitemap" href="/sitemap-index.xml" />
+
+		<ClientRouter />
+	</head>
+	<body class="bg-gray-0 text-gray-7 min-h-dvh">
+		<slot />
+	</body>
+</html>

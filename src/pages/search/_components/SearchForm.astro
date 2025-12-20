@@ -1,0 +1,145 @@
+---
+import { getCollection } from "astro:content";
+import { Icon } from "astro-icon/components";
+import { SEARCH_ICON_TRANSITION_NAME } from "@/pages/_lib/constants";
+import { getAllTags } from "../_lib/getAllTags";
+
+const allPosts = await getCollection("blog");
+const allTags = getAllTags(allPosts);
+---
+
+<form class="flex flex-col gap-4">
+	<div class="flex items-center gap-4">
+		<a
+			href="/"
+			class="group"
+			aria-label="Go back to home"
+			data-astro-history="auto"
+		>
+			<span
+				class="border-gray-5 flex h-12 w-12 items-center justify-center rounded-full border-2 p-2 duration-100"
+			>
+				<Icon name="tabler:arrow-left" class="h-6 w-6" />
+			</span>
+		</a>
+		<div class="w-full">
+			<div
+				class="border-gray-5 flex h-14 w-full items-center rounded-2xl border-2 px-4 focus-within:ring-blue-500"
+			>
+				<Icon
+					name="tabler:search"
+					class="text-gray-4 mr-4 h-6 w-6"
+					transition:name={SEARCH_ICON_TRANSITION_NAME}
+				/>
+				<input
+					id="search"
+					type="text"
+					placeholder="Search..."
+					class="w-full bg-transparent focus:outline-none"
+				/>
+			</div>
+		</div>
+	</div>
+
+	<div class="flex flex-wrap gap-2">
+		{
+			Object.entries(allTags)
+				.sort((a, b) => b[1] - a[1])
+				.map(([tag, count]) => (
+					<div class="flex">
+						<input
+							class="peer"
+							name="tag"
+							id={tag}
+							value={tag}
+							type="checkbox"
+							hidden
+						/>
+						<label
+							for={tag}
+							class="tag border-gray-5 hover:bg-gray-2 rounded-full border-2 px-4 py-2 text-sm duration-200 peer-checked:border-lime-500 peer-checked:bg-lime-200 hover:cursor-pointer dark:peer-checked:bg-lime-800"
+						>
+							#<span class="tag-key">{tag}</span> ({count})
+						</label>
+					</div>
+				))
+		}
+	</div>
+</form>
+
+<script>
+	const init = () => {
+		const inputs = document.querySelectorAll("input[name='tag']");
+		const searchInput = document.getElementById("search");
+
+		// URLから初期状態を設定
+		const urlParams = new URLSearchParams(window.location.search);
+		const currentTags = urlParams.getAll("tag");
+		const currentSearch = urlParams.get("q");
+
+		inputs.forEach((input) => {
+			if (input instanceof HTMLInputElement) {
+				input.checked = currentTags.includes(input.value);
+			}
+		});
+
+		if (searchInput instanceof HTMLInputElement) {
+			searchInput.value = currentSearch || "";
+
+			searchInput.addEventListener("input", (e) => {
+				const url = new URL(window.location.href);
+				const value = (e.target as HTMLInputElement).value;
+				if (value) {
+					url.searchParams.set("q", value);
+				} else {
+					url.searchParams.delete("q");
+				}
+				window.history.replaceState({}, "", url);
+				window.dispatchEvent(new Event("url-changed"));
+			});
+		}
+
+		inputs.forEach((input) => {
+			input.addEventListener("change", () => {
+				const url = new URL(window.location.href);
+				url.searchParams.delete("tag");
+				inputs.forEach((i) => {
+					if (i instanceof HTMLInputElement && i.checked) {
+						url.searchParams.append("tag", i.value);
+					}
+				});
+				// 検索クエリも維持する (URLオブジェクトを使っているので自動的に維持される)
+				window.history.replaceState({}, "", url);
+				window.dispatchEvent(new Event("url-changed"));
+			});
+		});
+	};
+
+	const syncState = () => {
+		const inputs = document.querySelectorAll("input[name='tag']");
+		const searchInput = document.getElementById("search");
+		const urlParams = new URLSearchParams(window.location.search);
+		const currentTags = urlParams.getAll("tag");
+		const currentSearch = urlParams.get("q");
+
+		inputs.forEach((input) => {
+			if (input instanceof HTMLInputElement) {
+				input.checked = currentTags.includes(input.value);
+			}
+		});
+
+		if (searchInput instanceof HTMLInputElement) {
+			// 入力中かもしれないので、フォーカスがない場合のみ更新するか、
+			// あるいは値が違う場合のみ更新するが、inputイベントで更新しているので
+			// 基本的には同期しているはず。戻るボタンなどで戻った場合用。
+			if (searchInput.value !== currentSearch) {
+				searchInput.value = currentSearch || "";
+			}
+		}
+	};
+
+	init();
+	document.addEventListener("astro:after-swap", init);
+	window.addEventListener("popstate", syncState); // ブラウザの戻る/進む対応
+	window.addEventListener("url-changed", syncState); // カスタムイベントで同期
+</script>
