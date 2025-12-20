@@ -15,30 +15,31 @@ const { slug, initialData } = Astro.props;
 
 <form
 	id="edit-form"
-	class="flex h-full flex-col gap-4"
+	class="flex flex-col gap-4"
 	data-slug={slug}
 	data-sha={initialData.sha}
 >
-	<div class="flex h-full flex-1 flex-col gap-4 md:grid md:grid-cols-2">
-		<div class="flex flex-col gap-4">
-			<div
-				class="flex flex-col gap-4 rounded border border-gray-200 bg-white p-4"
-			>
+	<div class="flex flex-col gap-4">
+		<details
+			class="collapse-arrow border-base-300 bg-base-100 rounded-box collapse border"
+		>
+			<summary class="collapse-title text-xl font-medium">Metadata</summary>
+			<div class="collapse-content flex flex-col gap-4">
 				<EditTitle value={initialData.frontmatter.title} />
 				<EditDate value={initialData.frontmatter.date} />
 				<EditTags value={initialData.frontmatter.tags} />
 				<EditDraft value={initialData.frontmatter.draft} />
 			</div>
-		</div>
+		</details>
 
-		<div class="flex h-full flex-col gap-2">
+		<div class="flex flex-col gap-2">
 			<label for="body" class="text-base-content text-sm font-bold"
 				>Body (Markdown)</label
 			>
 			<textarea
 				id="body"
 				name="body"
-				class="textarea textarea-bordered h-full w-full flex-1 resize-none font-mono text-sm leading-normal"
+				class="textarea textarea-bordered min-h-[500px] w-full resize-none overflow-hidden font-mono text-sm leading-normal"
 				spellcheck="false">{initialData.body}</textarea
 			>
 		</div>
@@ -55,4 +56,16 @@ const { slug, initialData } = Astro.props;
 <script>
 	import { setupEditPostForm } from "@/pages/admin/_lib/edit-post.client";
 	setupEditPostForm();
+
+	const textarea = document.getElementById("body") as HTMLTextAreaElement;
+	if (textarea) {
+		const adjustHeight = () => {
+			textarea.style.height = "auto";
+			textarea.style.height = textarea.scrollHeight + "px";
+		};
+		textarea.addEventListener("input", adjustHeight);
+		window.addEventListener("resize", adjustHeight);
+		// Adjust initially - slight delay to ensure rendering
+		requestAnimationFrame(adjustHeight);
+	}
 </script>
