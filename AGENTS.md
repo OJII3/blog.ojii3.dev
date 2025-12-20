@@ -47,11 +47,9 @@ GH_APP_CLIENT_SECRET=
 
 - `bun install` — 依存関係をインストールする.
 - `bun run build` — `dist/` に最適化バンドルを生成。
-- `bun preview` — `wrangler dev --port 4321` で Cloudflare 環境を模倣（開発時はこれを使用）。`bun dev` は Cloudflare adapter のため利用不可。
-- `bun check` — Biome/Prettier の lint/format チェック。
-- `bun typecheck` — `astro check` + `tsc --noEmit`。
+- `bun check` — Biome/Prettier の lint/format と TypeScript の型チェック。
 - `bun format` — Biome + Prettier を書き込みモードで実行。
-- `bun markdownlint` — `content/**/*.md` の MarkdownLint を修正モードで実行。
+- `bun test` — テストを実行。
 
 ## コーディングスタイルと命名規則
 
