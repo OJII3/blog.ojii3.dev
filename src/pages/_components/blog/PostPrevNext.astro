@@ -1,30 +1,30 @@
 ---
-import type { CollectionEntry } from "astro:content";
 import { Icon } from "astro-icon/components";
-import { BORDER_COLORS } from "@/pages/_lib/constants";
+import { BORDER_COLORS, type VitaColor } from "@/pages/_lib/constants";
 
 export interface Props {
-	originalPost: CollectionEntry<"blog">;
-	targetPost: CollectionEntry<"blog">;
+	color: VitaColor;
+	url: string;
+	title: string;
 	isPrev?: boolean;
 	isNext?: boolean;
 }
 
-const { originalPost, targetPost, isPrev, isNext } = Astro.props;
+const { color, url, title, isPrev, isNext } = Astro.props;
 ---
 
 <a
-	href={`/${targetPost.id}`}
+	href={url}
 	class:list={[
 		"flex w-full items-center gap-2 rounded-2xl border-2 p-4 duration-200",
-		BORDER_COLORS[originalPost.data.color],
+		BORDER_COLORS[color],
 	]}
 	data-astro-reload
 >
 	{isPrev ? <Icon name="tabler:arrow-left" /> : null}
 
 	<div class="flex-1">
-		<div class="text-sm">{targetPost.data.title}</div>
+		<div class="text-sm">{title}</div>
 	</div>
 
 	{isNext ? <Icon name="tabler:arrow-right" /> : null}
