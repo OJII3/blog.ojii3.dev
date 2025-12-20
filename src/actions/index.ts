@@ -4,7 +4,7 @@ import {
 	defineAction,
 } from "astro:actions";
 import { z } from "astro:schema";
-import { updatePostCore } from "@/pages/admin/_lib/content-service/blog-service";
+import { updatePostCore } from "@/pages/admin/_lib/blog-service";
 import { getGitHubAccessToken } from "@/pages/admin/_lib/github/client";
 
 const updatePostInput = z.object({

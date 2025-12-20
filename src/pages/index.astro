@@ -1,9 +1,9 @@
 ---
 import { getCollection } from "astro:content";
-import GlobalLayout from "@/pages/_layouts/GlobalLayout.astro";
 import BottomCard from "@/pages/_components/blog/BottomCard.astro";
 import PostCard from "@/pages/_components/blog/PostCard.astro";
 import TopCard from "@/pages/_components/blog/TopCard.astro";
+import GlobalLayout from "@/pages/_layouts/GlobalLayout.astro";
 
 const allBlogPosts = (await getCollection("blog"))
 	.filter((post) => !post.data.draft)
