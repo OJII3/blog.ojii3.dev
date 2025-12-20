@@ -5,27 +5,78 @@ interface Props {
 
 const { value } = Astro.props;
 
-// Format date to YYYY-MM-DDTHH:mm for datetime-local input
+// Helper to format date as YYYY-MM-DD
+const formatDate = (d: Date) => {
+	const pad = (n: number) => n.toString().padStart(2, "0");
+	return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+};
+
 const dateVal = value
 	? value instanceof Date
 		? value
 		: new Date(value)
 	: undefined;
-const pad = (n: number) => n.toString().padStart(2, "0");
-const formatted =
-	dateVal && !Number.isNaN(dateVal.getTime())
-		? `${dateVal.getFullYear()}-${pad(dateVal.getMonth() + 1)}-${pad(dateVal.getDate())}T${pad(dateVal.getHours())}:${pad(dateVal.getMinutes())}`
-		: "";
+
+const initialValue =
+	dateVal && !Number.isNaN(dateVal.getTime()) ? formatDate(dateVal) : "";
 ---
 
 <div class="flex flex-col gap-2">
-	<label for="date" class="text-gray-7 text-sm font-bold">Date</label>
-	<input
-		type="datetime-local"
-		id="date"
-		name="date"
-		value={formatted}
-		class="border-gray-2 bg-gray-0 text-gray-7 focus:ring-accent-500 flex-1 rounded border p-2 font-mono text-sm outline-none focus:ring-2"
-		required
-	/>
+	<label for="date-picker-btn" class="text-base-content text-sm font-bold"
+		>Date</label
+	>
+	<button
+		type="button"
+		id="date-picker-btn"
+		popovertarget="date-popover"
+		class="input input-bordered flex w-full items-center text-left"
+		style="anchor-name:--date-popover"
+	>
+		{initialValue || "Pick a date"}
+	</button>
+	<input type="hidden" name="date" id="date-input" value={initialValue} />
+
+	<div
+		popover
+		id="date-popover"
+		class="dropdown bg-base-100 border-base-200 rounded-box border shadow-lg"
+		style="position-anchor:--date-popover; margin-top: 0.5rem;"
+	>
+		<calendar-date class="cally" value={initialValue}>
+			<svg
+				aria-label="Previous"
+				class="size-4 fill-current"
+				slot="previous"
+				xmlns="http://www.w3.org/2000/svg"
+				viewBox="0 0 24 24"><path d="M15.75 19.5 8.25 12l7.5-7.5"></path></svg
+			>
+			<svg
+				aria-label="Next"
+				class="size-4 fill-current"
+				slot="next"
+				xmlns="http://www.w3.org/2000/svg"
+				viewBox="0 0 24 24"><path d="m8.25 4.5 7.5 7.5-7.5 7.5"></path></svg
+			>
+			<calendar-month></calendar-month>
+		</calendar-date>
+	</div>
 </div>
+
+<script>
+	import "cally";
+
+	const btn = document.getElementById("date-picker-btn");
+	const input = document.getElementById("date-input") as HTMLInputElement;
+	const calendar = document.querySelector("calendar-date");
+	const popover = document.getElementById("date-popover");
+
+	if (btn && input && calendar && popover) {
+		calendar.addEventListener("change", (e: Event) => {
+			const target = e.target as HTMLElement & { value: string };
+			const newValue = target.value;
+			input.value = newValue;
+			btn.innerText = newValue;
+			popover.hidePopover();
+		});
+	}
+</script>

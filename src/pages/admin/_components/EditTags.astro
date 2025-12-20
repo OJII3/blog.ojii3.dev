@@ -8,7 +8,7 @@ const tagsString = value.join(", ");
 ---
 
 <div class="flex flex-col gap-2">
-	<label for="tags" class="text-gray-7 text-sm font-bold"
+	<label for="tags" class="text-base-content text-sm font-bold"
 		>Tags (comma separated)</label
 	>
 	<input
@@ -17,6 +17,6 @@ const tagsString = value.join(", ");
 		name="tags"
 		value={tagsString}
 		placeholder="tech, life, memo"
-		class="border-gray-2 bg-gray-0 text-gray-7 focus:ring-accent-500 flex-1 rounded border p-2 text-sm outline-none focus:ring-2"
+		class="input input-bordered w-full"
 	/>
 </div>

@@ -29,6 +29,7 @@
 		"astro-icon": "^1.1.5",
 		"astro-pagefind": "^1.8.5",
 		"better-auth": "^1.4.7",
+		"cally": "^0.9.0",
 		"daisyui": "^5.5.14",
 		"gray-matter": "^4.0.3",
 		"js-yaml": "^4.1.1",

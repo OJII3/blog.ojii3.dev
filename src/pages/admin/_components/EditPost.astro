@@ -32,29 +32,21 @@ const { slug, initialData } = Astro.props;
 		</div>
 
 		<div class="flex h-full flex-col gap-2">
-			<label for="body" class="text-gray-7 text-sm font-bold"
+			<label for="body" class="text-base-content text-sm font-bold"
 				>Body (Markdown)</label
 			>
 			<textarea
 				id="body"
 				name="body"
-				class="textarea focus:ring-accent-500 h-full w-full flex-1 resize-none text-sm outline-none focus:ring-2"
+				class="textarea textarea-bordered h-full w-full flex-1 resize-none font-mono text-sm leading-normal"
 				spellcheck="false">{initialData.body}</textarea
 			>
 		</div>
 	</div>
 
-	<div class="border-gray-2 flex justify-end gap-4 border-t py-2">
-		<a
-			href="/admin"
-			class="text-gray-6 border-gray-2 hover:bg-gray-1 flex items-center rounded border px-4 py-2 text-sm font-medium"
-		>
-			Cancel
-		</a>
-		<button
-			type="submit"
-			class="bg-accent-600 hover:bg-accent-700 flex cursor-pointer items-center gap-2 rounded px-4 py-2 text-sm font-bold text-white shadow-sm disabled:cursor-not-allowed disabled:opacity-50"
-		>
+	<div class="border-base-200 flex justify-end gap-4 border-t py-2">
+		<a href="/admin" class="btn btn-outline"> Cancel </a>
+		<button type="submit" class="btn btn-primary">
 			<span id="btn-text">Save Changes</span>
 		</button>
 	</div>
