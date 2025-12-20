@@ -64,6 +64,7 @@ const { slug, initialData } = Astro.props;
 			textarea.style.height = textarea.scrollHeight + "px";
 		};
 		textarea.addEventListener("input", adjustHeight);
+		window.addEventListener("resize", adjustHeight);
 		// Adjust initially - slight delay to ensure rendering
 		requestAnimationFrame(adjustHeight);
 	}
