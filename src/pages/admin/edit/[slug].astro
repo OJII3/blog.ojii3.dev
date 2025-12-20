@@ -31,13 +31,7 @@ if (loadResult.status === "ok") {
 ---
 
 <AdminLayout title={`Edit: ${slug}`}>
-	<main
-		class="container mx-auto grid min-h-dvh max-w-5xl grid-rows-[auto_1fr] p-4"
-	>
-		<div class="mb-4 flex items-center justify-between">
-			<h1 class="text-gray-7 text-xl font-bold">Edit: {slug}</h1>
-		</div>
-
+	<main class="container mx-auto min-h-dvh max-w-5xl p-4">
 		{
 			errorMsg ? (
 				<div class="rounded-lg border border-red-300 bg-red-50 p-4 text-red-700">
@@ -48,9 +42,7 @@ if (loadResult.status === "ok") {
 					</a>
 				</div>
 			) : (
-				<div class="bottom-0 h-full flex-1">
-					<EditPost slug={slug} initialData={postData} />
-				</div>
+				<EditPost slug={slug} initialData={postData} />
 			)
 		}
 	</main>
