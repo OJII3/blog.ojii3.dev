@@ -4,9 +4,10 @@
 	"version": "0.0.1",
 	"scripts": {
 		"dev": "astro dev",
-		"build": "astro build",
-		"check": "biome check . && prettier --check .",
-		"typecheck": "astro check",
+		"build": "astro build --bun",
+		"lint": "biome lint .",
+		"check": "biome check . && prettier --check . && bun typecheck",
+		"typecheck": "astro check && tsc --noEmit",
 		"test": "bun test",
 		"format": "biome check . --write && prettier --write .",
 		"markdownlint": "markdownlint-cli2 --fix './content/**/*.md'",
