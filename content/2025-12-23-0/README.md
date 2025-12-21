@@ -2,7 +2,8 @@
 title: Unity のカットインのカメラワークを Blender で作る
 date: 2025-12-23
 tags:
-  - nix
+  - blender
+  - unity
 draft: true
 ---
 [農工大アドベントカレンダー2025](https://qiita.com/advent-calendar/2025/tuat)23日目の記事です。
