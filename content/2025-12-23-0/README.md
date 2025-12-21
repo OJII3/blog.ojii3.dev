@@ -14,4 +14,4 @@ draft: true
 
 学祭に向けてUnityでゲームを作っており、キャラクターの入場カットインを担当していました。
 
-昨年までは全てのカメラワークは Unity の Cinemachine (と Timeline) で作っていて、
+昨年までは全てのカメラワークは Unity の Cinemachine (と Timeline) で作っていて、キャラクターアニメーションのみ Blender 製でした。しかし、カットインはできるだけ全部 Blender で作った方が良いのではないかと薄々感じ始め、カメラワークを Blender で作る方法と、Unity へ出力する方法を考えました。
