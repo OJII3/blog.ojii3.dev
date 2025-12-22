@@ -4,7 +4,7 @@
 	"version": "0.0.1",
 	"scripts": {
 		"dev": "astro dev",
-		"build": "astro build --bun",
+		"build": "astro build",
 		"lint": "biome lint .",
 		"check": "biome check . && prettier --check . && bun typecheck",
 		"typecheck": "astro check && tsc --noEmit",
