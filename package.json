@@ -38,7 +38,6 @@
 		"picomatch": "^4.0.3",
 		"prettier-plugin-astro": "^0.14.1",
 		"react-dom": "^19.2.3",
-		"rehype-expressive-code": "^0.41.5",
 		"tailwindcss": "^4.1.18"
 	},
 	"devDependencies": {
