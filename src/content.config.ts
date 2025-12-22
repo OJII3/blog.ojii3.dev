@@ -1,17 +1,20 @@
 import { defineCollection, z } from "astro:content";
 import { glob } from "astro/loaders";
+import { github } from "./loaders/github-glob";
 import { getColorIndex } from "./pages/_lib/utils/color";
 
 const blog = defineCollection({
-	loader: glob({
-		pattern: "**/README.md",
-		base: "./content",
-		generateId: ({ entry }) =>
-			entry
-				.replace(/\\/g, "/")
-				.replace(/\/README\.md$/i, "")
-				.replace(/\.md$/, ""),
-	}),
+	loader: import.meta.env.DEV
+		? glob({
+				pattern: "**/README.md",
+				base: "./content-mock",
+				generateId: ({ entry }) =>
+					entry
+						.replace(/\\/g, "/")
+						.replace(/\/README\.md$/i, "")
+						.replace(/\.md$/, ""),
+			})
+		: github("**/README.md", "./content"),
 	schema: z
 		.object({
 			title: z.string(),

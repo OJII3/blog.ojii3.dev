@@ -28,3 +28,6 @@ pnpm-debug.log*
 # direnv
 .envrc
 .direnv/
+
+# cloned content from external repository
+content/
