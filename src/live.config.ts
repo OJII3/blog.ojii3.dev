@@ -5,8 +5,8 @@ import { githubLiveLoader } from "./pages/admin/_lib/github";
 const liveBlog = defineLiveCollection({
 	loader: githubLiveLoader({
 		owner: "OJII3",
-		repo: "blog.ojii3.dev",
-		basePath: "content",
+		repo: "content",
+		basePath: "",
 		filename: "README.md",
 	}),
 	schema: z

@@ -37,7 +37,7 @@ export const updatePostCore = async ({
 	);
 
 	const client = createContentClientFromToken(accessToken);
-	const path = `content/${slug}/README.md`;
+	const path = `${slug}/README.md`;
 
 	const res = await client.upsertFile({
 		path,

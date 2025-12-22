@@ -2,7 +2,7 @@ import { Octokit } from "@octokit/core";
 import { auth } from "@/auth";
 
 export const repoOwner = "ojii3";
-export const repoName = "blog.ojii3.dev";
+export const repoName = "content";
 export const repoLabel = `${repoOwner}/${repoName}`;
 
 const USER_AGENT = "blog.ojii3.dev-admin";

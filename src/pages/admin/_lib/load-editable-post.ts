@@ -3,7 +3,7 @@ import { getGitHubAccessToken } from "@/pages/admin/_lib/github/client";
 import { createContentClientFromToken } from "@/pages/admin/_lib/github/content";
 import type { EditableFrontmatter, LoadEditablePostResult } from "./types";
 
-const POST_PATH = (slug: string) => `content/${slug}/README.md`;
+const POST_PATH = (slug: string) => `${slug}/README.md`;
 
 export const loadEditablePost = async (
 	slug: string,

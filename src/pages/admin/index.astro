@@ -21,7 +21,7 @@ const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}-\d+$/;
 
 try {
 	const client = await createContentClient(Astro.request.headers);
-	const listing = await client.listRepoPath("content");
+	const listing = await client.listRepoPath("");
 
 	// Filter for directories matching the date pattern
 	const filteredEntries = listing
