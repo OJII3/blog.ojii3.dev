@@ -1,6 +1,8 @@
 import { createMarkdownProcessor } from "@astrojs/markdown-remark";
 import type { LiveLoader } from "astro/loaders";
 import graymatter from "gray-matter";
+import rehypeExpressiveCode from "rehype-expressive-code";
+import { expressiveCodeOptions, markdownConfig } from "@/../astro.config.mjs";
 import { repoLabel } from "./client";
 import { type ContentClient, createContentClientFromToken } from "./content";
 import type { GitHubContentItem } from "./types";
@@ -34,8 +36,14 @@ let processor: Awaited<ReturnType<typeof createMarkdownProcessor>> | null =
 const getProcessor = async () => {
 	if (processor) return processor;
 	processor = await createMarkdownProcessor({
+		...markdownConfig,
+		// Use rehype-expressive-code plugin for admin preview
+		rehypePlugins: [
+			...(markdownConfig.rehypePlugins || []),
+			[rehypeExpressiveCode, expressiveCodeOptions],
+		],
+		// Disable built-in syntax highlighting since we use expressive-code
 		syntaxHighlight: false,
-		gfm: true,
 	});
 	return processor;
 };

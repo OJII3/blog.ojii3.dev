@@ -9,6 +9,30 @@ import { defineConfig, envField } from "astro/config";
 import expressiveCode from "astro-expressive-code";
 import icon from "astro-icon";
 import pagefind from "astro-pagefind";
+
+/**
+ * Expressive Code configuration shared between Astro integration and admin preview.
+ * @type {import('astro-expressive-code').AstroExpressiveCodeOptions}
+ */
+export const expressiveCodeOptions = {
+	themes: ["tokyo-night"],
+	styleOverrides: {
+		frames: {
+			frameBoxShadowCssValue: "none",
+		},
+	},
+};
+
+/**
+ * Shared markdown configuration for both Astro content and admin preview.
+ * Note: For Astro content, syntaxHighlight is handled by expressiveCode integration.
+ * For admin preview, we use rehype-expressive-code plugin directly.
+ */
+export const markdownConfig = {
+	gfm: true,
+	rehypePlugins: [],
+};
+
 // https://astro.build/config
 export default defineConfig({
 	site: "https://blog.ojii3.dev",
@@ -26,14 +50,7 @@ export default defineConfig({
 		},
 	},
 	integrations: [
-		expressiveCode({
-			themes: ["tokyo-night"],
-			styleOverrides: {
-				frames: {
-					frameBoxShadowCssValue: "none",
-				},
-			},
-		}),
+		expressiveCode(expressiveCodeOptions),
 		icon(),
 		partytown(),
 		sitemap(),
@@ -42,10 +59,7 @@ export default defineConfig({
 	experimental: {
 		liveContentCollections: true,
 	},
-	markdown: {
-		gfm: true,
-		rehypePlugins: [],
-	},
+	markdown: markdownConfig,
 	image: {
 		domains: ["raw.githubusercontent.com", "github.com", "*.s3.amazonaws.com"],
 		layout: "constrained",
