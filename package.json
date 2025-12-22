@@ -10,7 +10,7 @@
 		"typecheck": "astro check && tsc --noEmit",
 		"test": "bun test",
 		"format": "biome check . --write && prettier --write .",
-		"markdownlint": "markdownlint-cli2 --fix './content/**/*.md'",
+		"markdownlint": "markdownlint-cli2 --fix './content-mock/**/*.md'",
 		"preview": "wrangler dev --port 4321",
 		"astro": "astro",
 		"wrangler": "wrangler"
