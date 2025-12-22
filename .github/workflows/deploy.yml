@@ -131,7 +131,7 @@ jobs:
         id: get-version-id
         run: |
           version_id="$(bun wrangler versions list --json | \
-            jq -r 'first(.[] |
+            jq -r 'last(.[] |
             select(.annotations."workers/tag" == "${{ needs.deploy.outputs.version_tag }}") | .id) // ""')"
 
           if [ -z "$version_id" ]; then
