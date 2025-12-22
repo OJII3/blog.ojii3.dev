@@ -1,7 +1,5 @@
 {
-  "permissions": {
-    "allow": [
-      "WebSearch"
-    ]
-  }
+	"permissions": {
+		"allow": ["WebSearch"]
+	}
 }
