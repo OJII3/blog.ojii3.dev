@@ -109,7 +109,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     needs: deploy
-    if: needs.deploy.outputs.success == 'true' && github.event_name == 'push'
+    if: needs.deploy.outputs.success == 'true' && (github.event_name == 'push' || github.event_name == 'repository_dispatch')
     environment:
       name: production
       url: ${{ steps.publish.outputs.deployment-url }}
