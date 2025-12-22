@@ -49,6 +49,9 @@ try {
 				<a class="btn btn-ghost text-xl">Admin Dashboard</a>
 			</div>
 			<div class="flex-none items-center gap-4 px-2">
+				<button id="admin-deploy-btn" class="btn btn-sm btn-primary">
+					Deploy
+				</button>
 				<button id="admin-logout-btn" class="btn btn-sm btn-error btn-outline">
 					Logout
 				</button>
@@ -111,6 +114,8 @@ try {
 </AdminLayout>
 
 <script>
+	import { actions } from "astro:actions";
+
 	const { signOut } = await import("@/pages/admin/_lib/auth/auth-client");
 	const logoutBtn = document.getElementById("admin-logout-btn");
 	logoutBtn?.addEventListener("click", async () => {
@@ -121,5 +126,30 @@ try {
 				},
 			},
 		});
+	});
+
+	const deployBtn = document.getElementById("admin-deploy-btn");
+	deployBtn?.addEventListener("click", async () => {
+		if (!confirm("Deploy workflow をトリガーしますか？")) {
+			return;
+		}
+
+		try {
+			deployBtn.setAttribute("disabled", "true");
+			deployBtn.textContent = "Deploying...";
+
+			await actions.triggerDeploy();
+
+			alert("Deploy workflow がトリガーされました！");
+			deployBtn.textContent = "Deploy";
+		} catch (error) {
+			console.error(error);
+			alert(
+				`エラーが発生しました: ${error instanceof Error ? error.message : "Unknown error"}`,
+			);
+			deployBtn.textContent = "Deploy";
+		} finally {
+			deployBtn.removeAttribute("disabled");
+		}
 	});
 </script>
