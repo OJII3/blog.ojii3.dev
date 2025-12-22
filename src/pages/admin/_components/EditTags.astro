@@ -8,15 +8,12 @@ const tagsString = value.join(", ");
 ---
 
 <div class="flex flex-col gap-2">
-	<label for="tags" class="text-base-content text-sm font-bold"
-		>Tags (comma separated)</label
-	>
 	<input
 		type="text"
 		id="tags"
 		name="tags"
 		value={tagsString}
-		placeholder="tech, life, memo"
+		placeholder="Tags (comma separated, e.g. tech, life, memo)"
 		class="input input-bordered w-full"
 	/>
 </div>
