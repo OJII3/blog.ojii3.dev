@@ -32,11 +32,13 @@
 		"cally": "^0.9.0",
 		"daisyui": "^5.5.14",
 		"gray-matter": "^4.0.3",
+		"i": "^0.3.7",
 		"js-yaml": "^4.1.1",
 		"markdownlint-cli2": "^0.20.0",
 		"picomatch": "^4.0.3",
 		"prettier-plugin-astro": "^0.14.1",
 		"react-dom": "^19.2.3",
+		"rehype-expressive-code": "^0.41.5",
 		"tailwindcss": "^4.1.18"
 	},
 	"devDependencies": {

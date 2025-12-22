@@ -10,28 +10,7 @@ import expressiveCode from "astro-expressive-code";
 import icon from "astro-icon";
 import pagefind from "astro-pagefind";
 
-/**
- * Expressive Code configuration shared between Astro integration and admin preview.
- * @type {import('astro-expressive-code').AstroExpressiveCodeOptions}
- */
-export const expressiveCodeOptions = {
-	themes: ["tokyo-night"],
-	styleOverrides: {
-		frames: {
-			frameBoxShadowCssValue: "none",
-		},
-	},
-};
-
-/**
- * Shared markdown configuration for both Astro content and admin preview.
- * Note: For Astro content, syntaxHighlight is handled by expressiveCode integration.
- * For admin preview, we use rehype-expressive-code plugin directly.
- */
-export const markdownConfig = {
-	gfm: true,
-	rehypePlugins: [],
-};
+export const markdownConfig = {};
 
 // https://astro.build/config
 export default defineConfig({
@@ -44,13 +23,19 @@ export default defineConfig({
 					"/pagefind/pagefind.js",
 					"@resvg/resvg-js",
 					"node:fs/promises",
-					"node:async_hooks",
 				],
 			},
 		},
 	},
 	integrations: [
-		expressiveCode(expressiveCodeOptions),
+		expressiveCode({
+			themes: ["tokyo-night"],
+			styleOverrides: {
+				frames: {
+					frameBoxShadowCssValue: "none",
+				},
+			},
+		}),
 		icon(),
 		partytown(),
 		sitemap(),
@@ -59,7 +44,10 @@ export default defineConfig({
 	experimental: {
 		liveContentCollections: true,
 	},
-	markdown: markdownConfig,
+	markdown: {
+		gfm: true,
+		rehypePlugins: [],
+	},
 	image: {
 		domains: ["raw.githubusercontent.com", "github.com", "*.s3.amazonaws.com"],
 		layout: "constrained",
