@@ -14,8 +14,6 @@ import type {
 	UpsertContentParams,
 } from "./types";
 
-const DEFAULT_PATH = "content";
-
 export type ContentClient = {
 	listRepoPath: (path: string) => Promise<GitHubContentItem[]>;
 	upsertFile: (params: UpsertContentParams) => Promise<GitHubFileCommit>;
@@ -23,10 +21,7 @@ export type ContentClient = {
 	getFile: (params: GetFileParams) => Promise<GitHubFileContent>;
 };
 
-const normalizePath = (path: string) => {
-	const cleaned = path.replace(/^\/+/, "");
-	return cleaned.length === 0 ? DEFAULT_PATH : cleaned;
-};
+const normalizePath = (path: string) => path.replace(/^\/+/, "");
 
 const toBase64 = (content: string) => {
 	if (typeof Buffer !== "undefined") {

@@ -13,7 +13,7 @@ const mockUpsertFile = mock(() =>
 	Promise.resolve({
 		content: {
 			name: "README.md",
-			path: "content/slug/README.md",
+			path: "slug/README.md",
 			sha: "new-sha",
 		},
 		commit: { sha: "commit-sha" },
@@ -50,7 +50,7 @@ describe("updatePostCore", () => {
 			throw new Error("upsertFile was not called");
 		}
 
-		expect(args.path).toBe("content/test-slug/README.md");
+		expect(args.path).toBe("test-slug/README.md");
 		expect(args.message).toBe("chore(content): update post test-slug");
 		expect(args.sha).toBe("old-sha");
 

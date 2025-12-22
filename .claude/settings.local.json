@@ -7,7 +7,10 @@
 			"Bash(timeout 30 bun run:*)",
 			"Bash(git add:*)",
 			"Bash(git rm:*)",
-			"Bash(git restore:*)"
+			"Bash(git restore:*)",
+			"Bash(bun typecheck:*)",
+			"Bash(bun format:*)",
+			"Bash(bun test)"
 		]
 	}
 }

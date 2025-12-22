@@ -40,11 +40,12 @@ const getProcessor = async () => {
 	return processor;
 };
 
-const toEntryId = (fullPath: string, basePath: string) =>
-	fullPath
-		.replace(new RegExp(`^${basePath}/`), "")
-		.replace(/\/README\.md$/i, "")
-		.replace(/\.md$/i, "");
+const toEntryId = (fullPath: string, basePath: string) => {
+	const withoutBase = basePath
+		? fullPath.replace(new RegExp(`^${basePath}/`), "")
+		: fullPath;
+	return withoutBase.replace(/\/README\.md$/i, "").replace(/\.md$/i, "");
+};
 
 const buildEntries = async (
 	client: ContentClient,
@@ -139,7 +140,9 @@ export const githubLiveLoader = (
 			const client = createContentClientFromToken(token);
 
 			const id = filter.id;
-			const path = `${basePath}/${id}/${filename}`;
+			const path = basePath
+				? `${basePath}/${id}/${filename}`
+				: `${id}/${filename}`;
 
 			const item: GitHubContentItem = {
 				type: "file",
