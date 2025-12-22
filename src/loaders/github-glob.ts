@@ -1,7 +1,7 @@
-import { glob } from "astro/loaders";
 import { execSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
+import { glob } from "astro/loaders";
 
 const REPO_URL = "https://github.com/OJII3/content.git";
 const TARGET_DIR = "./content";

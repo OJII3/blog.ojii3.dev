@@ -1,5 +1,13 @@
 {
 	"permissions": {
-		"allow": ["WebSearch"]
+		"allow": [
+			"WebSearch",
+			"WebFetch(domain:blog.ojii3.dev)",
+			"Bash(gomi -rf:*)",
+			"Bash(timeout 30 bun run:*)",
+			"Bash(git add:*)",
+			"Bash(git rm:*)",
+			"Bash(git restore:*)"
+		]
 	}
 }
