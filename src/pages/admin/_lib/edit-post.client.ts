@@ -84,7 +84,7 @@ export const setupEditPostForm = (formId = "edit-form") => {
 			});
 
 			if (!error) {
-				window.location.href = `/admin/preview/${slug}`;
+				alert("保存しました！");
 				return;
 			}
 

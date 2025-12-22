@@ -1,0 +1,55 @@
+---
+import type { GitHubContentItem } from "@/pages/admin/_lib/github";
+
+interface Props {
+	entries: GitHubContentItem[];
+}
+
+const { entries } = Astro.props;
+---
+
+<div class="card bg-base-100 border-base-200 h-full">
+	<div class="card-body p-0">
+		<div class="overflow-x-auto">
+			<table class="table-zebra table w-full">
+				<thead>
+					<tr>
+						<th>Post ID</th>
+						<th class="text-right">Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					{
+						entries.length === 0 ? (
+							<tr>
+								<td colspan="2" class="py-8 text-center opacity-60">
+									No posts found.
+								</td>
+							</tr>
+						) : (
+							entries.map((item) => (
+								<tr>
+									<td class="font-mono font-bold">{item.name}</td>
+									<td class="flex justify-end gap-2">
+										<a
+											href={`/admin/edit/${item.name}`}
+											class="btn btn-sm btn-primary"
+										>
+											Edit
+										</a>
+										<a
+											href={`/admin/preview/${item.name}`}
+											class="btn btn-sm btn-secondary btn-outline"
+										>
+											Preview
+										</a>
+									</td>
+								</tr>
+							))
+						)
+					}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

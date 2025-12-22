@@ -9,6 +9,9 @@ import { defineConfig, envField } from "astro/config";
 import expressiveCode from "astro-expressive-code";
 import icon from "astro-icon";
 import pagefind from "astro-pagefind";
+
+export const markdownConfig = {};
+
 // https://astro.build/config
 export default defineConfig({
 	site: "https://blog.ojii3.dev",
@@ -20,7 +23,6 @@ export default defineConfig({
 					"/pagefind/pagefind.js",
 					"@resvg/resvg-js",
 					"node:fs/promises",
-					"node:async_hooks",
 				],
 			},
 		},
@@ -33,8 +35,35 @@ export default defineConfig({
 					frameBoxShadowCssValue: "none",
 				},
 			},
+			shiki: {
+				bundledLangs: [
+					"astro",
+					"csharp",
+					"diff",
+					"javascript",
+					"json",
+					"nix",
+					"shell",
+					"toml",
+					"typescript",
+					"yaml",
+				],
+			},
 		}),
-		icon(),
+		icon({
+			include: {
+				tabler: [
+					"home",
+					"sun",
+					"edit",
+					"brand-github-filled",
+					"settings",
+					"arrow-left",
+					"arrow-right",
+					"search",
+				],
+			},
+		}),
 		partytown(),
 		sitemap(),
 		pagefind(),

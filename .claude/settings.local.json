@@ -10,7 +10,10 @@
 			"Bash(git restore:*)",
 			"Bash(bun typecheck:*)",
 			"Bash(bun format:*)",
-			"Bash(bun test)"
+			"Bash(bun test)",
+			"Bash(bun pm:*)",
+			"Bash(grep:*)",
+			"WebFetch(domain:expressive-code.com)"
 		]
 	}
 }

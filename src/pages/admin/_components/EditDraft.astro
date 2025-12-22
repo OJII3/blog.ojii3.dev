@@ -7,7 +7,6 @@ const { value = false } = Astro.props;
 ---
 
 <div class="flex items-center gap-4">
-	<label class="text-base-content text-sm font-bold">Draft</label>
 	<input
 		type="checkbox"
 		id="draft"
@@ -15,4 +14,5 @@ const { value = false } = Astro.props;
 		checked={value}
 		class="toggle checked:bg-secondary"
 	/>
+	<span class="text-base-content text-sm">Draft</span>
 </div>
