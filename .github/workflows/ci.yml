@@ -14,7 +14,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  lint-and-build:
+  lint:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -31,16 +31,32 @@ jobs:
       - name: Setup | Install dependencies
         run: bun install --frozen-lockfile
 
-      - name: Check | Biome lint and format
+      - name: Check | lint, format check, typecheck
         run: bun run check
         env:
           GOOGLE_ANALYTICS_ID: ${{ secrets.GOOGLE_ANALYTICS_ID }}
           GH_APP_CLIENT_ID: ${{ secrets.GH_APP_CLIENT_ID }}
           GH_APP_CLIENT_SECRET: dummy_value
           BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Setup | Checkout
+        # v6.0.1
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
 
-      - name: Check | Build
-        run: bun run build
+      - name: Setup | Bun
+        # v2.0.2
+        uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76
+        with:
+          bun-version-file: ".bun-version"
+
+      - name: Setup | Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Test
+        run: bun test
         env:
           GOOGLE_ANALYTICS_ID: ${{ secrets.GOOGLE_ANALYTICS_ID }}
           GH_APP_CLIENT_ID: ${{ secrets.GH_APP_CLIENT_ID }}
