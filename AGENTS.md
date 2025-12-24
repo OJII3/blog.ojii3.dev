@@ -2,35 +2,6 @@
 
 このリポジトリは [Astro](https://astro.build/) + Cloudflare Workers（`@astrojs/cloudflare` アダプター）で構築されたパーソナルブログサイト。パッケージマネージャ/ビルドランタイムは Bun。
 
-## 環境構築
-
-- Astro やローカル CLI 用の環境変数を `.env` に設定する.
-
-```sh
-# .env
-CLOUDFLARE_API_TOKEN=
-BETTER_AUTH_URL=http://localhost:4321
-BETTER_AUTH_SECRET=dummy # dummy only for astro build
-GH_APP_CLIENT_ID=
-GH_APP_CLIENT_SECRET=dummy # dummy only for astro build
-SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt 
-```
-
-- `direnv allow` で自動読み込み。
-- 依存関係をインストールする.
-
-```sh
-bun i
-```
-
-- Wrangler でのローカル実行用に `.dev.vars` を設定する.
-
-```sh
-# .dev.vars
-BETTER_AUTH_SECRET=
-GH_APP_CLIENT_SECRET=
-```
-
 ## 手順
 
 - ロジックの実装は、先にテストを書く。テストには `bun test` を使用する。
