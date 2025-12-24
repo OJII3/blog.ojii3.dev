@@ -2,23 +2,27 @@
 import { Icon } from "astro-icon/components";
 ---
 
-<header
-	class="navbar bg-base-100 rounded-box border-base-200 mb-6 border shadow-sm"
->
-	<div class="flex-none">
-		<a href="/" class="btn btn-ghost btn-square">
-			<Icon name="tabler:home" class="size-6" />
+<header class="bg-base-200/50 sticky top-0 z-20 mb-4 backdrop-blur-sm">
+	<div class="flex items-center justify-between px-2 py-2">
+		<a href="/" class="btn btn-ghost btn-circle btn-sm">
+			<Icon name="tabler:home" class="size-5" />
 		</a>
-	</div>
-	<div class="flex-1">
-		<a class="btn btn-ghost text-xl">Admin Dashboard</a>
-	</div>
-	<div class="flex-none items-center gap-4 px-2">
-		<button id="admin-deploy-btn" class="btn btn-sm btn-primary">
-			Deploy
-		</button>
-		<button id="admin-logout-btn" class="btn btn-sm btn-error btn-outline">
-			Logout
-		</button>
+
+		<div class="flex items-center gap-1">
+			<button
+				id="admin-deploy-btn"
+				class="btn btn-primary btn-circle btn-sm shadow-sm"
+				title="Deploy"
+			>
+				<Icon name="tabler:rocket" class="size-4" />
+			</button>
+			<button
+				id="admin-logout-btn"
+				class="btn btn-ghost btn-circle btn-sm text-error"
+				title="Logout"
+			>
+				<Icon name="tabler:logout" class="size-4" />
+			</button>
+		</div>
 	</div>
 </header>

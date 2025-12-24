@@ -1,4 +1,5 @@
 ---
+import { Icon } from "astro-icon/components";
 import { loadEditablePost } from "@/pages/admin/_lib/load-editable-post";
 import type { EditablePost } from "@/pages/admin/_lib/types";
 import EditPost from "../_components/EditPost.astro";
@@ -31,15 +32,20 @@ if (loadResult.status === "ok") {
 ---
 
 <AdminLayout title={`Edit: ${slug}`}>
-	<main class="container mx-auto min-h-dvh max-w-5xl p-4">
+	<main class="mx-auto min-h-dvh max-w-lg px-2">
 		{
 			errorMsg ? (
-				<div class="rounded-lg border border-red-300 bg-red-50 p-4 text-red-700">
-					<p class="font-semibold">Error loading post</p>
-					<p>{errorMsg}</p>
-					<a href="/admin" class="mt-2 inline-block text-sm underline">
-						Back to Admin
-					</a>
+				<div class="flex min-h-[50vh] flex-col items-center justify-center">
+					<div class="text-center">
+						<Icon
+							name="tabler:alert-circle"
+							class="text-error mx-auto size-10"
+						/>
+						<p class="text-error mt-2 text-sm">{errorMsg}</p>
+						<a href="/admin" class="btn btn-ghost btn-sm mt-4">
+							<Icon name="tabler:arrow-left" class="size-4" />
+						</a>
+					</div>
 				</div>
 			) : (
 				<EditPost slug={slug} initialData={postData} />

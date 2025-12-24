@@ -1,4 +1,5 @@
 ---
+import { Icon } from "astro-icon/components";
 import type { EditablePost } from "@/pages/admin/_lib/types";
 import EditDate from "./EditDate.astro";
 import EditDraft from "./EditDraft.astro";
@@ -13,52 +14,62 @@ interface Props {
 const { slug, initialData } = Astro.props;
 ---
 
+<div class="bg-base-200/50 sticky top-0 z-20 -mx-2 mb-3 backdrop-blur-sm">
+	<div class="flex items-center justify-between px-2 py-2">
+		<div class="flex items-center gap-2">
+			<a href="/admin" class="btn btn-ghost btn-circle btn-sm">
+				<Icon name="tabler:arrow-left" class="size-5" />
+			</a>
+			<span class="truncate font-mono text-sm">{slug}</span>
+		</div>
+		<div class="flex items-center gap-1">
+			<a
+				href={`/admin/preview/${slug}`}
+				class="btn btn-ghost btn-circle btn-sm"
+				title="Preview"
+			>
+				<Icon name="tabler:eye" class="size-4" />
+			</a>
+			<button
+				type="submit"
+				form="edit-form"
+				class="btn btn-primary btn-circle btn-sm shadow-sm"
+				title="Save"
+			>
+				<Icon name="tabler:device-floppy" class="size-4" />
+			</button>
+		</div>
+	</div>
+</div>
+
 <form
 	id="edit-form"
-	class="flex flex-col gap-4 pb-24"
+	class="flex flex-col gap-3 pb-4"
 	data-slug={slug}
 	data-sha={initialData.sha}
 >
-	<div class="flex flex-col gap-4">
-		<details
-			class="collapse-arrow border-base-300 bg-base-100 rounded-box collapse border"
-		>
-			<summary class="collapse-title text-xl font-medium">Metadata</summary>
-			<div class="collapse-content flex flex-col gap-4">
-				<EditTitle value={initialData.frontmatter.title} />
+	<details class="bg-base-200/30 rounded-xl">
+		<summary class="text-base-content/70 cursor-pointer px-3 py-2 text-sm">
+			Metadata
+		</summary>
+		<div class="space-y-3 px-3 pb-3">
+			<EditTitle value={initialData.frontmatter.title} />
+			<div class="grid grid-cols-2 gap-2">
 				<EditDate value={initialData.frontmatter.date} />
-				<EditTags value={initialData.frontmatter.tags} />
 				<EditDraft value={initialData.frontmatter.draft} />
 			</div>
-		</details>
-
-		<div class="flex flex-col gap-2">
-			<label for="body" class="text-base-content text-sm font-bold"
-				>Body (Markdown)</label
-			>
-			<textarea
-				id="body"
-				name="body"
-				class="textarea textarea-bordered [field-sizing:content] min-h-[500px] w-full resize-none font-mono text-sm leading-normal"
-				spellcheck="false">{initialData.body}</textarea
-			>
+			<EditTags value={initialData.frontmatter.tags} />
 		</div>
-	</div>
-</form>
+	</details>
 
-<div
-	class="bg-base-100 border-base-200 fixed right-0 bottom-0 left-0 z-10 border-t shadow-lg"
->
-	<div class="container mx-auto flex max-w-5xl justify-end gap-4 p-4">
-		<a href="/admin" class="btn btn-outline"> Cancel </a>
-		<a href={`/admin/preview/${slug}`} class="btn btn-secondary btn-outline">
-			Preview
-		</a>
-		<button type="submit" form="edit-form" class="btn btn-primary">
-			<span id="btn-text">Save Changes</span>
-		</button>
-	</div>
-</div>
+	<textarea
+		id="body"
+		name="body"
+		class="textarea textarea-bordered [field-sizing:content] min-h-[60vh] w-full resize-none font-mono text-sm leading-relaxed"
+		spellcheck="false"
+		placeholder="Markdown...">{initialData.body}</textarea
+	>
+</form>
 
 <script>
 	import { setupEditPostForm } from "@/pages/admin/_lib/edit-post.client";
