@@ -39,7 +39,7 @@ const { slug, initialData } = Astro.props;
 			<textarea
 				id="body"
 				name="body"
-				class="textarea textarea-bordered min-h-[500px] w-full resize-none overflow-hidden font-mono text-sm leading-normal"
+				class="textarea textarea-bordered [field-sizing:content] min-h-[500px] w-full resize-none font-mono text-sm leading-normal"
 				spellcheck="false">{initialData.body}</textarea
 			>
 		</div>
@@ -66,13 +66,22 @@ const { slug, initialData } = Astro.props;
 
 	const textarea = document.getElementById("body") as HTMLTextAreaElement;
 	if (textarea) {
-		const adjustHeight = () => {
-			textarea.style.height = "auto";
-			textarea.style.height = textarea.scrollHeight + "px";
-		};
-		textarea.addEventListener("input", adjustHeight);
-		window.addEventListener("resize", adjustHeight);
-		// Adjust initially - slight delay to ensure rendering
-		requestAnimationFrame(adjustHeight);
+		// field-sizing: content がサポートされていない場合のみ JS フォールバック
+		const supportsFieldSizing = CSS.supports("field-sizing", "content");
+		if (!supportsFieldSizing) {
+			let pending = false;
+			const adjustHeight = () => {
+				if (pending) return;
+				pending = true;
+				requestAnimationFrame(() => {
+					textarea.style.height = "auto";
+					textarea.style.height = textarea.scrollHeight + "px";
+					pending = false;
+				});
+			};
+			textarea.addEventListener("input", adjustHeight);
+			window.addEventListener("resize", adjustHeight);
+			adjustHeight();
+		}
 	}
 </script>
