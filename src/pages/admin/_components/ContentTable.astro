@@ -1,4 +1,5 @@
 ---
+import { Icon } from "astro-icon/components";
 import type { GitHubContentItem } from "@/pages/admin/_lib/github";
 
 interface Props {
@@ -8,48 +9,35 @@ interface Props {
 const { entries } = Astro.props;
 ---
 
-<div class="card bg-base-100 border-base-200 h-full">
-	<div class="card-body p-0">
-		<div class="overflow-x-auto">
-			<table class="table-zebra table w-full">
-				<thead>
-					<tr>
-						<th>Post ID</th>
-						<th class="text-right">Actions</th>
-					</tr>
-				</thead>
-				<tbody>
-					{
-						entries.length === 0 ? (
-							<tr>
-								<td colspan="2" class="py-8 text-center opacity-60">
-									No posts found.
-								</td>
-							</tr>
-						) : (
-							entries.map((item) => (
-								<tr>
-									<td class="font-mono font-bold">{item.name}</td>
-									<td class="flex justify-end gap-2">
-										<a
-											href={`/admin/edit/${item.name}`}
-											class="btn btn-sm btn-primary"
-										>
-											Edit
-										</a>
-										<a
-											href={`/admin/preview/${item.name}`}
-											class="btn btn-sm btn-secondary btn-outline"
-										>
-											Preview
-										</a>
-									</td>
-								</tr>
-							))
-						)
-					}
-				</tbody>
-			</table>
+{
+	entries.length === 0 ? (
+		<div class="bg-base-200/50 flex flex-col items-center justify-center rounded-xl py-12">
+			<Icon name="tabler:file-off" class="text-base-content/30 size-10" />
+			<p class="text-base-content/50 mt-2 text-sm">No posts</p>
 		</div>
-	</div>
-</div>
+	) : (
+		<ul class="divide-base-200 divide-y">
+			{entries.map((item) => (
+				<li class="active:bg-base-200/50 flex items-center justify-between gap-2 py-2.5">
+					<span class="truncate font-mono text-sm">{item.name}</span>
+					<div class="flex shrink-0 items-center gap-1">
+						<a
+							href={`/admin/edit/${item.name}`}
+							class="btn btn-primary btn-circle btn-sm"
+							title="Edit"
+						>
+							<Icon name="tabler:edit" class="size-4" />
+						</a>
+						<a
+							href={`/admin/preview/${item.name}`}
+							class="btn btn-ghost btn-circle btn-sm"
+							title="Preview"
+						>
+							<Icon name="tabler:eye" class="size-4" />
+						</a>
+					</div>
+				</li>
+			))}
+		</ul>
+	)
+}

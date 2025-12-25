@@ -21,42 +21,40 @@ const initialValue =
 	dateVal && !Number.isNaN(dateVal.getTime()) ? formatDate(dateVal) : "";
 ---
 
-<div class="flex flex-col gap-2">
-	<button
-		type="button"
-		id="date-picker-btn"
-		popovertarget="date-popover"
-		class="input input-bordered flex w-full items-center text-left"
-		style="anchor-name:--date-popover"
-	>
-		{initialValue || "Date (click to select)"}
-	</button>
-	<input type="hidden" name="date" id="date-input" value={initialValue} />
+<button
+	type="button"
+	id="date-picker-btn"
+	popovertarget="date-popover"
+	class="input input-bordered input-sm w-full text-left"
+	style="anchor-name:--date-popover"
+>
+	{initialValue || "Date"}
+</button>
+<input type="hidden" name="date" id="date-input" value={initialValue} />
 
-	<div
-		popover
-		id="date-popover"
-		class="dropdown bg-base-100 border-base-200 rounded-box border shadow-lg"
-		style="position-anchor:--date-popover; margin-top: 0.5rem;"
-	>
-		<calendar-date class="cally" value={initialValue}>
-			<svg
-				aria-label="Previous"
-				class="size-4 fill-current"
-				slot="previous"
-				xmlns="http://www.w3.org/2000/svg"
-				viewBox="0 0 24 24"><path d="M15.75 19.5 8.25 12l7.5-7.5"></path></svg
-			>
-			<svg
-				aria-label="Next"
-				class="size-4 fill-current"
-				slot="next"
-				xmlns="http://www.w3.org/2000/svg"
-				viewBox="0 0 24 24"><path d="m8.25 4.5 7.5 7.5-7.5 7.5"></path></svg
-			>
-			<calendar-month></calendar-month>
-		</calendar-date>
-	</div>
+<div
+	popover
+	id="date-popover"
+	class="bg-base-100 border-base-200 rounded-xl border p-2 shadow-xl"
+	style="position-anchor:--date-popover; margin-top: 0.5rem;"
+>
+	<calendar-date class="cally" value={initialValue}>
+		<svg
+			aria-label="Previous"
+			class="size-4 fill-current"
+			slot="previous"
+			xmlns="http://www.w3.org/2000/svg"
+			viewBox="0 0 24 24"><path d="M15.75 19.5 8.25 12l7.5-7.5"></path></svg
+		>
+		<svg
+			aria-label="Next"
+			class="size-4 fill-current"
+			slot="next"
+			xmlns="http://www.w3.org/2000/svg"
+			viewBox="0 0 24 24"><path d="m8.25 4.5 7.5 7.5-7.5 7.5"></path></svg
+		>
+		<calendar-month></calendar-month>
+	</calendar-date>
 </div>
 
 <script>

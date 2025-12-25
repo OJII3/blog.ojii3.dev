@@ -6,13 +6,13 @@ interface Props {
 const { value = false } = Astro.props;
 ---
 
-<div class="flex items-center gap-4">
+<label class="flex h-8 cursor-pointer items-center gap-2">
 	<input
 		type="checkbox"
 		id="draft"
 		name="draft"
 		checked={value}
-		class="toggle checked:bg-secondary"
+		class="toggle toggle-warning toggle-sm"
 	/>
-	<span class="text-base-content text-sm">Draft</span>
-</div>
+	<span class="text-xs">Draft</span>
+</label>
