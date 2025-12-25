@@ -65,6 +65,7 @@ export default defineConfig({
 					"logout",
 					"rocket",
 					"search",
+					"settings",
 					"sun",
 				],
 			},
