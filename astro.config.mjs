@@ -63,6 +63,7 @@ export default defineConfig({
 					"file-off",
 					"home",
 					"logout",
+					"photo-up",
 					"rocket",
 					"search",
 					"settings",

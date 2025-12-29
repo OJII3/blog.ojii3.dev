@@ -22,8 +22,13 @@
     - `_components/` — 管理画面専用コンポーネント（エディタ UI など）。
     - `_layouts/` — 管理画面専用レイアウト（実体は `src/pages/admin/_layouts/AdminLayout.astro`）。
     - `_lib/` — 管理画面用ロジック（認証、GitHub API、編集ロジック）。
+      - `github/content.ts` — GitHub Contents API クライアント（`createContentClient`, `createContentClientFromHeaders`）。
+      - `github/encoding.ts` — Base64 エンコード/デコードユーティリティ。
       - `github/rehype-image-url.ts` — Markdown 内の相対パス画像を GitHub Raw URL に変換する rehype プラグイン。
+      - `ui/toast.ts` — Toast 通知表示ユーティリティ（クライアントサイド）。
   - `api/auth/[...all].ts` — BetterAuth API。
+- `src/lib/`（アプリケーション共通ユーティリティ）
+  - `result.ts` — 統一 Result 型（`Result<T, E>`, `AuthResult<T, E>`）とヘルパー関数。
 - `src/actions/`（Astro 制約でサーバーアクション専用）
   - `index.ts` — `updatePost` サーバーアクション。
 - `src/middleware.ts` — Astro エントリーポイント。実処理は `src/pages/_lib/middleware.ts` に委譲。

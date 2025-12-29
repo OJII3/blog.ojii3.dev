@@ -1,6 +1,7 @@
 import matter from "gray-matter";
+import { err, ok, unauthorized } from "@/lib/result";
 import { getGitHubAccessToken } from "@/pages/admin/_lib/github/client";
-import { createContentClientFromToken } from "@/pages/admin/_lib/github/content";
+import { createContentClient } from "@/pages/admin/_lib/github/content";
 import type { EditableFrontmatter, LoadEditablePostResult } from "./types";
 
 const POST_PATH = (slug: string) => `${slug}/README.md`;
@@ -11,25 +12,22 @@ export const loadEditablePost = async (
 ): Promise<LoadEditablePostResult> => {
 	const accessToken = await getGitHubAccessToken(headers);
 	if (!accessToken) {
-		return { status: "unauthorized" };
+		return unauthorized();
 	}
 
 	try {
-		const client = createContentClientFromToken(accessToken);
+		const client = createContentClient(accessToken);
 		const file = await client.getFile({ path: POST_PATH(slug) });
 		const { data, content } = matter(file.content);
 
-		return {
-			status: "ok",
-			post: {
-				frontmatter: data as EditableFrontmatter,
-				body: content.trim(),
-				sha: file.sha,
-			},
-		};
+		return ok({
+			frontmatter: data as EditableFrontmatter,
+			body: content.trim(),
+			sha: file.sha,
+		});
 	} catch (error) {
 		const message =
 			error instanceof Error ? error.message : "Failed to load post";
-		return { status: "error", message };
+		return err(message);
 	}
 };
