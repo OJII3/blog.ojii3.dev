@@ -1,5 +1,6 @@
 ---
 import { Icon } from "astro-icon/components";
+import { isUnauthorized } from "@/lib/result";
 import { loadEditablePost } from "@/pages/admin/_lib/load-editable-post";
 import type { EditablePost } from "@/pages/admin/_lib/types";
 import EditPost from "../_components/EditPost.astro";
@@ -18,16 +19,14 @@ let errorMsg = "";
 
 const loadResult = await loadEditablePost(slug, Astro.request.headers);
 
-if (loadResult.status === "unauthorized") {
+if (isUnauthorized(loadResult)) {
 	return Astro.redirect("/login");
 }
 
-if (loadResult.status === "error") {
-	errorMsg = loadResult.message;
-}
-
-if (loadResult.status === "ok") {
-	postData = loadResult.post;
+if (!loadResult.ok) {
+	errorMsg = loadResult.error;
+} else {
+	postData = loadResult.value;
 }
 ---
 

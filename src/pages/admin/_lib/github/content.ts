@@ -5,6 +5,7 @@ import {
 	repoName,
 	repoOwner,
 } from "./client";
+import { decodeBase64, encodeBase64 } from "./encoding";
 import type {
 	DeleteContentParams,
 	GetFileParams,
@@ -22,16 +23,6 @@ export type ContentClient = {
 };
 
 const normalizePath = (path: string) => path.replace(/^\/+/, "");
-
-const toBase64 = (content: string) => {
-	if (typeof Buffer !== "undefined") {
-		return Buffer.from(content, "utf8").toString("base64");
-	}
-	const encoded = new TextEncoder().encode(content);
-	let binary = "";
-	for (const byte of encoded) binary += String.fromCharCode(byte);
-	return btoa(binary);
-};
 
 const listRepoPathWithOctokit = async (
 	octokit: Octokit,
@@ -73,7 +64,7 @@ const upsertFileWithOctokit = async (
 			repo: repoName,
 			path: resolvedPath,
 			message,
-			content: isBase64 ? content : toBase64(content),
+			content: isBase64 ? content : encodeBase64(content),
 			branch,
 			sha,
 			author,
@@ -105,18 +96,6 @@ const deleteFileWithOctokit = async (
 	);
 
 	return response.data as GitHubFileCommit;
-};
-
-const decodeBase64 = (content: string) => {
-	if (typeof Buffer !== "undefined") {
-		return Buffer.from(content, "base64").toString("utf8");
-	}
-	const binary = atob(content);
-	const bytes = new Uint8Array(binary.length);
-	for (let i = 0; i < binary.length; i += 1) {
-		bytes[i] = binary.charCodeAt(i);
-	}
-	return new TextDecoder().decode(bytes);
 };
 
 const getFileWithOctokit = async (
@@ -156,12 +135,29 @@ const getFileWithOctokit = async (
 	};
 };
 
-export const createContentClient = async (
+/**
+ * トークンを直接指定してContentClientを作成（主要API）
+ */
+export const createContentClient = (accessToken?: string): ContentClient => {
+	const octokit = createOctokit(accessToken);
+	return {
+		listRepoPath: (path: string) => listRepoPathWithOctokit(octokit, path),
+		upsertFile: (params: UpsertContentParams) =>
+			upsertFileWithOctokit(octokit, params),
+		deleteFile: (params: DeleteContentParams) =>
+			deleteFileWithOctokit(octokit, params),
+		getFile: (params: GetFileParams) => getFileWithOctokit(octokit, params),
+	};
+};
+
+/**
+ * Headersからトークンを取得してContentClientを作成
+ */
+export const createContentClientFromHeaders = async (
 	headers: Headers,
 ): Promise<ContentClient> => {
 	const octokit = await createOctokitClient(headers);
-
-	const client: ContentClient = {
+	return {
 		listRepoPath: (path: string) => listRepoPathWithOctokit(octokit, path),
 		upsertFile: (params: UpsertContentParams) =>
 			upsertFileWithOctokit(octokit, params),
@@ -169,21 +165,7 @@ export const createContentClient = async (
 			deleteFileWithOctokit(octokit, params),
 		getFile: (params: GetFileParams) => getFileWithOctokit(octokit, params),
 	};
-
-	return client;
 };
 
-export const createContentClientFromToken = (
-	accessToken?: string,
-): ContentClient => {
-	const octokit = createOctokit(accessToken);
-	const client: ContentClient = {
-		listRepoPath: (path: string) => listRepoPathWithOctokit(octokit, path),
-		upsertFile: (params: UpsertContentParams) =>
-			upsertFileWithOctokit(octokit, params),
-		deleteFile: (params: DeleteContentParams) =>
-			deleteFileWithOctokit(octokit, params),
-		getFile: (params: GetFileParams) => getFileWithOctokit(octokit, params),
-	};
-	return client;
-};
+/** @deprecated Use createContentClient instead */
+export const createContentClientFromToken = createContentClient;

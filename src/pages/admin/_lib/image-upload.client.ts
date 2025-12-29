@@ -1,25 +1,5 @@
 import { actions } from "astro:actions";
-
-type ToastType = "success" | "error" | "info";
-
-const showToast = (message: string, type: ToastType = "info") => {
-	const existing = document.querySelector(".toast-container");
-	if (existing) existing.remove();
-
-	const container = document.createElement("div");
-	container.className = "toast-container toast toast-top toast-end z-50";
-
-	const alertClass = {
-		success: "alert-success",
-		error: "alert-error",
-		info: "alert-info",
-	}[type];
-
-	container.innerHTML = `<div class="alert ${alertClass} shadow-lg"><span>${message}</span></div>`;
-	document.body.appendChild(container);
-
-	setTimeout(() => container.remove(), 3000);
-};
+import { showError, showSuccess } from "./ui/toast";
 
 const insertTextAtCursor = (textarea: HTMLTextAreaElement, text: string) => {
 	const start = textarea.selectionStart;
@@ -90,7 +70,7 @@ export const setupImageUploader = (
 				}
 			} catch (e) {
 				const msg = e instanceof Error ? e.message : "Unknown error";
-				showToast(`${file.name}: ${msg}`, "error");
+				showError(`${file.name}: ${msg}`);
 			}
 
 			if (statusEl) {
@@ -103,7 +83,7 @@ export const setupImageUploader = (
 		}
 
 		if (successCount > 0) {
-			showToast(`${successCount}件の画像をアップロードしました`, "success");
+			showSuccess(`${successCount}件の画像をアップロードしました`);
 		}
 
 		fileInput.value = "";

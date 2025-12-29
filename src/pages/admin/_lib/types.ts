@@ -1,3 +1,5 @@
+import type { AuthResult } from "@/lib/result";
+
 export type EditableFrontmatter = {
 	title?: string;
 	date?: string | Date;
@@ -11,7 +13,5 @@ export type EditablePost = {
 	sha: string;
 };
 
-export type LoadEditablePostResult =
-	| { status: "ok"; post: EditablePost }
-	| { status: "unauthorized" }
-	| { status: "error"; message: string };
+/** 記事読み込みの結果型 */
+export type LoadEditablePostResult = AuthResult<EditablePost>;
