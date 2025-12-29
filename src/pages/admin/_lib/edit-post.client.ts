@@ -6,6 +6,27 @@ type SubmitState = {
 	originalText?: string;
 };
 
+type ToastType = "success" | "error" | "info";
+
+const showToast = (message: string, type: ToastType = "info") => {
+	const existing = document.querySelector(".toast-container");
+	if (existing) existing.remove();
+
+	const container = document.createElement("div");
+	container.className = "toast-container toast toast-top toast-end z-50";
+
+	const alertClass = {
+		success: "alert-success",
+		error: "alert-error",
+		info: "alert-info",
+	}[type];
+
+	container.innerHTML = `<div class="alert ${alertClass} shadow-lg"><span>${message}</span></div>`;
+	document.body.appendChild(container);
+
+	setTimeout(() => container.remove(), 3000);
+};
+
 const parseTags = (value: FormDataEntryValue | null) => {
 	if (typeof value !== "string") return [] as string[];
 
@@ -66,6 +87,8 @@ export const setupEditPostForm = (formId = "edit-form") => {
 		return;
 	}
 
+	let currentSha = sha;
+
 	form.addEventListener("submit", async (event) => {
 		event.preventDefault();
 
@@ -76,22 +99,37 @@ export const setupEditPostForm = (formId = "edit-form") => {
 		const body = formData.get("body");
 
 		try {
-			const { error } = await actions.updatePost({
+			const { data, error } = await actions.updatePost({
 				slug,
 				frontmatter,
 				body: typeof body === "string" ? body : "",
-				sha,
+				sha: currentSha,
 			});
 
-			if (!error) {
-				alert("保存しました！");
+			if (!error && data) {
+				if (data.sha) {
+					currentSha = data.sha;
+					form.dataset.sha = data.sha;
+				}
+				showToast("保存しました", "success");
 				return;
 			}
 
-			alert(`Error: ${error.message}`);
-		} catch (error) {
-			console.error(error);
-			alert("Network error");
+			const message = error?.message ?? "Unknown error";
+			if (
+				message.includes("409") ||
+				message.toLowerCase().includes("conflict")
+			) {
+				showToast(
+					"コンフリクトが発生しました。ページを再読み込みしてください。",
+					"error",
+				);
+			} else {
+				showToast(`エラー: ${message}`, "error");
+			}
+		} catch (err) {
+			console.error(err);
+			showToast("ネットワークエラーが発生しました", "error");
 		} finally {
 			toggleSubmitState(submitState, false);
 		}
