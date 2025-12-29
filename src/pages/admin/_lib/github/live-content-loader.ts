@@ -2,8 +2,12 @@ import { createMarkdownProcessor } from "@astrojs/markdown-remark";
 import type { LiveLoader } from "astro/loaders";
 import graymatter from "gray-matter";
 import rehypeExpressiveCode from "rehype-expressive-code";
-import { repoLabel } from "./client";
+import rehypeParse from "rehype-parse";
+import rehypeStringify from "rehype-stringify";
+import { unified } from "unified";
+import { repoLabel, repoName, repoOwner } from "./client";
 import { type ContentClient, createContentClientFromToken } from "./content";
+import { rehypeImageUrl } from "./rehype-image-url";
 import type { GitHubContentItem } from "./types";
 
 type LiveLoaderOptions = {
@@ -62,6 +66,18 @@ const toEntryId = (fullPath: string, basePath: string) => {
 	return withoutBase.replace(/\/README\.md$/i, "").replace(/\.md$/i, "");
 };
 
+const transformImageUrls = async (
+	html: string,
+	slug: string,
+): Promise<string> => {
+	const result = await unified()
+		.use(rehypeParse, { fragment: true })
+		.use(rehypeImageUrl, { owner: repoOwner, repo: repoName, slug })
+		.use(rehypeStringify)
+		.process(html);
+	return String(result);
+};
+
 const buildEntries = async (
 	client: ContentClient,
 	items: GitHubContentItem[],
@@ -75,6 +91,7 @@ const buildEntries = async (
 				const { data, content } = graymatter(file.content);
 				const rendered = await processor.render(content);
 				const id = toEntryId(item.path, basePath);
+				const html = await transformImageUrls(rendered.code, id);
 
 				// バリデーションはスキーマ側で行うので、ここでは最低限の型変換のみ行う.
 				const title = (data?.title as string) || "No Title";
@@ -96,7 +113,7 @@ const buildEntries = async (
 						sha: file.sha,
 						content: content,
 						htmlUrl: file.htmlUrl ?? undefined,
-						html: rendered.code,
+						html,
 						title,
 						date,
 						dateString,

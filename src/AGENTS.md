@@ -22,6 +22,7 @@
     - `_components/` — 管理画面専用コンポーネント（エディタ UI など）。
     - `_layouts/` — 管理画面専用レイアウト（実体は `src/pages/admin/_layouts/AdminLayout.astro`）。
     - `_lib/` — 管理画面用ロジック（認証、GitHub API、編集ロジック）。
+      - `github/rehype-image-url.ts` — Markdown 内の相対パス画像を GitHub Raw URL に変換する rehype プラグイン。
   - `api/auth/[...all].ts` — BetterAuth API。
 - `src/actions/`（Astro 制約でサーバーアクション専用）
   - `index.ts` — `updatePost` サーバーアクション。
