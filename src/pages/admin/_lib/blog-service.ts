@@ -46,5 +46,8 @@ export const updatePostCore = async ({
 		sha,
 	});
 
-	return { success: true, data: res };
+	return {
+		success: true,
+		sha: res.content?.sha,
+	};
 };

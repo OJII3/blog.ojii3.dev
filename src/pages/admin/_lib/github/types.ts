@@ -6,10 +6,19 @@ export type GitHubContentItem = {
 	htmlUrl?: string | null;
 };
 
+export type GitHubFileCommitContent = {
+	sha: string;
+	name: string;
+	path: string;
+	html_url?: string | null;
+};
+
 export type GitHubFileCommit = {
-	content?: unknown;
-	commit?: unknown;
-	[key: string]: unknown;
+	content: GitHubFileCommitContent | null;
+	commit: {
+		sha: string;
+		message: string;
+	};
 };
 
 export type UpsertContentParams = {
