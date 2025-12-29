@@ -1,0 +1,26 @@
+---
+import { Icon } from "astro-icon/components";
+
+interface Props {
+	slug: string;
+}
+
+const { slug } = Astro.props;
+---
+
+<div id="image-uploader" data-slug={slug} class="mb-2">
+	<div
+		data-drop-zone
+		class="border-base-300 hover:border-base-content/30 flex cursor-pointer items-center gap-2 rounded-lg border-2 border-dashed px-3 py-2 transition-colors"
+	>
+		<Icon name="tabler:photo-up" class="text-base-content/50 size-5 shrink-0" />
+		<span class="text-base-content/50 text-sm">
+			画像をドロップ、貼り付け、または
+			<label class="link cursor-pointer">
+				選択
+				<input type="file" accept="image/*" multiple class="hidden" />
+			</label>
+		</span>
+		<span data-upload-status class="text-info ml-auto hidden text-xs"></span>
+	</div>
+</div>

@@ -29,6 +29,7 @@ export type UpsertContentParams = {
 	sha?: string; // required when updating existing file
 	author?: { name: string; email: string };
 	committer?: { name: string; email: string };
+	isBase64?: boolean; // true if content is already base64 encoded (e.g., binary files)
 };
 
 export type DeleteContentParams = {
