@@ -63,7 +63,8 @@ const upsertFileWithOctokit = async (
 	octokit: Octokit,
 	params: UpsertContentParams,
 ): Promise<GitHubFileCommit> => {
-	const { path, content, message, branch, sha, author, committer } = params;
+	const { path, content, message, branch, sha, author, committer, isBase64 } =
+		params;
 	const resolvedPath = normalizePath(path);
 	const response = await octokit.request(
 		"PUT /repos/{owner}/{repo}/contents/{path}",
@@ -72,7 +73,7 @@ const upsertFileWithOctokit = async (
 			repo: repoName,
 			path: resolvedPath,
 			message,
-			content: toBase64(content),
+			content: isBase64 ? content : toBase64(content),
 			branch,
 			sha,
 			author,
