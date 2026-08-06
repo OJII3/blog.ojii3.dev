@@ -5,6 +5,7 @@ import EditDate from "./EditDate.astro";
 import EditDraft from "./EditDraft.astro";
 import EditTags from "./EditTags.astro";
 import EditTitle from "./EditTitle.astro";
+import ImageUploader from "./ImageUploader.astro";
 
 interface Props {
 	slug: string;
@@ -62,6 +63,8 @@ const { slug, initialData } = Astro.props;
 		</div>
 	</details>
 
+	<ImageUploader slug={slug} />
+
 	<textarea
 		id="body"
 		name="body"
@@ -73,7 +76,15 @@ const { slug, initialData } = Astro.props;
 
 <script>
 	import { setupEditPostForm } from "@/pages/admin/_lib/edit-post.client";
+	import { setupImageUploader } from "@/pages/admin/_lib/image-upload.client";
+
 	setupEditPostForm();
+
+	const uploader = document.getElementById("image-uploader");
+	const slug = uploader?.dataset.slug;
+	if (slug) {
+		setupImageUploader("image-uploader", "body", slug);
+	}
 
 	const textarea = document.getElementById("body") as HTMLTextAreaElement;
 	if (textarea) {

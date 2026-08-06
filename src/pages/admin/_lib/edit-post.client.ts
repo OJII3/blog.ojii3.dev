@@ -1,4 +1,5 @@
 import { actions } from "astro:actions";
+import { showToast } from "./ui/toast";
 
 type SubmitState = {
 	button?: HTMLButtonElement | null;
@@ -66,6 +67,8 @@ export const setupEditPostForm = (formId = "edit-form") => {
 		return;
 	}
 
+	let currentSha = sha;
+
 	form.addEventListener("submit", async (event) => {
 		event.preventDefault();
 
@@ -76,22 +79,37 @@ export const setupEditPostForm = (formId = "edit-form") => {
 		const body = formData.get("body");
 
 		try {
-			const { error } = await actions.updatePost({
+			const { data, error } = await actions.updatePost({
 				slug,
 				frontmatter,
 				body: typeof body === "string" ? body : "",
-				sha,
+				sha: currentSha,
 			});
 
-			if (!error) {
-				alert("保存しました！");
+			if (!error && data) {
+				if (data.sha) {
+					currentSha = data.sha;
+					form.dataset.sha = data.sha;
+				}
+				showToast("保存しました", "success");
 				return;
 			}
 
-			alert(`Error: ${error.message}`);
-		} catch (error) {
-			console.error(error);
-			alert("Network error");
+			const message = error?.message ?? "Unknown error";
+			if (
+				message.includes("409") ||
+				message.toLowerCase().includes("conflict")
+			) {
+				showToast(
+					"コンフリクトが発生しました。ページを再読み込みしてください。",
+					"error",
+				);
+			} else {
+				showToast(`エラー: ${message}`, "error");
+			}
+		} catch (err) {
+			console.error(err);
+			showToast("ネットワークエラーが発生しました", "error");
 		} finally {
 			toggleSubmitState(submitState, false);
 		}
