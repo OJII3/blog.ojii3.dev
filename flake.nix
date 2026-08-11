@@ -26,7 +26,7 @@
           devShells.default = pkgs.mkShell {
             packages = with pkgs; [
               bun # as a package manager
-              nodejs-slim # wrangler dev requires nodejs
+              nodejs-slim_24 # wrangler dev requires nodejs
             ];
             shellHook = ''
               bun --version > .bun-version
