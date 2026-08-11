@@ -211,7 +211,8 @@ describe("createContentMarkdownProcessor", () => {
 			it("should reject uppercase DATA: scheme", async () => {
 				const md = `![data](DATA:image/png;base64,abc)`;
 				const result = await processor.render(md, "2024-01-01-0");
-				expect(result.html).toContain('src="DATA:');
+				// Uppercase DATA: is not a recognized protocol, so src is removed
+				expect(result.html).not.toContain("src=");
 				expect(result.html).not.toContain("media.blog.ojii3.dev");
 			});
 
@@ -302,6 +303,36 @@ describe("createContentMarkdownProcessor", () => {
 				const result = await processor.render(md, "2024-01-01-0");
 				expect(result.html).toContain('src=".///secret%ZZ.png"');
 				expect(result.html).not.toContain("media.blog.ojii3.dev");
+			});
+		});
+
+		describe("security: XSS prevention", () => {
+			it("should remove script tags", async () => {
+				const md = `<script>alert('xss')</script>`;
+				const result = await processor.render(md, "2024-01-01-0");
+				expect(result.html).not.toContain("<script>");
+				expect(result.html).not.toContain("alert");
+			});
+
+			it("should remove onerror event handlers", async () => {
+				const md = `<img src="x" onerror="alert('xss')">`;
+				const result = await processor.render(md, "2024-01-01-0");
+				expect(result.html).not.toContain("onerror");
+				expect(result.html).not.toContain("alert");
+			});
+
+			it("should remove javascript: URLs", async () => {
+				const md = `[click me](javascript:alert('xss'))`;
+				const result = await processor.render(md, "2024-01-01-0");
+				expect(result.html).not.toContain("javascript:");
+				expect(result.html).not.toContain("alert");
+			});
+
+			it("should preserve safe HTML elements", async () => {
+				const md = `<div class="test">Hello</div>`;
+				const result = await processor.render(md, "2024-01-01-0");
+				expect(result.html).toContain("<div");
+				expect(result.html).toContain("Hello");
 			});
 		});
 	});

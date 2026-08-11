@@ -2,6 +2,7 @@ import { createMarkdownProcessor } from "@astrojs/markdown-remark";
 import type { Element, Root } from "hast";
 import rehypeExpressiveCode from "rehype-expressive-code";
 import rehypeParse from "rehype-parse";
+import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import rehypeStringify from "rehype-stringify";
 import { unified } from "unified";
 import { visit } from "unist-util-visit";
@@ -49,6 +50,36 @@ const isAbsolutePathAfterDecode = (decoded: string): boolean => {
 
 const isValidSlug = (slug: string): boolean => {
 	return slug !== "." && slug !== "..";
+};
+
+// Custom sanitize schema that preserves expressive-code classes and safe attributes
+const sanitizeSchema = {
+	...defaultSchema,
+	attributes: {
+		...defaultSchema.attributes,
+		"*": [
+			...((defaultSchema.attributes?.["*"] as string[]) || []),
+			"class",
+			"data(ec)",
+			"style",
+		],
+		code: [
+			...((defaultSchema.attributes?.code as string[]) || []),
+			"data(ec)",
+			"data-code-block",
+		],
+		img: [...((defaultSchema.attributes?.img as string[]) || [])],
+	},
+	// Allow data: and blob: protocols for img src
+	protocols: {
+		...defaultSchema.protocols,
+		src: [
+			...((defaultSchema.protocols?.src as string[]) || []),
+			"data",
+			"blob",
+		],
+	},
+	tagNames: [...(defaultSchema.tagNames || []), "div", "span"],
 };
 
 const createRehypeMediaImageUrl = (mediaBaseUrl: string, slug: string) => {
@@ -141,6 +172,7 @@ export const createContentMarkdownProcessor = (
 	const transformImageUrls = async (html: string, slug: string) => {
 		const result = await unified()
 			.use(rehypeParse, { fragment: true })
+			.use(rehypeSanitize, sanitizeSchema)
 			.use(createRehypeMediaImageUrl(mediaBaseUrl, slug))
 			.use(rehypeStringify)
 			.process(html);

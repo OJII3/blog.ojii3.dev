@@ -1,7 +1,6 @@
 import type { LiveLoader } from "astro/loaders";
 import graymatter from "gray-matter";
 import { createContentMarkdownProcessor } from "../../../../lib/content/markdown";
-import { repoLabel } from "./client";
 import {
 	type ContentClient,
 	type ContentClientOptions,
@@ -54,6 +53,34 @@ const buildGitHubRawBaseUrl = (
 	return url.href.replace(/\/$/, "");
 };
 
+// Normalize basePath by trimming leading/trailing slashes
+const normalizeBasePath = (basePath: string): string => {
+	return basePath.replace(/^\/+|\/+$/g, "");
+};
+
+// Validate basePath segments to prevent traversal attacks
+const validateBasePath = (basePath: string): boolean => {
+	if (!basePath) return true;
+	const normalized = normalizeBasePath(basePath);
+	const segments = normalized.split("/");
+	// Reject segments that are . or ..
+	return !segments.some((segment) => segment === "." || segment === "..");
+};
+
+// Build cache hint tags from configured options
+const buildCacheHintTags = (
+	owner: string,
+	repo: string,
+	ref: string,
+	basePath: string,
+): string[] => {
+	const tags = [`${owner}/${repo}`, ref];
+	if (basePath) {
+		tags.push(normalizeBasePath(basePath));
+	}
+	return tags;
+};
+
 let processor: ReturnType<typeof createContentMarkdownProcessor> | null = null;
 let processorMediaBaseUrl: string | null = null;
 
@@ -66,10 +93,17 @@ const getProcessor = (mediaBaseUrl: string) => {
 	return processor;
 };
 
-const toEntryId = (fullPath: string, basePath: string) => {
-	const withoutBase = basePath
-		? fullPath.replace(new RegExp(`^${basePath}/`), "")
-		: fullPath;
+// Convert file path to entry ID using safe string operations
+const toEntryId = (fullPath: string, basePath: string): string => {
+	const normalizedBase = normalizeBasePath(basePath);
+	let withoutBase = fullPath;
+
+	// Remove basePath prefix if present
+	if (normalizedBase && fullPath.startsWith(`${normalizedBase}/`)) {
+		withoutBase = fullPath.slice(normalizedBase.length + 1);
+	}
+
+	// Remove README.md or .md suffix
 	return withoutBase.replace(/\/README\.md$/i, "").replace(/\.md$/i, "");
 };
 
@@ -78,6 +112,7 @@ const buildEntries = async (
 	items: GitHubContentItem[],
 	basePath: string,
 	mediaBaseUrl: string,
+	cacheHintTags: string[],
 ) => {
 	const processor = getProcessor(mediaBaseUrl);
 	const entries = await Promise.all(
@@ -117,7 +152,7 @@ const buildEntries = async (
 						draft,
 					},
 					cacheHint: {
-						tags: [repoLabel, item.path],
+						tags: [...cacheHintTags, item.path],
 					},
 				};
 			} catch (_e) {
@@ -135,8 +170,26 @@ export const githubLiveLoader = (
 	options: LiveLoaderOptions,
 ): LiveLoader<EntryData, EntryFilter, CollectionFilter, Error> => {
 	const { owner, repo, ref = "main", filename, basePath } = options;
-	const mediaBaseUrl = buildGitHubRawBaseUrl(owner, repo, ref, basePath);
+
+	// Validate basePath to prevent traversal attacks
+	if (!validateBasePath(basePath)) {
+		throw new Error(`Invalid basePath: ${basePath}`);
+	}
+
+	const normalizedBasePath = normalizeBasePath(basePath);
+	const mediaBaseUrl = buildGitHubRawBaseUrl(
+		owner,
+		repo,
+		ref,
+		normalizedBasePath,
+	);
 	const clientOptions: ContentClientOptions = { owner, repo, ref };
+	const cacheHintTags = buildCacheHintTags(
+		owner,
+		repo,
+		ref,
+		normalizedBasePath,
+	);
 
 	return {
 		name: "github-live-loader",
@@ -144,7 +197,7 @@ export const githubLiveLoader = (
 			const token = filter?.token;
 			const client = createContentClient(token, clientOptions);
 
-			const dirs = await client.listRepoPath(basePath);
+			const dirs = await client.listRepoPath(normalizedBasePath);
 
 			// Construct file paths for each directory
 			const files: GitHubContentItem[] = dirs
@@ -156,11 +209,17 @@ export const githubLiveLoader = (
 					sha: "", // sha is not known yet, but getFile will fetch it
 				}));
 
-			const entries = await buildEntries(client, files, basePath, mediaBaseUrl);
+			const entries = await buildEntries(
+				client,
+				files,
+				normalizedBasePath,
+				mediaBaseUrl,
+				cacheHintTags,
+			);
 			return {
 				entries,
 				cacheHint: {
-					tags: [repoLabel],
+					tags: cacheHintTags,
 				},
 			};
 		},
@@ -170,8 +229,8 @@ export const githubLiveLoader = (
 			const client = createContentClient(token, clientOptions);
 
 			const id = filter.id;
-			const path = basePath
-				? `${basePath}/${id}/${filename}`
+			const path = normalizedBasePath
+				? `${normalizedBasePath}/${id}/${filename}`
 				: `${id}/${filename}`;
 
 			const item: GitHubContentItem = {
@@ -184,8 +243,9 @@ export const githubLiveLoader = (
 			const entries = await buildEntries(
 				client,
 				[item],
-				basePath,
+				normalizedBasePath,
 				mediaBaseUrl,
+				cacheHintTags,
 			);
 			if (!entries[0]) throw new Error(`Entry not found: ${id}`);
 			return entries[0];
