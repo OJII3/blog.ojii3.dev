@@ -275,6 +275,34 @@ describe("createContentMarkdownProcessor", () => {
 				expect(result.html).toContain('src="image.png"');
 				expect(result.html).not.toContain("media.blog.ojii3.dev");
 			});
+
+			it("should leave .//secret.png unchanged (starts with // after normalization)", async () => {
+				const md = `![evil](.//secret.png)`;
+				const result = await processor.render(md, "2024-01-01-0");
+				expect(result.html).toContain('src=".//secret.png"');
+				expect(result.html).not.toContain("media.blog.ojii3.dev");
+			});
+
+			it("should leave .///secret.png unchanged (starts with /// after normalization)", async () => {
+				const md = `![evil](.///secret.png)`;
+				const result = await processor.render(md, "2024-01-01-0");
+				expect(result.html).toContain('src=".///secret.png"');
+				expect(result.html).not.toContain("media.blog.ojii3.dev");
+			});
+
+			it("should handle .//secret%ZZ.png without throwing", async () => {
+				const md = `![evil](.//secret%ZZ.png)`;
+				const result = await processor.render(md, "2024-01-01-0");
+				expect(result.html).toContain('src=".//secret%ZZ.png"');
+				expect(result.html).not.toContain("media.blog.ojii3.dev");
+			});
+
+			it("should handle .///secret%ZZ.png without throwing", async () => {
+				const md = `![evil](.///secret%ZZ.png)`;
+				const result = await processor.render(md, "2024-01-01-0");
+				expect(result.html).toContain('src=".///secret%ZZ.png"');
+				expect(result.html).not.toContain("media.blog.ojii3.dev");
+			});
 		});
 	});
 });

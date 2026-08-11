@@ -27,6 +27,10 @@ const normalizeRelativePath = (src: string): string => {
 	return src.replace(/^\.\//, "");
 };
 
+const isInvalidNormalizedPath = (normalized: string): boolean => {
+	return normalized.startsWith("/") || normalized.startsWith("//");
+};
+
 const safeDecodeURIComponent = (str: string): string | null => {
 	try {
 		return decodeURIComponent(str);
@@ -72,6 +76,8 @@ const createRehypeMediaImageUrl = (mediaBaseUrl: string, slug: string) => {
 
 				const normalizedPath = normalizeRelativePath(src);
 
+				if (isInvalidNormalizedPath(normalizedPath)) return;
+
 				const decoded = safeDecodeURIComponent(normalizedPath);
 				if (decoded === null) {
 					const segments = normalizedPath.split("/");
@@ -79,9 +85,13 @@ const createRehypeMediaImageUrl = (mediaBaseUrl: string, slug: string) => {
 					const encodedPath = segments
 						.map((segment) => encodeURIComponent(segment))
 						.join("/");
-					const resultUrl = new URL(encodedPath, baseWithSlug);
-					if (resultUrl.origin !== expectedOrigin) return;
-					node.properties.src = resultUrl.href;
+					try {
+						const resultUrl = new URL(encodedPath, baseWithSlug);
+						if (resultUrl.origin !== expectedOrigin) return;
+						node.properties.src = resultUrl.href;
+					} catch {
+						// Malformed URL, leave unchanged
+					}
 					return;
 				}
 
@@ -93,9 +103,13 @@ const createRehypeMediaImageUrl = (mediaBaseUrl: string, slug: string) => {
 				const encodedPath = segments
 					.map((segment) => encodeURIComponent(segment))
 					.join("/");
-				const resultUrl = new URL(encodedPath, baseWithSlug);
-				if (resultUrl.origin !== expectedOrigin) return;
-				node.properties.src = resultUrl.href;
+				try {
+					const resultUrl = new URL(encodedPath, baseWithSlug);
+					if (resultUrl.origin !== expectedOrigin) return;
+					node.properties.src = resultUrl.href;
+				} catch {
+					// Malformed URL, leave unchanged
+				}
 			});
 		};
 	};

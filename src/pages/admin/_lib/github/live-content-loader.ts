@@ -29,15 +29,23 @@ type EntryData = {
 type EntryFilter = { id: string; token?: string };
 type CollectionFilter = { prefix?: string; token?: string };
 
-const GITHUB_RAW_BASE_URL =
-	"https://raw.githubusercontent.com/OJII3/content/main";
+const buildGitHubRawBaseUrl = (
+	owner: string,
+	repo: string,
+	ref: string = "main",
+): string => {
+	return `https://raw.githubusercontent.com/${owner}/${repo}/${ref}`;
+};
 
 let processor: ReturnType<typeof createContentMarkdownProcessor> | null = null;
-const getProcessor = () => {
-	if (processor) return processor;
+let processorMediaBaseUrl: string | null = null;
+
+const getProcessor = (mediaBaseUrl: string) => {
+	if (processor && processorMediaBaseUrl === mediaBaseUrl) return processor;
 	processor = createContentMarkdownProcessor({
-		mediaBaseUrl: GITHUB_RAW_BASE_URL,
+		mediaBaseUrl,
 	});
+	processorMediaBaseUrl = mediaBaseUrl;
 	return processor;
 };
 
@@ -52,8 +60,9 @@ const buildEntries = async (
 	client: ContentClient,
 	items: GitHubContentItem[],
 	basePath: string,
+	mediaBaseUrl: string,
 ) => {
-	const processor = getProcessor();
+	const processor = getProcessor(mediaBaseUrl);
 	const entries = await Promise.all(
 		items.map(async (item) => {
 			try {
@@ -108,7 +117,8 @@ const buildEntries = async (
 export const githubLiveLoader = (
 	options: LiveLoaderOptions,
 ): LiveLoader<EntryData, EntryFilter, CollectionFilter, Error> => {
-	const { filename, basePath } = options;
+	const { owner, repo, ref, filename, basePath } = options;
+	const mediaBaseUrl = buildGitHubRawBaseUrl(owner, repo, ref);
 
 	return {
 		name: "github-live-loader",
@@ -128,7 +138,7 @@ export const githubLiveLoader = (
 					sha: "", // sha is not known yet, but getFile will fetch it
 				}));
 
-			const entries = await buildEntries(client, files, basePath);
+			const entries = await buildEntries(client, files, basePath, mediaBaseUrl);
 			return {
 				entries,
 				cacheHint: {
@@ -153,7 +163,12 @@ export const githubLiveLoader = (
 				sha: "",
 			};
 
-			const entries = await buildEntries(client, [item], basePath);
+			const entries = await buildEntries(
+				client,
+				[item],
+				basePath,
+				mediaBaseUrl,
+			);
 			if (!entries[0]) throw new Error(`Entry not found: ${id}`);
 			return entries[0];
 		},
