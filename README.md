@@ -37,4 +37,5 @@ GH_APP_CLIENT_SECRET=
 
 - ローカル migration: `bun wrangler d1 migrations apply blog-content --local`
 - ローカル Worker 起動: `bun run preview`
+- コンテンツ移行 dry-run: `bun run migrate-content -- --source ./content --dry-run`
 

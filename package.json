@@ -13,7 +13,8 @@
 		"markdownlint": "markdownlint-cli2 --fix './content-mock/**/*.md'",
 		"preview": "wrangler dev --port 4321",
 		"astro": "astro",
-		"wrangler": "wrangler"
+		"wrangler": "wrangler",
+		"migrate-content": "bun scripts/migrate-content.ts"
 	},
 	"dependencies": {
 		"@astrojs/cloudflare": "^14.2.0",
