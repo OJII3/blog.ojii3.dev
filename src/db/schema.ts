@@ -14,6 +14,7 @@ export const posts = sqliteTable("posts", {
 	revision: integer("revision").notNull().default(1),
 	createdAt: integer("created_at").notNull(),
 	updatedAt: integer("updated_at").notNull(),
+	updateToken: text("update_token").notNull().default(""),
 });
 
 export const tags = sqliteTable("tags", {

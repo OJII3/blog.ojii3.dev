@@ -276,6 +276,39 @@ describe("updatePost", () => {
 		expect(rows).toEqual(["alpha", "beta"]);
 	});
 
+	it("deduplicates input tags preserving first-seen order", async () => {
+		await seedPost(testDb, {
+			slug: "dup",
+			title: "Dup",
+			date: "2024-01-01",
+			body: "body",
+			revision: 1,
+			tags: [],
+		});
+
+		const result = await updatePost(testDb.d1, {
+			slug: "dup",
+			title: "Dup",
+			date: "2024-02-01",
+			body: "body",
+			draft: false,
+			tags: ["alpha", "beta", "alpha", "gamma", "beta"],
+			revision: 1,
+		});
+
+		expect(result).toEqual({ kind: "updated", revision: 2 });
+
+		const updated = await getPost(testDb.db, "dup");
+		expect(updated).not.toBeNull();
+		expect(updated?.tags).toEqual(["alpha", "beta", "gamma"]);
+
+		const allPostTags = await testDb.db.select().from(postTags).all();
+		const rows = allPostTags
+			.filter((t) => t.postSlug === "dup")
+			.map((t) => t.tagName);
+		expect(rows).toEqual(["alpha", "beta", "gamma"]);
+	});
+
 	it("leaves data unchanged when stale update loses race", async () => {
 		await seedPost(testDb, {
 			slug: "post",
@@ -402,6 +435,44 @@ describe("searchPosts", () => {
 		const result = await searchPosts(testDb.db, { query: "Post" });
 
 		expect(result.length).toBeLessThanOrEqual(50);
+	});
+
+	it("caps tag-filtered results at limit", async () => {
+		for (let i = 0; i < 60; i++) {
+			await seedPost(testDb, {
+				slug: `post-${String(i).padStart(3, "0")}`,
+				title: `Post ${i}`,
+				date: `2024-01-${String(Math.min(i + 1, 28)).padStart(2, "0")}`,
+				tags: ["common"],
+			});
+		}
+
+		const result = await searchPosts(testDb.db, {
+			tags: ["common"],
+			limit: 10,
+		});
+
+		expect(result).toHaveLength(10);
+	});
+
+	it("caps tag+query results at limit", async () => {
+		for (let i = 0; i < 60; i++) {
+			await seedPost(testDb, {
+				slug: `post-${String(i).padStart(3, "0")}`,
+				title: `Post ${i}`,
+				date: `2024-01-${String(Math.min(i + 1, 28)).padStart(2, "0")}`,
+				body: "searchable content",
+				tags: ["common"],
+			});
+		}
+
+		const result = await searchPosts(testDb.db, {
+			query: "searchable",
+			tags: ["common"],
+			limit: 10,
+		});
+
+		expect(result).toHaveLength(10);
 	});
 
 	it("clamps negative limit to zero and returns empty", async () => {

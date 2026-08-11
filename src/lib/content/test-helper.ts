@@ -1,5 +1,5 @@
 import { Database } from "bun:sqlite";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import type {
@@ -9,7 +9,11 @@ import type {
 } from "../../db/client";
 import { posts, postTags, tags } from "../../db/schema";
 
-class D1Stmt implements ContentD1PreparedStatement {
+interface ExecutableStmt {
+	executeSync(): ContentD1Result;
+}
+
+class D1Stmt implements ContentD1PreparedStatement, ExecutableStmt {
 	private values: unknown[] = [];
 	constructor(
 		private sqlite: Database,
@@ -63,7 +67,7 @@ class D1Db implements ContentD1Database {
 		const results: ContentD1Result[] = [];
 		const tx = this.sqlite.transaction(() => {
 			for (const s of stmts) {
-				results.push((s as D1Stmt).executeSync());
+				results.push((s as unknown as ExecutableStmt).executeSync());
 			}
 		});
 		tx();
@@ -75,15 +79,24 @@ export type TestDb = ReturnType<typeof createTestDb>;
 
 export function createTestDb() {
 	const sqlite = new Database(":memory:");
-	const sqlPath = join(process.cwd(), "drizzle/0000_create_content.sql");
-	const sqlFile = readFileSync(sqlPath, "utf-8");
-	const statements = sqlFile
-		.split("--> statement-breakpoint")
-		.map((s) => s.trim())
-		.filter((s) => s.length > 0);
-	for (const stmt of statements) {
-		sqlite.exec(stmt);
+	sqlite.exec("PRAGMA foreign_keys = ON");
+
+	const drizzleDir = join(process.cwd(), "drizzle");
+	const migrationFiles = readdirSync(drizzleDir)
+		.filter((f) => f.endsWith(".sql"))
+		.sort();
+
+	for (const file of migrationFiles) {
+		const sqlFile = readFileSync(join(drizzleDir, file), "utf-8");
+		const statements = sqlFile
+			.split("--> statement-breakpoint")
+			.map((s) => s.trim())
+			.filter((s) => s.length > 0);
+		for (const stmt of statements) {
+			sqlite.exec(stmt);
+		}
 	}
+
 	const drizzleDb = drizzle(sqlite, { schema: { posts, tags, postTags } });
 	const d1Db = new D1Db(sqlite);
 	return { db: drizzleDb, d1: d1Db };

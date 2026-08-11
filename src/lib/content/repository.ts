@@ -105,13 +105,16 @@ export async function updatePost(
 
 	const now = Date.now();
 	const newRevision = input.revision + 1;
+	const updateToken = crypto.randomUUID();
+
+	const uniqueTags = [...new Set(input.tags)];
 
 	const stmts = [];
 
 	stmts.push(
 		d1
 			.prepare(
-				"UPDATE `posts` SET `title` = ?, `date` = ?, `draft` = ?, `body` = ?, `revision` = ?, `updated_at` = ? WHERE `slug` = ? AND `revision` = ?",
+				"UPDATE `posts` SET `title` = ?, `date` = ?, `draft` = ?, `body` = ?, `revision` = ?, `updated_at` = ?, `update_token` = ? WHERE `slug` = ? AND `revision` = ?",
 			)
 			.bind(
 				input.title,
@@ -120,6 +123,7 @@ export async function updatePost(
 				input.body,
 				newRevision,
 				now,
+				updateToken,
 				input.slug,
 				input.revision,
 			),
@@ -128,28 +132,28 @@ export async function updatePost(
 	stmts.push(
 		d1
 			.prepare(
-				"DELETE FROM `post_tags` WHERE `post_slug` = ? AND EXISTS (SELECT 1 FROM `posts` WHERE `slug` = ? AND `revision` = ? AND `updated_at` = ?)",
+				"DELETE FROM `post_tags` WHERE `post_slug` = ? AND EXISTS (SELECT 1 FROM `posts` WHERE `slug` = ? AND `revision` = ? AND `update_token` = ?)",
 			)
-			.bind(input.slug, input.slug, newRevision, now),
+			.bind(input.slug, input.slug, newRevision, updateToken),
 	);
 
-	for (const tagName of input.tags) {
+	for (const tagName of uniqueTags) {
 		stmts.push(
 			d1
 				.prepare(
-					"INSERT OR IGNORE INTO `tags`(`name`) SELECT ? WHERE EXISTS (SELECT 1 FROM `posts` WHERE `slug` = ? AND `revision` = ? AND `updated_at` = ?)",
+					"INSERT OR IGNORE INTO `tags`(`name`) SELECT ? WHERE EXISTS (SELECT 1 FROM `posts` WHERE `slug` = ? AND `revision` = ? AND `update_token` = ?)",
 				)
-				.bind(tagName, input.slug, newRevision, now),
+				.bind(tagName, input.slug, newRevision, updateToken),
 		);
 	}
 
-	for (const tagName of input.tags) {
+	for (const tagName of uniqueTags) {
 		stmts.push(
 			d1
 				.prepare(
-					"INSERT INTO `post_tags`(`post_slug`, `tag_name`) SELECT ?, ? WHERE EXISTS (SELECT 1 FROM `posts` WHERE `slug` = ? AND `revision` = ? AND `updated_at` = ?)",
+					"INSERT INTO `post_tags`(`post_slug`, `tag_name`) SELECT ?, ? WHERE EXISTS (SELECT 1 FROM `posts` WHERE `slug` = ? AND `revision` = ? AND `update_token` = ?)",
 				)
-				.bind(input.slug, tagName, input.slug, newRevision, now),
+				.bind(input.slug, tagName, input.slug, newRevision, updateToken),
 		);
 	}
 
@@ -192,6 +196,7 @@ export async function searchPosts(
 				),
 			)
 			.orderBy(sql`${posts.date} DESC`)
+			.limit(limit)
 			.all();
 
 		matchedPosts = queryResults.filter((p: PostRow) => slugSet.has(p.slug));
@@ -224,6 +229,7 @@ export async function searchPosts(
 			.from(posts)
 			.where(eq(posts.draft, false))
 			.orderBy(sql`${posts.date} DESC`)
+			.limit(limit)
 			.all();
 
 		matchedPosts = allPosts.filter((p: PostRow) => slugSet.has(p.slug));
