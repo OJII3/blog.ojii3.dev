@@ -1,5 +1,4 @@
 ---
-import { type CollectionEntry } from "astro:content";
 import { Icon } from "astro-icon/components";
 import GlobalLayout from "@/pages/_layouts/GlobalLayout.astro";
 import {
@@ -12,6 +11,11 @@ import {
 import PostHeader from "./PostHeader.astro";
 import PostPrevNext from "./PostPrevNext.astro";
 
+export interface PostLink {
+	id: string;
+	data: { title: string };
+}
+
 export interface Props {
 	title: string;
 	dateString: string;
@@ -19,8 +23,8 @@ export interface Props {
 	tags?: string[];
 	draft?: boolean;
 	postId?: string; // If present, enables view transitions and OG image
-	prevPost?: CollectionEntry<"blog"> | null;
-	nextPost?: CollectionEntry<"blog"> | null;
+	prevPost?: PostLink | null;
+	nextPost?: PostLink | null;
 	html?: string; // For preview content
 }
 

@@ -1,16 +1,27 @@
 ---
-import { type CollectionEntry, render } from "astro:content";
 import PostShell from "@/pages/_components/PostShell.astro";
+import type { VitaColor } from "@/pages/_lib/constants";
+
+export interface LiveBlogEntry {
+	id: string;
+	data: {
+		title: string;
+		dateString: string;
+		color: VitaColor;
+		tags: string[];
+		draft: boolean;
+		html: string;
+	};
+}
 
 export interface Props {
-	prevPost: CollectionEntry<"blog"> | null;
-	nextPost: CollectionEntry<"blog"> | null;
-	post: CollectionEntry<"blog">;
+	prevPost: LiveBlogEntry | null;
+	nextPost: LiveBlogEntry | null;
+	post: LiveBlogEntry;
 }
 
 const { post, prevPost, nextPost } = Astro.props;
-const { title, dateString, color, tags, draft } = post.data;
-const { Content } = await render(post);
+const { title, dateString, color, tags, draft, html } = post.data;
 ---
 
 <PostShell
@@ -22,6 +33,5 @@ const { Content } = await render(post);
 	postId={post.id}
 	prevPost={prevPost}
 	nextPost={nextPost}
->
-	<Content />
-</PostShell>
+	html={html}
+/>
