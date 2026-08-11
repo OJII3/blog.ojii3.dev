@@ -2,36 +2,20 @@ import { Database } from "bun:sqlite";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { drizzle } from "drizzle-orm/bun-sqlite";
+import type {
+	ContentD1Database,
+	ContentD1PreparedStatement,
+	ContentD1Result,
+} from "../../db/client";
 import { posts, postTags, tags } from "../../db/schema";
 
-// D1Database test double wrapping bun:sqlite to exercise the same SQL statements
-// that would run against Cloudflare D1 in production. A true D1 binding is unavailable
-// in Bun tests, so this double implements prepare/bind/first/all/run/batch.
-export interface D1Result<T = unknown> {
-	results: T[];
-	meta: { changes: number };
-	success: boolean;
-}
-
-export interface D1PreparedStatement {
-	bind(...values: unknown[]): D1PreparedStatement;
-	first<T = Record<string, unknown>>(): Promise<T | null>;
-	all<T = Record<string, unknown>>(): Promise<D1Result<T>>;
-	run(): Promise<D1Result>;
-}
-
-export interface D1Database {
-	prepare(sql: string): D1PreparedStatement;
-	batch(stmts: D1PreparedStatement[]): Promise<D1Result[]>;
-}
-
-class D1Stmt implements D1PreparedStatement {
+class D1Stmt implements ContentD1PreparedStatement {
 	private values: unknown[] = [];
 	constructor(
 		private sqlite: Database,
 		private sql: string,
 	) {}
-	bind(...values: unknown[]): D1PreparedStatement {
+	bind(...values: unknown[]): ContentD1PreparedStatement {
 		const s = new D1Stmt(this.sqlite, this.sql);
 		s.values = values;
 		return s;
@@ -41,14 +25,14 @@ class D1Stmt implements D1PreparedStatement {
 		const row = this.sqlite.prepare(this.sql).get(...(this.values as any[]));
 		return (row as T) ?? null;
 	}
-	async all<T = Record<string, unknown>>(): Promise<D1Result<T>> {
+	async all<T = Record<string, unknown>>(): Promise<ContentD1Result<T>> {
 		// biome-ignore lint/suspicious/noExplicitAny: D1 bind values are dynamically typed
 		const rows = this.sqlite
 			.prepare(this.sql)
 			.all(...(this.values as any[])) as T[];
 		return { results: rows, meta: { changes: 0 }, success: true };
 	}
-	async run(): Promise<D1Result> {
+	async run(): Promise<ContentD1Result> {
 		// biome-ignore lint/suspicious/noExplicitAny: D1 bind values are dynamically typed
 		const info = this.sqlite.prepare(this.sql).run(...(this.values as any[]));
 		return {
@@ -57,7 +41,7 @@ class D1Stmt implements D1PreparedStatement {
 			success: true,
 		};
 	}
-	executeSync(): D1Result {
+	executeSync(): ContentD1Result {
 		const sql = this.sql.trim().toUpperCase();
 		if (sql.startsWith("SELECT") || sql.startsWith("WITH")) {
 			// biome-ignore lint/suspicious/noExplicitAny: D1 bind values are dynamically typed
@@ -70,13 +54,13 @@ class D1Stmt implements D1PreparedStatement {
 	}
 }
 
-class D1Db implements D1Database {
+class D1Db implements ContentD1Database {
 	constructor(private sqlite: Database) {}
-	prepare(sql: string): D1PreparedStatement {
+	prepare(sql: string): ContentD1PreparedStatement {
 		return new D1Stmt(this.sqlite, sql);
 	}
-	async batch(stmts: D1PreparedStatement[]): Promise<D1Result[]> {
-		const results: D1Result[] = [];
+	async batch(stmts: ContentD1PreparedStatement[]): Promise<ContentD1Result[]> {
+		const results: ContentD1Result[] = [];
 		const tx = this.sqlite.transaction(() => {
 			for (const s of stmts) {
 				results.push((s as D1Stmt).executeSync());

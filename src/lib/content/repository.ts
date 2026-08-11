@@ -1,7 +1,7 @@
 import { and, eq, like, or, sql } from "drizzle-orm";
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
+import type { ContentD1Database, ContentD1Result } from "../../db/client";
 import { posts, postTags, type tags } from "../../db/schema";
-import type { D1Database, D1Result } from "./test-helper";
 import type { ContentPost, UpdatePostInput, UpdatePostResult } from "./types";
 
 type Schema = {
@@ -89,7 +89,7 @@ export async function getPost(
 }
 
 export async function updatePost(
-	d1: D1Database,
+	d1: ContentD1Database,
 	input: UpdatePostInput,
 ): Promise<UpdatePostResult> {
 	const existing = await d1
@@ -128,18 +128,18 @@ export async function updatePost(
 	stmts.push(
 		d1
 			.prepare(
-				"DELETE FROM `post_tags` WHERE `post_slug` = ? AND (SELECT changes()) > 0",
+				"DELETE FROM `post_tags` WHERE `post_slug` = ? AND EXISTS (SELECT 1 FROM `posts` WHERE `slug` = ? AND `revision` = ? AND `updated_at` = ?)",
 			)
-			.bind(input.slug),
+			.bind(input.slug, input.slug, newRevision, now),
 	);
 
 	for (const tagName of input.tags) {
 		stmts.push(
 			d1
 				.prepare(
-					"INSERT OR IGNORE INTO `tags`(`name`) SELECT ? WHERE (SELECT changes()) > 0",
+					"INSERT OR IGNORE INTO `tags`(`name`) SELECT ? WHERE EXISTS (SELECT 1 FROM `posts` WHERE `slug` = ? AND `revision` = ? AND `updated_at` = ?)",
 				)
-				.bind(tagName),
+				.bind(tagName, input.slug, newRevision, now),
 		);
 	}
 
@@ -153,7 +153,7 @@ export async function updatePost(
 		);
 	}
 
-	const results: D1Result[] = await d1.batch(stmts);
+	const results: ContentD1Result[] = await d1.batch(stmts);
 
 	const updateResult = results[0];
 	if (updateResult.meta.changes === 0) {
@@ -167,7 +167,7 @@ export async function searchPosts(
 	db: DrizzleDb,
 	opts: { query?: string; tags?: string[]; limit?: number },
 ): Promise<ContentPost[]> {
-	const limit = Math.min(opts.limit ?? 50, 50);
+	const limit = Math.min(Math.max(opts.limit ?? 50, 0), 50);
 
 	let matchedPosts: PostRow[];
 

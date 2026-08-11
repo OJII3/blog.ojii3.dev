@@ -242,6 +242,40 @@ describe("updatePost", () => {
 		expect(result).toEqual({ kind: "not-found" });
 	});
 
+	it("inserts tags and post_tags when updating a post that had no tags", async () => {
+		await seedPost(testDb, {
+			slug: "no-tags",
+			title: "No Tags",
+			date: "2024-01-01",
+			body: "body",
+			revision: 1,
+			tags: [],
+		});
+
+		const result = await updatePost(testDb.d1, {
+			slug: "no-tags",
+			title: "Now Tagged",
+			date: "2024-02-01",
+			body: "new body",
+			draft: false,
+			tags: ["alpha", "beta"],
+			revision: 1,
+		});
+
+		expect(result).toEqual({ kind: "updated", revision: 2 });
+
+		const updated = await getPost(testDb.db, "no-tags");
+		expect(updated).not.toBeNull();
+		expect(updated!.tags.sort()).toEqual(["alpha", "beta"]);
+
+		const allPostTags = await testDb.db.select().from(postTags).all();
+		const rows = allPostTags
+			.filter((t) => t.postSlug === "no-tags")
+			.map((t) => t.tagName)
+			.sort();
+		expect(rows).toEqual(["alpha", "beta"]);
+	});
+
 	it("leaves data unchanged when stale update loses race", async () => {
 		await seedPost(testDb, {
 			slug: "post",
@@ -368,6 +402,18 @@ describe("searchPosts", () => {
 		const result = await searchPosts(testDb.db, { query: "Post" });
 
 		expect(result.length).toBeLessThanOrEqual(50);
+	});
+
+	it("clamps negative limit to zero and returns empty", async () => {
+		await seedPost(testDb, {
+			slug: "post",
+			title: "Hello",
+			date: "2024-01-01",
+		});
+
+		const result = await searchPosts(testDb.db, { query: "Hello", limit: -10 });
+
+		expect(result).toEqual([]);
 	});
 
 	it("returns empty array when no match", async () => {
