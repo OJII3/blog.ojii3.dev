@@ -2,7 +2,11 @@ import type { LiveLoader } from "astro/loaders";
 import graymatter from "gray-matter";
 import { createContentMarkdownProcessor } from "../../../../lib/content/markdown";
 import { repoLabel } from "./client";
-import { type ContentClient, createContentClientFromToken } from "./content";
+import {
+	type ContentClient,
+	type ContentClientOptions,
+	createContentClient,
+} from "./content";
 import type { GitHubContentItem } from "./types";
 
 type LiveLoaderOptions = {
@@ -32,9 +36,22 @@ type CollectionFilter = { prefix?: string; token?: string };
 const buildGitHubRawBaseUrl = (
 	owner: string,
 	repo: string,
-	ref: string = "main",
+	ref: string,
+	basePath: string,
 ): string => {
-	return `https://raw.githubusercontent.com/${owner}/${repo}/${ref}`;
+	const encodedOwner = encodeURIComponent(owner);
+	const encodedRepo = encodeURIComponent(repo);
+	const encodedRef = encodeURIComponent(ref);
+	const url = new URL("https://raw.githubusercontent.com");
+	url.pathname = `/${encodedOwner}/${encodedRepo}/${encodedRef}`;
+	if (basePath) {
+		const encodedBasePath = basePath
+			.split("/")
+			.map((segment) => encodeURIComponent(segment))
+			.join("/");
+		url.pathname += `/${encodedBasePath}`;
+	}
+	return url.href.replace(/\/$/, "");
 };
 
 let processor: ReturnType<typeof createContentMarkdownProcessor> | null = null;
@@ -117,14 +134,15 @@ const buildEntries = async (
 export const githubLiveLoader = (
 	options: LiveLoaderOptions,
 ): LiveLoader<EntryData, EntryFilter, CollectionFilter, Error> => {
-	const { owner, repo, ref, filename, basePath } = options;
-	const mediaBaseUrl = buildGitHubRawBaseUrl(owner, repo, ref);
+	const { owner, repo, ref = "main", filename, basePath } = options;
+	const mediaBaseUrl = buildGitHubRawBaseUrl(owner, repo, ref, basePath);
+	const clientOptions: ContentClientOptions = { owner, repo, ref };
 
 	return {
 		name: "github-live-loader",
 		loadCollection: async ({ filter }) => {
 			const token = filter?.token;
-			const client = createContentClientFromToken(token);
+			const client = createContentClient(token, clientOptions);
 
 			const dirs = await client.listRepoPath(basePath);
 
@@ -149,7 +167,7 @@ export const githubLiveLoader = (
 
 		loadEntry: async ({ filter }) => {
 			const token = filter.token;
-			const client = createContentClientFromToken(token);
+			const client = createContentClient(token, clientOptions);
 
 			const id = filter.id;
 			const path = basePath

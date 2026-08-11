@@ -15,6 +15,12 @@ import type {
 	UpsertContentParams,
 } from "./types";
 
+export type ContentClientOptions = {
+	owner?: string;
+	repo?: string;
+	ref?: string;
+};
+
 export type ContentClient = {
 	listRepoPath: (path: string) => Promise<GitHubContentItem[]>;
 	upsertFile: (params: UpsertContentParams) => Promise<GitHubFileCommit>;
@@ -27,14 +33,18 @@ const normalizePath = (path: string) => path.replace(/^\/+/, "");
 const listRepoPathWithOctokit = async (
 	octokit: Octokit,
 	path: string,
+	options?: ContentClientOptions,
 ): Promise<GitHubContentItem[]> => {
 	const resolvedPath = normalizePath(path);
+	const owner = options?.owner ?? repoOwner;
+	const repo = options?.repo ?? repoName;
 	const response = await octokit.request(
 		"GET /repos/{owner}/{repo}/contents/{path}",
 		{
-			owner: repoOwner,
-			repo: repoName,
+			owner,
+			repo,
 			path: resolvedPath,
+			ref: options?.ref,
 		},
 	);
 
@@ -53,15 +63,18 @@ const listRepoPathWithOctokit = async (
 const upsertFileWithOctokit = async (
 	octokit: Octokit,
 	params: UpsertContentParams,
+	options?: ContentClientOptions,
 ): Promise<GitHubFileCommit> => {
 	const { path, content, message, branch, sha, author, committer, isBase64 } =
 		params;
 	const resolvedPath = normalizePath(path);
+	const owner = options?.owner ?? repoOwner;
+	const repo = options?.repo ?? repoName;
 	const response = await octokit.request(
 		"PUT /repos/{owner}/{repo}/contents/{path}",
 		{
-			owner: repoOwner,
-			repo: repoName,
+			owner,
+			repo,
 			path: resolvedPath,
 			message,
 			content: isBase64 ? content : encodeBase64(content),
@@ -78,14 +91,17 @@ const upsertFileWithOctokit = async (
 const deleteFileWithOctokit = async (
 	octokit: Octokit,
 	params: DeleteContentParams,
+	options?: ContentClientOptions,
 ): Promise<GitHubFileCommit> => {
 	const { path, message, sha, branch, author, committer } = params;
 	const resolvedPath = normalizePath(path);
+	const owner = options?.owner ?? repoOwner;
+	const repo = options?.repo ?? repoName;
 	const response = await octokit.request(
 		"DELETE /repos/{owner}/{repo}/contents/{path}",
 		{
-			owner: repoOwner,
-			repo: repoName,
+			owner,
+			repo,
 			path: resolvedPath,
 			message,
 			sha,
@@ -101,16 +117,20 @@ const deleteFileWithOctokit = async (
 const getFileWithOctokit = async (
 	octokit: Octokit,
 	params: GetFileParams,
+	options?: ContentClientOptions,
 ): Promise<GitHubFileContent> => {
 	const { path, ref } = params;
 	const resolvedPath = normalizePath(path);
+	const owner = options?.owner ?? repoOwner;
+	const repo = options?.repo ?? repoName;
+	const resolvedRef = ref ?? options?.ref;
 	const response = await octokit.request(
 		"GET /repos/{owner}/{repo}/contents/{path}",
 		{
-			owner: repoOwner,
-			repo: repoName,
+			owner,
+			repo,
 			path: resolvedPath,
-			ref,
+			ref: resolvedRef,
 		},
 	);
 
@@ -138,15 +158,20 @@ const getFileWithOctokit = async (
 /**
  * トークンを直接指定してContentClientを作成（主要API）
  */
-export const createContentClient = (accessToken?: string): ContentClient => {
+export const createContentClient = (
+	accessToken?: string,
+	options?: ContentClientOptions,
+): ContentClient => {
 	const octokit = createOctokit(accessToken);
 	return {
-		listRepoPath: (path: string) => listRepoPathWithOctokit(octokit, path),
+		listRepoPath: (path: string) =>
+			listRepoPathWithOctokit(octokit, path, options),
 		upsertFile: (params: UpsertContentParams) =>
-			upsertFileWithOctokit(octokit, params),
+			upsertFileWithOctokit(octokit, params, options),
 		deleteFile: (params: DeleteContentParams) =>
-			deleteFileWithOctokit(octokit, params),
-		getFile: (params: GetFileParams) => getFileWithOctokit(octokit, params),
+			deleteFileWithOctokit(octokit, params, options),
+		getFile: (params: GetFileParams) =>
+			getFileWithOctokit(octokit, params, options),
 	};
 };
 
@@ -155,15 +180,18 @@ export const createContentClient = (accessToken?: string): ContentClient => {
  */
 export const createContentClientFromHeaders = async (
 	headers: Headers,
+	options?: ContentClientOptions,
 ): Promise<ContentClient> => {
 	const octokit = await createOctokitClient(headers);
 	return {
-		listRepoPath: (path: string) => listRepoPathWithOctokit(octokit, path),
+		listRepoPath: (path: string) =>
+			listRepoPathWithOctokit(octokit, path, options),
 		upsertFile: (params: UpsertContentParams) =>
-			upsertFileWithOctokit(octokit, params),
+			upsertFileWithOctokit(octokit, params, options),
 		deleteFile: (params: DeleteContentParams) =>
-			deleteFileWithOctokit(octokit, params),
-		getFile: (params: GetFileParams) => getFileWithOctokit(octokit, params),
+			deleteFileWithOctokit(octokit, params, options),
+		getFile: (params: GetFileParams) =>
+			getFileWithOctokit(octokit, params, options),
 	};
 };
 
