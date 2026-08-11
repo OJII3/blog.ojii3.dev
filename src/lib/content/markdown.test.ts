@@ -334,6 +334,19 @@ describe("createContentMarkdownProcessor", () => {
 				expect(result.html).toContain("<div");
 				expect(result.html).toContain("Hello");
 			});
+
+			it("should preserve expressive-code output structure", async () => {
+				const md = "```typescript\nconst x = 1;\n```";
+				const result = await processor.render(md, "2024-01-01-0");
+				// Check for the expressive-code wrapper div with className
+				expect(result.html).toContain('<div class="expressive-code');
+				// Check for the style element that expressive-code generates
+				expect(result.html).toContain("<style>");
+				// Check for the code block content (tokenized by syntax highlighter)
+				expect(result.html).toContain("const");
+				expect(result.html).toContain("x");
+				expect(result.html).toContain("1");
+			});
 		});
 	});
 });

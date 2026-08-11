@@ -59,9 +59,9 @@ const sanitizeSchema = {
 		...defaultSchema.attributes,
 		"*": [
 			...((defaultSchema.attributes?.["*"] as string[]) || []),
-			"class",
-			"data(ec)",
-			"style",
+			"className", // HAST property name for class
+			"data*", // Allow all data attributes
+			"style", // Allow inline styles
 		],
 		code: [
 			...((defaultSchema.attributes?.code as string[]) || []),
@@ -79,7 +79,7 @@ const sanitizeSchema = {
 			"blob",
 		],
 	},
-	tagNames: [...(defaultSchema.tagNames || []), "div", "span"],
+	tagNames: [...(defaultSchema.tagNames || []), "div", "span", "style"],
 };
 
 const createRehypeMediaImageUrl = (mediaBaseUrl: string, slug: string) => {
