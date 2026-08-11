@@ -16,18 +16,19 @@
 		"wrangler": "wrangler"
 	},
 	"dependencies": {
-		"@astrojs/cloudflare": "^12.6.12",
-		"@astrojs/partytown": "^2.1.4",
-		"@astrojs/sitemap": "3.6.0",
+		"@astrojs/cloudflare": "^14.2.0",
+		"@astrojs/markdown-remark": "^7.2.2",
+		"@astrojs/partytown": "^2.1.7",
+		"@astrojs/sitemap": "3.7.3",
 		"@iconify-json/tabler": "^1.2.24",
 		"@octokit/core": "^7.0.6",
-		"@tailwindcss/vite": "^4.1.18",
+		"@tailwindcss/vite": "^4.3.3",
 		"@types/js-yaml": "^4.0.9",
 		"@types/react-dom": "^19.2.3",
-		"astro": "5.16.6",
-		"astro-expressive-code": "^0.41.5",
+		"astro": "7.2.0",
+		"astro-expressive-code": "^0.44.1",
 		"astro-icon": "^1.1.5",
-		"astro-pagefind": "^1.8.5",
+		"astro-pagefind": "^2.0.1",
 		"better-auth": "^1.4.7",
 		"cally": "^0.9.0",
 		"daisyui": "^5.5.14",
@@ -38,12 +39,12 @@
 		"picomatch": "^4.0.3",
 		"prettier-plugin-astro": "^0.14.1",
 		"react-dom": "^19.2.3",
-		"tailwindcss": "^4.1.18"
+		"tailwindcss": "^4.3.3"
 	},
 	"devDependencies": {
-		"@astrojs/check": "^0.9.6",
+		"@astrojs/check": "^0.9.10",
 		"@biomejs/biome": "^2.3.10",
-		"@cloudflare/workers-types": "^4.20251217.0",
+		"@cloudflare/workers-types": "^5.20260811.1",
 		"@octokit/openapi-types": "^27.0.0",
 		"@resvg/resvg-js": "^2.6.2",
 		"@tailwindcss/typography": "^0.5.19",
@@ -55,6 +56,6 @@
 		"react": "^19.2.3",
 		"satori": "^0.18.3",
 		"typescript": "^5.9.3",
-		"wrangler": "^4.55.0"
+		"wrangler": "^4.120.1"
 	}
 }

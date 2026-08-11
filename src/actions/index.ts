@@ -3,7 +3,7 @@ import {
 	ActionError,
 	defineAction,
 } from "astro:actions";
-import { z } from "astro:schema";
+import { z } from "astro/zod";
 import { updatePostCore } from "@/pages/admin/_lib/blog-service";
 import {
 	createOctokit,
