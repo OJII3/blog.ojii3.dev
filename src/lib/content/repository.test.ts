@@ -266,7 +266,7 @@ describe("updatePost", () => {
 
 		const updated = await getPost(testDb.db, "no-tags");
 		expect(updated).not.toBeNull();
-		expect(updated!.tags.sort()).toEqual(["alpha", "beta"]);
+		expect(updated?.tags.sort()).toEqual(["alpha", "beta"]);
 
 		const allPostTags = await testDb.db.select().from(postTags).all();
 		const rows = allPostTags

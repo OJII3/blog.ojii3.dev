@@ -26,9 +26,9 @@ class D1Stmt implements ContentD1PreparedStatement {
 		return (row as T) ?? null;
 	}
 	async all<T = Record<string, unknown>>(): Promise<ContentD1Result<T>> {
-		// biome-ignore lint/suspicious/noExplicitAny: D1 bind values are dynamically typed
 		const rows = this.sqlite
 			.prepare(this.sql)
+			// biome-ignore lint/suspicious/noExplicitAny: D1 bind values are dynamically typed
 			.all(...(this.values as any[])) as T[];
 		return { results: rows, meta: { changes: 0 }, success: true };
 	}
