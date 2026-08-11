@@ -39,7 +39,15 @@ const hasPathTraversal = (segments: string[]): boolean => {
 	return segments.some((segment) => segment === ".." || segment === ".");
 };
 
+const isAbsolutePathAfterDecode = (decoded: string): boolean => {
+	return decoded.startsWith("/");
+};
+
 const createRehypeMediaImageUrl = (mediaBaseUrl: string, slug: string) => {
+	const encodedSlug = encodeURIComponent(slug);
+	const baseWithSlug = `${mediaBaseUrl}/${encodedSlug}/`;
+	const expectedOrigin = new URL(mediaBaseUrl).origin;
+
 	return () => {
 		return (tree: Root) => {
 			visit(tree, "element", (node: Element) => {
@@ -59,11 +67,13 @@ const createRehypeMediaImageUrl = (mediaBaseUrl: string, slug: string) => {
 					const encodedPath = segments
 						.map((segment) => encodeURIComponent(segment))
 						.join("/");
-					const resultUrl = new URL(encodedPath, `${mediaBaseUrl}/${slug}/`);
-					if (resultUrl.origin !== new URL(mediaBaseUrl).origin) return;
+					const resultUrl = new URL(encodedPath, baseWithSlug);
+					if (resultUrl.origin !== expectedOrigin) return;
 					node.properties.src = resultUrl.href;
 					return;
 				}
+
+				if (isAbsolutePathAfterDecode(decoded)) return;
 
 				const segments = decoded.split("/");
 				if (hasPathTraversal(segments)) return;
@@ -71,8 +81,8 @@ const createRehypeMediaImageUrl = (mediaBaseUrl: string, slug: string) => {
 				const encodedPath = segments
 					.map((segment) => encodeURIComponent(segment))
 					.join("/");
-				const resultUrl = new URL(encodedPath, `${mediaBaseUrl}/${slug}/`);
-				if (resultUrl.origin !== new URL(mediaBaseUrl).origin) return;
+				const resultUrl = new URL(encodedPath, baseWithSlug);
+				if (resultUrl.origin !== expectedOrigin) return;
 				node.properties.src = resultUrl.href;
 			});
 		};

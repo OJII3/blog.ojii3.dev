@@ -186,6 +186,13 @@ describe("createContentMarkdownProcessor", () => {
 				expect(result.html).not.toContain("media.blog.ojii3.dev");
 			});
 
+			it("should leave %2Fevil.png unchanged (decoded to root-relative)", async () => {
+				const md = `![evil](%2Fevil.png)`;
+				const result = await processor.render(md, "2024-01-01-0");
+				expect(result.html).toContain('src="%2Fevil.png"');
+				expect(result.html).not.toContain("media.blog.ojii3.dev");
+			});
+
 			it("should handle malformed % safely without throwing", async () => {
 				const md = `![broken](100%real.png)`;
 				const result = await processor.render(md, "2024-01-01-0");
@@ -211,6 +218,44 @@ describe("createContentMarkdownProcessor", () => {
 			it("should preserve configured origin for all relative paths", async () => {
 				const md = `![test](image.png)`;
 				const result = await processor.render(md, "2024-01-01-0");
+				const srcMatch = result.html.match(/src="([^"]+)"/);
+				expect(srcMatch).toBeTruthy();
+				const url = new URL(srcMatch?.[1] ?? "");
+				expect(url.origin).toBe("https://media.blog.ojii3.dev");
+			});
+		});
+
+		describe("security: slug encoding", () => {
+			it("should encode slug containing ../ to prevent path traversal", async () => {
+				const md = `![test](image.png)`;
+				const result = await processor.render(md, "../evil");
+				expect(result.html).toContain(
+					'src="https://media.blog.ojii3.dev/..%2Fevil/image.png"',
+				);
+				expect(result.html).not.toContain("../");
+			});
+
+			it("should encode slug containing ? to prevent query injection", async () => {
+				const md = `![test](image.png)`;
+				const result = await processor.render(md, "post?evil=true");
+				expect(result.html).toContain(
+					'src="https://media.blog.ojii3.dev/post%3Fevil%3Dtrue/image.png"',
+				);
+				expect(result.html).not.toContain("?");
+			});
+
+			it("should encode slug containing # to prevent fragment injection", async () => {
+				const md = `![test](image.png)`;
+				const result = await processor.render(md, "post#evil");
+				expect(result.html).toContain(
+					'src="https://media.blog.ojii3.dev/post%23evil/image.png"',
+				);
+				expect(result.html).not.toContain("#");
+			});
+
+			it("should preserve configured origin even with hostile slug", async () => {
+				const md = `![test](image.png)`;
+				const result = await processor.render(md, "../evil#post?hack=true");
 				const srcMatch = result.html.match(/src="([^"]+)"/);
 				expect(srcMatch).toBeTruthy();
 				const url = new URL(srcMatch?.[1] ?? "");
