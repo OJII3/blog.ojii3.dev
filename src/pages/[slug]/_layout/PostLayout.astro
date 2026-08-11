@@ -21,7 +21,7 @@ export interface Props {
 }
 
 const { post, prevPost, nextPost } = Astro.props;
-const { title, dateString, color, tags, draft, html } = post.data;
+const { title, dateString, color, tags, html } = post.data;
 ---
 
 <PostShell
@@ -29,7 +29,6 @@ const { title, dateString, color, tags, draft, html } = post.data;
 	dateString={dateString}
 	color={color}
 	tags={tags}
-	draft={draft}
 	postId={post.id}
 	prevPost={prevPost}
 	nextPost={nextPost}

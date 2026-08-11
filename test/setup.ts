@@ -19,6 +19,7 @@ mock.module("astro/zod", () => ({
 		object: identity,
 		string: optional,
 		boolean: optional,
+		number: optional,
 		array: optional,
 		record: () => ({}),
 		unknown: () => ({}),

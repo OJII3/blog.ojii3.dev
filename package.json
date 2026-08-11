@@ -28,7 +28,6 @@
 		"astro": "7.2.0",
 		"astro-expressive-code": "^0.44.1",
 		"astro-icon": "^1.1.5",
-		"astro-pagefind": "^2.0.1",
 		"better-auth": "^1.4.7",
 		"cally": "^0.9.0",
 		"daisyui": "^5.5.14",

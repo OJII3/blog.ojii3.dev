@@ -25,6 +25,11 @@ export type ContentEnv = {
 	MEDIA_BASE_URL: string;
 };
 
+export async function getContentEnv(): Promise<ContentEnv> {
+	const { env } = await import("cloudflare:workers");
+	return env as unknown as ContentEnv;
+}
+
 export function createContentDb(env: Pick<ContentEnv, "DB">) {
 	return drizzle(env.DB, { schema: { posts, tags, postTags } });
 }
