@@ -30,7 +30,5 @@ export const postTags = sqliteTable(
 			.notNull()
 			.references(() => tags.name),
 	},
-	(table) => ({
-		primaryKey: primaryKey({ columns: [table.postSlug, table.tagName] }),
-	}),
+	(table) => [primaryKey({ columns: [table.postSlug, table.tagName] })],
 );
