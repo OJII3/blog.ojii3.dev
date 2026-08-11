@@ -177,29 +177,22 @@ export async function searchPosts(
 
 	if (opts.query && opts.tags?.length) {
 		const pattern = `%${opts.query}%`;
-		const tagFilteredSlugs: Array<{ postSlug: string }> = await db
-			.select({ postSlug: postTags.postSlug })
-			.from(postTags)
-			.where(or(...opts.tags.map((t: string) => eq(postTags.tagName, t))))
-			.all();
-		const slugSet = new Set(
-			tagFilteredSlugs.map((r: { postSlug: string }) => r.postSlug),
-		);
-
-		const queryResults: PostRow[] = await db
+		matchedPosts = await db
 			.select()
 			.from(posts)
 			.where(
 				and(
 					eq(posts.draft, false),
 					or(like(posts.title, pattern), like(posts.body, pattern)),
+					sql`EXISTS (SELECT 1 FROM ${postTags} WHERE ${postTags.postSlug} = ${posts.slug} AND ${postTags.tagName} IN (${sql.join(
+						opts.tags.map((t: string) => sql`${t}`),
+						sql`, `,
+					)}))`,
 				),
 			)
 			.orderBy(sql`${posts.date} DESC`)
 			.limit(limit)
 			.all();
-
-		matchedPosts = queryResults.filter((p: PostRow) => slugSet.has(p.slug));
 	} else if (opts.query) {
 		const pattern = `%${opts.query}%`;
 		matchedPosts = await db
@@ -215,24 +208,21 @@ export async function searchPosts(
 			.limit(limit)
 			.all();
 	} else if (opts.tags?.length) {
-		const tagFilteredSlugs: Array<{ postSlug: string }> = await db
-			.select({ postSlug: postTags.postSlug })
-			.from(postTags)
-			.where(or(...opts.tags.map((t: string) => eq(postTags.tagName, t))))
-			.all();
-		const slugSet = new Set(
-			tagFilteredSlugs.map((r: { postSlug: string }) => r.postSlug),
-		);
-
-		const allPosts: PostRow[] = await db
+		matchedPosts = await db
 			.select()
 			.from(posts)
-			.where(eq(posts.draft, false))
+			.where(
+				and(
+					eq(posts.draft, false),
+					sql`EXISTS (SELECT 1 FROM ${postTags} WHERE ${postTags.postSlug} = ${posts.slug} AND ${postTags.tagName} IN (${sql.join(
+						opts.tags.map((t: string) => sql`${t}`),
+						sql`, `,
+					)}))`,
+				),
+			)
 			.orderBy(sql`${posts.date} DESC`)
 			.limit(limit)
 			.all();
-
-		matchedPosts = allPosts.filter((p: PostRow) => slugSet.has(p.slug));
 	} else {
 		matchedPosts = await db
 			.select()

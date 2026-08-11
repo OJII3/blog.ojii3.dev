@@ -536,4 +536,52 @@ describe("searchPosts", () => {
 		expect(noFilter).toHaveLength(1);
 		expect(noFilter[0].slug).toBe("published");
 	});
+
+	it("applies tag filter before limit in tag-only search", async () => {
+		await seedPost(testDb, {
+			slug: "older-no-tag",
+			title: "Older No Tag",
+			date: "2024-01-01",
+			body: "body",
+			tags: [],
+		});
+		await seedPost(testDb, {
+			slug: "newer-with-tag",
+			title: "Newer With Tag",
+			date: "2024-02-01",
+			body: "body",
+			tags: ["target"],
+		});
+
+		const result = await searchPosts(testDb.db, { tags: ["target"], limit: 1 });
+
+		expect(result).toHaveLength(1);
+		expect(result[0].slug).toBe("newer-with-tag");
+	});
+
+	it("applies tag filter before limit in tag+query search", async () => {
+		await seedPost(testDb, {
+			slug: "older-no-tag",
+			title: "Older No Tag",
+			date: "2024-01-01",
+			body: "searchable",
+			tags: [],
+		});
+		await seedPost(testDb, {
+			slug: "newer-with-tag",
+			title: "Newer With Tag",
+			date: "2024-02-01",
+			body: "searchable",
+			tags: ["target"],
+		});
+
+		const result = await searchPosts(testDb.db, {
+			query: "searchable",
+			tags: ["target"],
+			limit: 1,
+		});
+
+		expect(result).toHaveLength(1);
+		expect(result[0].slug).toBe("newer-with-tag");
+	});
 });
