@@ -80,7 +80,7 @@ export default defineConfig({
 		processor: unified(),
 	},
 	image: {
-		domains: ["raw.githubusercontent.com", "github.com", "*.s3.amazonaws.com"],
+		domains: ["*.s3.amazonaws.com"],
 		layout: "constrained",
 	},
 	adapter: cloudflare({

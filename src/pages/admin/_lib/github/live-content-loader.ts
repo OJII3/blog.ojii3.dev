@@ -1,13 +1,8 @@
-import { createMarkdownProcessor } from "@astrojs/markdown-remark";
 import type { LiveLoader } from "astro/loaders";
 import graymatter from "gray-matter";
-import rehypeExpressiveCode from "rehype-expressive-code";
-import rehypeParse from "rehype-parse";
-import rehypeStringify from "rehype-stringify";
-import { unified } from "unified";
-import { repoLabel, repoName, repoOwner } from "./client";
+import { createContentMarkdownProcessor } from "../../../../lib/content/markdown";
+import { repoLabel } from "./client";
 import { type ContentClient, createContentClientFromToken } from "./content";
-import { rehypeImageUrl } from "./rehype-image-url";
 import type { GitHubContentItem } from "./types";
 
 type LiveLoaderOptions = {
@@ -34,27 +29,13 @@ type EntryData = {
 type EntryFilter = { id: string; token?: string };
 type CollectionFilter = { prefix?: string; token?: string };
 
-let processor: Awaited<ReturnType<typeof createMarkdownProcessor>> | null =
-	null;
-const getProcessor = async () => {
+const MEDIA_BASE_URL = "https://media.blog.ojii3.dev";
+
+let processor: ReturnType<typeof createContentMarkdownProcessor> | null = null;
+const getProcessor = () => {
 	if (processor) return processor;
-	processor = await createMarkdownProcessor({
-		gfm: true,
-		rehypePlugins: [
-			[
-				rehypeExpressiveCode,
-				{
-					themes: ["tokyo-night"],
-					styleOverrides: {
-						frames: {
-							frameBoxShadowCssValue: "none",
-						},
-					},
-				},
-			],
-		],
-		// Disable built-in syntax highlighting since we use expressive-code
-		syntaxHighlight: false,
+	processor = createContentMarkdownProcessor({
+		mediaBaseUrl: MEDIA_BASE_URL,
 	});
 	return processor;
 };
@@ -66,32 +47,20 @@ const toEntryId = (fullPath: string, basePath: string) => {
 	return withoutBase.replace(/\/README\.md$/i, "").replace(/\.md$/i, "");
 };
 
-const transformImageUrls = async (
-	html: string,
-	slug: string,
-): Promise<string> => {
-	const result = await unified()
-		.use(rehypeParse, { fragment: true })
-		.use(rehypeImageUrl, { owner: repoOwner, repo: repoName, slug })
-		.use(rehypeStringify)
-		.process(html);
-	return String(result);
-};
-
 const buildEntries = async (
 	client: ContentClient,
 	items: GitHubContentItem[],
 	basePath: string,
 ) => {
-	const processor = await getProcessor();
+	const processor = getProcessor();
 	const entries = await Promise.all(
 		items.map(async (item) => {
 			try {
 				const file = await client.getFile({ path: item.path });
 				const { data, content } = graymatter(file.content);
-				const rendered = await processor.render(content);
 				const id = toEntryId(item.path, basePath);
-				const html = await transformImageUrls(rendered.code, id);
+				const result = await processor.render(content, id);
+				const html = result.html;
 
 				// バリデーションはスキーマ側で行うので、ここでは最低限の型変換のみ行う.
 				const title = (data?.title as string) || "No Title";
