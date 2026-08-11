@@ -43,7 +43,19 @@ const isAbsolutePathAfterDecode = (decoded: string): boolean => {
 	return decoded.startsWith("/");
 };
 
+const isValidSlug = (slug: string): boolean => {
+	return slug !== "." && slug !== "..";
+};
+
 const createRehypeMediaImageUrl = (mediaBaseUrl: string, slug: string) => {
+	if (!isValidSlug(slug)) {
+		return () => {
+			return (_tree: Root) => {
+				// Do not rewrite URLs if slug is invalid
+			};
+		};
+	}
+
 	const encodedSlug = encodeURIComponent(slug);
 	const baseWithSlug = `${mediaBaseUrl}/${encodedSlug}/`;
 	const expectedOrigin = new URL(mediaBaseUrl).origin;

@@ -261,6 +261,20 @@ describe("createContentMarkdownProcessor", () => {
 				const url = new URL(srcMatch?.[1] ?? "");
 				expect(url.origin).toBe("https://media.blog.ojii3.dev");
 			});
+
+			it("should not rewrite URLs when slug is exactly '.'", async () => {
+				const md = `![test](image.png)`;
+				const result = await processor.render(md, ".");
+				expect(result.html).toContain('src="image.png"');
+				expect(result.html).not.toContain("media.blog.ojii3.dev");
+			});
+
+			it("should not rewrite URLs when slug is exactly '..'", async () => {
+				const md = `![test](image.png)`;
+				const result = await processor.render(md, "..");
+				expect(result.html).toContain('src="image.png"');
+				expect(result.html).not.toContain("media.blog.ojii3.dev");
+			});
 		});
 	});
 });
