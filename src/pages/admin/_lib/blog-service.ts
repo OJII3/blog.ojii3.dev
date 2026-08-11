@@ -1,5 +1,5 @@
 import matter from "gray-matter";
-import { createContentClientFromToken } from "@/pages/admin/_lib/github/content";
+import { createContentClient } from "@/pages/admin/_lib/github/content";
 
 export interface UpdatePostParams {
 	slug: string;
@@ -36,7 +36,7 @@ export const updatePostCore = async ({
 		"date: $1",
 	);
 
-	const client = createContentClientFromToken(accessToken);
+	const client = createContentClient(accessToken);
 	const path = `${slug}/README.md`;
 
 	const res = await client.upsertFile({

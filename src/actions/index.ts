@@ -9,7 +9,7 @@ import {
 	createOctokit,
 	getGitHubAccessToken,
 } from "@/pages/admin/_lib/github/client";
-import { createContentClientFromToken } from "@/pages/admin/_lib/github/content";
+import { createContentClient } from "@/pages/admin/_lib/github/content";
 
 const updatePostInput = z.object({
 	slug: z.string(),
@@ -111,7 +111,7 @@ export const uploadImageHandler = async (
 		const arrayBuffer = await file.arrayBuffer();
 		const base64Content = Buffer.from(arrayBuffer).toString("base64");
 
-		const contentClient = createContentClientFromToken(accessToken);
+		const contentClient = createContentClient(accessToken);
 		const path = `${slug}/${file.name}`;
 
 		await contentClient.upsertFile({

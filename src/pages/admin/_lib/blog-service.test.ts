@@ -21,7 +21,7 @@ const mockUpsertFile = mock(() =>
 );
 
 mock.module("@/pages/admin/_lib/github/content", () => ({
-	createContentClientFromToken: () => ({
+	createContentClient: () => ({
 		upsertFile: mockUpsertFile,
 	}),
 }));

@@ -194,6 +194,3 @@ export const createContentClientFromHeaders = async (
 			getFileWithOctokit(octokit, params, options),
 	};
 };
-
-/** @deprecated Use createContentClient instead */
-export const createContentClientFromToken = createContentClient;
