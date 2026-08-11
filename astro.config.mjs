@@ -18,11 +18,6 @@ export default defineConfig({
 	output: "server",
 	vite: {
 		plugins: [tailwindcss()],
-		build: {
-			rolldownOptions: {
-				external: ["@resvg/resvg-js", "node:fs/promises"],
-			},
-		},
 	},
 	integrations: [
 		expressiveCode({
