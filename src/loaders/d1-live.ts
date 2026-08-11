@@ -119,9 +119,7 @@ export function d1LiveLoader(
 			const processor = createMarkdownProcessor({ mediaBaseUrl });
 			const post = await getPost(db, filter.id);
 
-			if (!post) {
-				throw new Error(`Entry not found: ${filter.id}`);
-			}
+			if (!post) return undefined;
 
 			return toEntryData(post, processor);
 		},

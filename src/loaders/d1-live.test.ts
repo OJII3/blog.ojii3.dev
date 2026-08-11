@@ -157,14 +157,14 @@ describe("d1LiveLoader", () => {
 			expect(result.data.html).toBe("<div># Hello\n\nWorld</div>");
 		});
 
-		it("throws error for unknown slug", async () => {
+		it("returns undefined for unknown slug", async () => {
 			const loader = createLoader();
-			await expect(
-				loader.loadEntry({
-					filter: { id: "nonexistent" },
-					collection: "blog",
-				}),
-			).rejects.toThrow("Entry not found: nonexistent");
+			const result = await loader.loadEntry({
+				filter: { id: "nonexistent" },
+				collection: "blog",
+			});
+
+			expect(result).toBeUndefined();
 		});
 	});
 });
