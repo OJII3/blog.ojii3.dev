@@ -132,5 +132,29 @@ describe("createContentMarkdownProcessor", () => {
 			const result = await processor.render(md, "2024-01-01-0");
 			expect(result.html).toContain('href="image.png"');
 		});
+
+		it("should not modify img elements without src", async () => {
+			const input = '<img alt="no src">';
+			const result = await processor.render(input, "2024-01-01-0");
+			expect(result.html).toContain("<img");
+			expect(result.html).toContain('alt="no src"');
+			expect(result.html).not.toContain("src=");
+		});
+
+		it("should encode ? and # as part of filename path", async () => {
+			const md = `![special](<what?is#this.png>)`;
+			const result = await processor.render(md, "2024-01-01-0");
+			expect(result.html).toContain(
+				'src="https://media.blog.ojii3.dev/2024-01-01-0/what%3Fis%23this.png"',
+			);
+		});
+
+		it("should handle already-encoded segments without double-encoding", async () => {
+			const md = `![encoded](my%20folder/image.png)`;
+			const result = await processor.render(md, "2024-01-01-0");
+			expect(result.html).toContain(
+				'src="https://media.blog.ojii3.dev/2024-01-01-0/my%20folder/image.png"',
+			);
+		});
 	});
 });

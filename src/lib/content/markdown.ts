@@ -38,12 +38,12 @@ const createRehypeMediaImageUrl = (mediaBaseUrl: string, slug: string) => {
 
 				if (isRelativePath(src)) {
 					const normalizedPath = normalizeRelativePath(src);
-					const decodedPath = decodeURIComponent(normalizedPath);
-					const encodedPath = decodedPath
+					const basePath = `${mediaBaseUrl}/${slug}/`;
+					const encodedPath = decodeURIComponent(normalizedPath)
 						.split("/")
 						.map((segment) => encodeURIComponent(segment))
 						.join("/");
-					node.properties.src = `${mediaBaseUrl}/${slug}/${encodedPath}`;
+					node.properties.src = new URL(encodedPath, basePath).href;
 				}
 			});
 		};
