@@ -1,6 +1,7 @@
 // @ts-check
 
 import cloudflare from "@astrojs/cloudflare";
+import { unified } from "@astrojs/markdown-remark";
 import partytown from "@astrojs/partytown";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
@@ -18,7 +19,7 @@ export default defineConfig({
 	vite: {
 		plugins: [tailwindcss()],
 		build: {
-			rollupOptions: {
+			rolldownOptions: {
 				external: [
 					"/pagefind/pagefind.js",
 					"@resvg/resvg-js",
@@ -75,23 +76,15 @@ export default defineConfig({
 		sitemap(),
 		pagefind(),
 	],
-	experimental: {
-		liveContentCollections: true,
-	},
 	markdown: {
-		gfm: true,
-		rehypePlugins: [],
+		processor: unified(),
 	},
 	image: {
 		domains: ["raw.githubusercontent.com", "github.com", "*.s3.amazonaws.com"],
 		layout: "constrained",
 	},
 	adapter: cloudflare({
-		routes: {
-			extend: {
-				include: [{ pattern: "/admin/*" }, { pattern: "/api/*" }],
-			},
-		},
+		prerenderEnvironment: "node",
 		imageService: "passthrough",
 	}),
 	env: {

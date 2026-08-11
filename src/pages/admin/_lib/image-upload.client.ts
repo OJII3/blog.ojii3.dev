@@ -65,7 +65,7 @@ export const setupImageUploader = (
 				const filename = await uploadImage(file, slug);
 				if (filename) {
 					const markdown = `![${file.name}](${filename})`;
-					insertTextAtCursor(textarea, markdown + "\n");
+					insertTextAtCursor(textarea, `${markdown}\n`);
 					successCount++;
 				}
 			} catch (e) {

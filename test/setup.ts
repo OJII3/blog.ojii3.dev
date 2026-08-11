@@ -14,7 +14,7 @@ mock.module("astro:actions", () => ({
 	},
 }));
 
-mock.module("astro:schema", () => ({
+mock.module("astro/zod", () => ({
 	z: {
 		object: identity,
 		string: optional,

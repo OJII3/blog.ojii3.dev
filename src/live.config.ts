@@ -1,4 +1,5 @@
-import { defineLiveCollection, z } from "astro:content";
+import { defineLiveCollection } from "astro:content";
+import { z } from "astro/zod";
 import { getColorIndex } from "./pages/_lib/utils/color";
 import { githubLiveLoader } from "./pages/admin/_lib/github";
 
