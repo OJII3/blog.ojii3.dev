@@ -1,7 +1,6 @@
 ---
 import { getLiveEntry } from "astro:content";
 import PostShell from "@/pages/_components/PostShell.astro";
-import { getGitHubAccessToken } from "@/pages/admin/_lib/github/client";
 import AdminLayout from "../_layouts/AdminLayout.astro";
 
 export const prerender = false;
@@ -10,16 +9,8 @@ const { slug } = Astro.params;
 
 if (!slug) return Astro.redirect("/admin");
 
-let token: string;
-try {
-	token = await getGitHubAccessToken(Astro.request.headers);
-} catch (e) {
-	return Astro.redirect("/404");
-}
-
-const { entry, error } = await getLiveEntry("liveBlog", {
+const { entry, error } = await getLiveEntry("blog", {
 	id: slug,
-	token,
 });
 
 if (error) {

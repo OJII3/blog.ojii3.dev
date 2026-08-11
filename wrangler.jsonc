@@ -11,6 +11,9 @@
 		"binding": "ASSETS",
 		"directory": "./dist"
 	},
+	"vars": {
+		"MEDIA_BASE_URL": "https://media.blog.ojii3.dev"
+	},
 	"d1_databases": [
 		{
 			"binding": "DB",
