@@ -539,40 +539,40 @@ describe("searchPosts", () => {
 
 	it("applies tag filter before limit in tag-only search", async () => {
 		await seedPost(testDb, {
-			slug: "older-no-tag",
-			title: "Older No Tag",
+			slug: "older-with-tag",
+			title: "Older With Tag",
 			date: "2024-01-01",
 			body: "body",
-			tags: [],
+			tags: ["target"],
 		});
 		await seedPost(testDb, {
-			slug: "newer-with-tag",
-			title: "Newer With Tag",
+			slug: "newer-no-tag",
+			title: "Newer No Tag",
 			date: "2024-02-01",
 			body: "body",
-			tags: ["target"],
+			tags: [],
 		});
 
 		const result = await searchPosts(testDb.db, { tags: ["target"], limit: 1 });
 
 		expect(result).toHaveLength(1);
-		expect(result[0].slug).toBe("newer-with-tag");
+		expect(result[0].slug).toBe("older-with-tag");
 	});
 
 	it("applies tag filter before limit in tag+query search", async () => {
 		await seedPost(testDb, {
-			slug: "older-no-tag",
-			title: "Older No Tag",
+			slug: "older-with-tag",
+			title: "Older With Tag",
 			date: "2024-01-01",
 			body: "searchable",
-			tags: [],
+			tags: ["target"],
 		});
 		await seedPost(testDb, {
-			slug: "newer-with-tag",
-			title: "Newer With Tag",
+			slug: "newer-no-tag",
+			title: "Newer No Tag",
 			date: "2024-02-01",
 			body: "searchable",
-			tags: ["target"],
+			tags: [],
 		});
 
 		const result = await searchPosts(testDb.db, {
@@ -582,6 +582,6 @@ describe("searchPosts", () => {
 		});
 
 		expect(result).toHaveLength(1);
-		expect(result[0].slug).toBe("newer-with-tag");
+		expect(result[0].slug).toBe("older-with-tag");
 	});
 });
