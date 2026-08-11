@@ -156,5 +156,66 @@ describe("createContentMarkdownProcessor", () => {
 				'src="https://media.blog.ojii3.dev/2024-01-01-0/my%20folder/image.png"',
 			);
 		});
+
+		describe("security: path traversal and scheme rejection", () => {
+			it("should leave ../ path traversal unchanged (not rewritten)", async () => {
+				const md = `![evil](../../../etc/passwd)`;
+				const result = await processor.render(md, "2024-01-01-0");
+				expect(result.html).toContain('src="../../../etc/passwd"');
+				expect(result.html).not.toContain("media.blog.ojii3.dev");
+			});
+
+			it("should leave encoded %2e%2e path traversal unchanged", async () => {
+				const md = `![evil](%2e%2e/%2e%2e/etc/passwd)`;
+				const result = await processor.render(md, "2024-01-01-0");
+				expect(result.html).toContain('src="%2e%2e/%2e%2e/etc/passwd"');
+				expect(result.html).not.toContain("media.blog.ojii3.dev");
+			});
+
+			it("should leave encoded slash traversal unchanged", async () => {
+				const md = `![evil](..%2F..%2Fetc%2Fpasswd)`;
+				const result = await processor.render(md, "2024-01-01-0");
+				expect(result.html).toContain('src="..%2F..%2Fetc%2Fpasswd"');
+				expect(result.html).not.toContain("media.blog.ojii3.dev");
+			});
+
+			it("should leave %2F%2Fevil.example unchanged (protocol-relative encoded)", async () => {
+				const md = `![evil](%2F%2Fevil.example/image.png)`;
+				const result = await processor.render(md, "2024-01-01-0");
+				expect(result.html).toContain('src="%2F%2Fevil.example/image.png"');
+				expect(result.html).not.toContain("media.blog.ojii3.dev");
+			});
+
+			it("should handle malformed % safely without throwing", async () => {
+				const md = `![broken](100%real.png)`;
+				const result = await processor.render(md, "2024-01-01-0");
+				expect(result.html).toContain(
+					'src="https://media.blog.ojii3.dev/2024-01-01-0/100%25real.png"',
+				);
+			});
+
+			it("should reject blob: scheme", async () => {
+				const md = `![blob](blob:https://example.com/image)`;
+				const result = await processor.render(md, "2024-01-01-0");
+				expect(result.html).toContain('src="blob:');
+				expect(result.html).not.toContain("media.blog.ojii3.dev");
+			});
+
+			it("should reject uppercase DATA: scheme", async () => {
+				const md = `![data](DATA:image/png;base64,abc)`;
+				const result = await processor.render(md, "2024-01-01-0");
+				expect(result.html).toContain('src="DATA:');
+				expect(result.html).not.toContain("media.blog.ojii3.dev");
+			});
+
+			it("should preserve configured origin for all relative paths", async () => {
+				const md = `![test](image.png)`;
+				const result = await processor.render(md, "2024-01-01-0");
+				const srcMatch = result.html.match(/src="([^"]+)"/);
+				expect(srcMatch).toBeTruthy();
+				const url = new URL(srcMatch?.[1] ?? "");
+				expect(url.origin).toBe("https://media.blog.ojii3.dev");
+			});
+		});
 	});
 });

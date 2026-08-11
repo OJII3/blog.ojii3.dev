@@ -17,7 +17,7 @@ const isRelativePath = (src: string): boolean => {
 	if (src.startsWith("/")) {
 		return false;
 	}
-	if (src.startsWith("data:")) {
+	if (/^[a-z][a-z0-9+.-]*:/i.test(src)) {
 		return false;
 	}
 	return true;
@@ -25,6 +25,18 @@ const isRelativePath = (src: string): boolean => {
 
 const normalizeRelativePath = (src: string): string => {
 	return src.replace(/^\.\//, "");
+};
+
+const safeDecodeURIComponent = (str: string): string | null => {
+	try {
+		return decodeURIComponent(str);
+	} catch {
+		return null;
+	}
+};
+
+const hasPathTraversal = (segments: string[]): boolean => {
+	return segments.some((segment) => segment === ".." || segment === ".");
 };
 
 const createRehypeMediaImageUrl = (mediaBaseUrl: string, slug: string) => {
@@ -36,15 +48,32 @@ const createRehypeMediaImageUrl = (mediaBaseUrl: string, slug: string) => {
 				const src = node.properties?.src;
 				if (typeof src !== "string" || !src) return;
 
-				if (isRelativePath(src)) {
-					const normalizedPath = normalizeRelativePath(src);
-					const basePath = `${mediaBaseUrl}/${slug}/`;
-					const encodedPath = decodeURIComponent(normalizedPath)
-						.split("/")
+				if (!isRelativePath(src)) return;
+
+				const normalizedPath = normalizeRelativePath(src);
+
+				const decoded = safeDecodeURIComponent(normalizedPath);
+				if (decoded === null) {
+					const segments = normalizedPath.split("/");
+					if (hasPathTraversal(segments)) return;
+					const encodedPath = segments
 						.map((segment) => encodeURIComponent(segment))
 						.join("/");
-					node.properties.src = new URL(encodedPath, basePath).href;
+					const resultUrl = new URL(encodedPath, `${mediaBaseUrl}/${slug}/`);
+					if (resultUrl.origin !== new URL(mediaBaseUrl).origin) return;
+					node.properties.src = resultUrl.href;
+					return;
 				}
+
+				const segments = decoded.split("/");
+				if (hasPathTraversal(segments)) return;
+
+				const encodedPath = segments
+					.map((segment) => encodeURIComponent(segment))
+					.join("/");
+				const resultUrl = new URL(encodedPath, `${mediaBaseUrl}/${slug}/`);
+				if (resultUrl.origin !== new URL(mediaBaseUrl).origin) return;
+				node.properties.src = resultUrl.href;
 			});
 		};
 	};

@@ -29,13 +29,14 @@ type EntryData = {
 type EntryFilter = { id: string; token?: string };
 type CollectionFilter = { prefix?: string; token?: string };
 
-const MEDIA_BASE_URL = "https://media.blog.ojii3.dev";
+const GITHUB_RAW_BASE_URL =
+	"https://raw.githubusercontent.com/OJII3/content/main";
 
 let processor: ReturnType<typeof createContentMarkdownProcessor> | null = null;
 const getProcessor = () => {
 	if (processor) return processor;
 	processor = createContentMarkdownProcessor({
-		mediaBaseUrl: MEDIA_BASE_URL,
+		mediaBaseUrl: GITHUB_RAW_BASE_URL,
 	});
 	return processor;
 };
