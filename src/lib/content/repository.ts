@@ -1,9 +1,16 @@
 import { and, eq, like, or, sql } from "drizzle-orm";
-import { posts, postTags, tags } from "../../db/schema";
+import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
+import { posts, postTags, type tags } from "../../db/schema";
+import type { D1Database, D1Result } from "./test-helper";
 import type { ContentPost, UpdatePostInput, UpdatePostResult } from "./types";
 
-// biome-ignore lint/suspicious/noExplicitAny: compatible with both D1 and bun-sqlite drizzle instances
-type Db = any;
+type Schema = {
+	posts: typeof posts;
+	tags: typeof tags;
+	postTags: typeof postTags;
+};
+
+type DrizzleDb = BaseSQLiteDatabase<"sync" | "async", unknown, Schema>;
 
 type PostRow = {
 	slug: string;
@@ -28,7 +35,7 @@ function rowToContentPost(row: PostRow, tagList: string[]): ContentPost {
 }
 
 export async function listPosts(
-	db: Db,
+	db: DrizzleDb,
 	opts: { includeDrafts: boolean },
 ): Promise<ContentPost[]> {
 	const allPosts: PostRow[] = opts.includeDrafts
@@ -58,7 +65,7 @@ export async function listPosts(
 }
 
 export async function getPost(
-	db: Db,
+	db: DrizzleDb,
 	slug: string,
 ): Promise<ContentPost | null> {
 	const post: PostRow | undefined = await db
@@ -82,14 +89,13 @@ export async function getPost(
 }
 
 export async function updatePost(
-	db: Db,
+	d1: D1Database,
 	input: UpdatePostInput,
 ): Promise<UpdatePostResult> {
-	const existing: PostRow | undefined = await db
-		.select()
-		.from(posts)
-		.where(eq(posts.slug, input.slug))
-		.get();
+	const existing = await d1
+		.prepare("SELECT `revision` FROM `posts` WHERE `slug` = ?")
+		.bind(input.slug)
+		.first<{ revision: number }>();
 
 	if (!existing) return { kind: "not-found" };
 
@@ -100,44 +106,57 @@ export async function updatePost(
 	const now = Date.now();
 	const newRevision = input.revision + 1;
 
-	try {
-		await db.transaction(async (tx: Db) => {
-			const result = await tx
-				.update(posts)
-				.set({
-					title: input.title,
-					date: input.date,
-					draft: input.draft,
-					body: input.body,
-					revision: newRevision,
-					updatedAt: now,
-				})
-				.where(
-					and(eq(posts.slug, input.slug), eq(posts.revision, input.revision)),
+	const stmts = [];
+
+	stmts.push(
+		d1
+			.prepare(
+				"UPDATE `posts` SET `title` = ?, `date` = ?, `draft` = ?, `body` = ?, `revision` = ?, `updated_at` = ? WHERE `slug` = ? AND `revision` = ?",
+			)
+			.bind(
+				input.title,
+				input.date,
+				input.draft ? 1 : 0,
+				input.body,
+				newRevision,
+				now,
+				input.slug,
+				input.revision,
+			),
+	);
+
+	stmts.push(
+		d1
+			.prepare(
+				"DELETE FROM `post_tags` WHERE `post_slug` = ? AND (SELECT changes()) > 0",
+			)
+			.bind(input.slug),
+	);
+
+	for (const tagName of input.tags) {
+		stmts.push(
+			d1
+				.prepare(
+					"INSERT OR IGNORE INTO `tags`(`name`) SELECT ? WHERE (SELECT changes()) > 0",
 				)
-				.returning({ revision: posts.revision })
-				.all();
+				.bind(tagName),
+		);
+	}
 
-			if (result.length === 0) {
-				tx.rollback();
-				return;
-			}
+	for (const tagName of input.tags) {
+		stmts.push(
+			d1
+				.prepare(
+					"INSERT INTO `post_tags`(`post_slug`, `tag_name`) SELECT ?, ? WHERE EXISTS (SELECT 1 FROM `posts` WHERE `slug` = ? AND `revision` = ? AND `updated_at` = ?)",
+				)
+				.bind(input.slug, tagName, input.slug, newRevision, now),
+		);
+	}
 
-			await tx.delete(postTags).where(eq(postTags.postSlug, input.slug)).run();
+	const results: D1Result[] = await d1.batch(stmts);
 
-			for (const tagName of input.tags) {
-				await tx
-					.insert(tags)
-					.values({ name: tagName })
-					.onConflictDoNothing()
-					.run();
-				await tx
-					.insert(postTags)
-					.values({ postSlug: input.slug, tagName })
-					.run();
-			}
-		});
-	} catch {
+	const updateResult = results[0];
+	if (updateResult.meta.changes === 0) {
 		return { kind: "conflict" };
 	}
 
@@ -145,7 +164,7 @@ export async function updatePost(
 }
 
 export async function searchPosts(
-	db: Db,
+	db: DrizzleDb,
 	opts: { query?: string; tags?: string[]; limit?: number },
 ): Promise<ContentPost[]> {
 	const limit = Math.min(opts.limit ?? 50, 50);
