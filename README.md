@@ -31,3 +31,10 @@ BETTER_AUTH_SECRET=
 GH_APP_CLIENT_SECRET=
 ```
 
+## D1/R2 Content Storage
+
+記事は Cloudflare D1, 画像は R2 に保存する.
+
+- ローカル migration: `bun wrangler d1 migrations apply blog-content --local`
+- ローカル Worker 起動: `bun run preview`
+
