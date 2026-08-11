@@ -309,9 +309,9 @@ describe("updatePost", () => {
 		expect(rows).toEqual(["alpha", "beta", "gamma"]);
 	});
 
-	it("leaves data unchanged when stale update loses race", async () => {
+	it("exactly one winner in concurrent same-millisecond updates via Promise.all", async () => {
 		await seedPost(testDb, {
-			slug: "post",
+			slug: "concurrent",
 			title: "Original",
 			date: "2024-01-01",
 			body: "old body",
@@ -319,46 +319,65 @@ describe("updatePost", () => {
 			tags: ["original-tag"],
 		});
 
-		const firstResult = await updatePost(testDb.d1, {
-			slug: "post",
-			title: "Winner",
-			date: "2024-02-01",
-			body: "winner body",
-			draft: false,
-			tags: ["winner-tag"],
-			revision: 1,
-		});
+		const fixedNow = 1_700_000_000_000;
+		const origDateNow = Date.now;
+		Date.now = () => fixedNow;
 
-		const staleResult = await updatePost(testDb.d1, {
-			slug: "post",
-			title: "Stale",
-			date: "2024-03-01",
-			body: "stale body",
-			draft: false,
-			tags: ["stale-tag"],
-			revision: 1,
-		});
+		try {
+			const [resultA, resultB] = await Promise.all([
+				updatePost(testDb.d1, {
+					slug: "concurrent",
+					title: "A",
+					date: "2024-02-01",
+					body: "body A",
+					draft: false,
+					tags: ["tag-a"],
+					revision: 1,
+				}),
+				updatePost(testDb.d1, {
+					slug: "concurrent",
+					title: "B",
+					date: "2024-03-01",
+					body: "body B",
+					draft: false,
+					tags: ["tag-b"],
+					revision: 1,
+				}),
+			]);
 
-		expect(firstResult).toEqual({ kind: "updated", revision: 2 });
-		expect(staleResult).toEqual({ kind: "conflict" });
+			const updated = [resultA, resultB].filter((r) => r.kind === "updated");
+			const conflicts = [resultA, resultB].filter((r) => r.kind === "conflict");
+			expect(updated).toHaveLength(1);
+			expect(conflicts).toHaveLength(1);
+			expect(updated[0]).toEqual({ kind: "updated", revision: 2 });
 
-		const finalPost = await getPost(testDb.db, "post");
-		expect(finalPost).not.toBeNull();
-		const fp = finalPost as NonNullable<typeof finalPost>;
-		expect(fp.title).toBe("Winner");
-		expect(fp.body).toBe("winner body");
-		expect(fp.dateString).toBe("2024-02-01");
-		expect(fp.tags).toEqual(["winner-tag"]);
-		expect(fp.revision).toBe(2);
+			const finalPost = await getPost(testDb.db, "concurrent");
+			expect(finalPost).not.toBeNull();
+			const fp = finalPost as NonNullable<typeof finalPost>;
+			expect(fp.revision).toBe(2);
 
-		const allPostTags = await testDb.db.select().from(postTags).all();
-		const postTagRows = allPostTags.filter((t) => t.postSlug === "post");
-		expect(postTagRows).toHaveLength(1);
-		expect(postTagRows[0].tagName).toBe("winner-tag");
+			const allPostTags = await testDb.db.select().from(postTags).all();
+			const postTagRows = allPostTags.filter(
+				(t) => t.postSlug === "concurrent",
+			);
+			expect(postTagRows).toHaveLength(1);
 
-		const allTags = await testDb.db.select().from(tags).all();
-		const tagNames = allTags.map((t) => t.name).sort();
-		expect(tagNames).toEqual(["original-tag", "winner-tag"]);
+			const winnerTag = postTagRows[0].tagName;
+			expect(["tag-a", "tag-b"]).toContain(winnerTag);
+
+			const loserTag = winnerTag === "tag-a" ? "tag-b" : "tag-a";
+			expect(postTagRows.map((t) => t.tagName)).not.toContain(loserTag);
+
+			if (winnerTag === "tag-a") {
+				expect(fp.body).toBe("body A");
+				expect(fp.tags).toEqual(["tag-a"]);
+			} else {
+				expect(fp.body).toBe("body B");
+				expect(fp.tags).toEqual(["tag-b"]);
+			}
+		} finally {
+			Date.now = origDateNow;
+		}
 	});
 });
 
