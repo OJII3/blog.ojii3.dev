@@ -1,12 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { posts, postTags, tags } from "../../db/schema";
-import {
-	getPost,
-	listPosts,
-	searchPosts,
-	updatePost,
-} from "./repository";
-import { type TestDb, createTestDb } from "./test-helper";
+import { getPost, listPosts, searchPosts, updatePost } from "./repository";
+import { createTestDb, type TestDb } from "./test-helper";
 
 let db: TestDb;
 
@@ -52,10 +47,7 @@ async function seedPost(
 				.values({ name: tagName })
 				.onConflictDoNothing()
 				.run();
-			await db
-				.insert(postTags)
-				.values({ postSlug: opts.slug, tagName })
-				.run();
+			await db.insert(postTags).values({ postSlug: opts.slug, tagName }).run();
 		}
 	}
 }
@@ -151,11 +143,12 @@ describe("getPost", () => {
 		const post = await getPost(db, "hello");
 
 		expect(post).not.toBeNull();
-		expect(post!.slug).toBe("hello");
-		expect(post!.title).toBe("Hello World");
-		expect(post!.body).toBe("content here");
-		expect(post!.dateString).toBe("2024-01-01");
-		expect(post!.tags).toEqual(["intro"]);
+		const p = post as NonNullable<typeof post>;
+		expect(p.slug).toBe("hello");
+		expect(p.title).toBe("Hello World");
+		expect(p.body).toBe("content here");
+		expect(p.dateString).toBe("2024-01-01");
+		expect(p.tags).toEqual(["intro"]);
 	});
 
 	it("returns null for non-existent slug", async () => {
@@ -188,11 +181,13 @@ describe("updatePost", () => {
 		expect(result).toEqual({ kind: "updated", revision: 2 });
 
 		const updated = await getPost(db, "post");
-		expect(updated!.title).toBe("Updated");
-		expect(updated!.body).toBe("new body");
-		expect(updated!.dateString).toBe("2024-02-01");
-		expect(updated!.tags).toEqual(["new-tag"]);
-		expect(updated!.revision).toBe(2);
+		expect(updated).not.toBeNull();
+		const u = updated as NonNullable<typeof updated>;
+		expect(u.title).toBe("Updated");
+		expect(u.body).toBe("new body");
+		expect(u.dateString).toBe("2024-02-01");
+		expect(u.tags).toEqual(["new-tag"]);
+		expect(u.revision).toBe(2);
 	});
 
 	it("returns conflict for stale revision and does not mutate post or tags", async () => {
@@ -218,10 +213,12 @@ describe("updatePost", () => {
 		expect(result).toEqual({ kind: "conflict" });
 
 		const unchanged = await getPost(db, "post");
-		expect(unchanged!.title).toBe("Original");
-		expect(unchanged!.body).toBe("old body");
-		expect(unchanged!.tags).toEqual(["existing-tag"]);
-		expect(unchanged!.revision).toBe(2);
+		expect(unchanged).not.toBeNull();
+		const u = unchanged as NonNullable<typeof unchanged>;
+		expect(u.title).toBe("Original");
+		expect(u.body).toBe("old body");
+		expect(u.tags).toEqual(["existing-tag"]);
+		expect(u.revision).toBe(2);
 	});
 
 	it("returns not-found for non-existent slug", async () => {
@@ -236,6 +233,63 @@ describe("updatePost", () => {
 		});
 
 		expect(result).toEqual({ kind: "not-found" });
+	});
+
+	it("does not corrupt tags on stale revision race condition", async () => {
+		await seedPost(db, {
+			slug: "post",
+			title: "Original",
+			date: "2024-01-01",
+			body: "old body",
+			revision: 1,
+			tags: ["original-tag"],
+		});
+
+		const staleUpdate = updatePost(db, {
+			slug: "post",
+			title: "Stale Update",
+			date: "2024-02-01",
+			body: "stale body",
+			draft: false,
+			tags: ["stale-tag"],
+			revision: 1,
+		});
+
+		const concurrentUpdate = updatePost(db, {
+			slug: "post",
+			title: "Concurrent Update",
+			date: "2024-03-01",
+			body: "concurrent body",
+			draft: false,
+			tags: ["concurrent-tag"],
+			revision: 1,
+		});
+
+		const results = await Promise.all([staleUpdate, concurrentUpdate]);
+
+		const successCount = results.filter((r) => r.kind === "updated").length;
+		const conflictCount = results.filter((r) => r.kind === "conflict").length;
+
+		expect(successCount).toBe(1);
+		expect(conflictCount).toBe(1);
+
+		const finalPost = await getPost(db, "post");
+		expect(finalPost).not.toBeNull();
+		const fp = finalPost as NonNullable<typeof finalPost>;
+
+		if (results[0].kind === "updated") {
+			expect(fp.title).toBe("Stale Update");
+			expect(fp.tags).toEqual(["stale-tag"]);
+			expect(fp.revision).toBe(2);
+		} else {
+			expect(fp.title).toBe("Concurrent Update");
+			expect(fp.tags).toEqual(["concurrent-tag"]);
+			expect(fp.revision).toBe(2);
+		}
+
+		const allTags = await db.select().from(postTags).all();
+		const postTags_ = allTags.filter((t) => t.postSlug === "post");
+		expect(postTags_).toHaveLength(1);
 	});
 });
 
@@ -324,5 +378,43 @@ describe("searchPosts", () => {
 		const result = await searchPosts(db, { query: "nonexistent" });
 
 		expect(result).toEqual([]);
+	});
+
+	it("excludes drafts from all search branches", async () => {
+		await seedPost(db, {
+			slug: "published",
+			title: "Published Post",
+			date: "2024-01-01",
+			body: "matching content",
+			draft: false,
+			tags: ["test"],
+		});
+		await seedPost(db, {
+			slug: "draft",
+			title: "Draft Post",
+			date: "2024-02-01",
+			body: "matching content",
+			draft: true,
+			tags: ["test"],
+		});
+
+		const byQuery = await searchPosts(db, { query: "matching" });
+		expect(byQuery).toHaveLength(1);
+		expect(byQuery[0].slug).toBe("published");
+
+		const byTag = await searchPosts(db, { tags: ["test"] });
+		expect(byTag).toHaveLength(1);
+		expect(byTag[0].slug).toBe("published");
+
+		const byQueryAndTag = await searchPosts(db, {
+			query: "matching",
+			tags: ["test"],
+		});
+		expect(byQueryAndTag).toHaveLength(1);
+		expect(byQueryAndTag[0].slug).toBe("published");
+
+		const noFilter = await searchPosts(db, {});
+		expect(noFilter).toHaveLength(1);
+		expect(noFilter[0].slug).toBe("published");
 	});
 });

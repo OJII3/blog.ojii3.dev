@@ -32,11 +32,7 @@ export async function listPosts(
 	opts: { includeDrafts: boolean },
 ): Promise<ContentPost[]> {
 	const allPosts: PostRow[] = opts.includeDrafts
-		? await db
-				.select()
-				.from(posts)
-				.orderBy(sql`${posts.date} DESC`)
-				.all()
+		? await db.select().from(posts).orderBy(sql`${posts.date} DESC`).all()
 		: await db
 				.select()
 				.from(posts)
@@ -106,7 +102,7 @@ export async function updatePost(
 
 	try {
 		await db.transaction(async (tx: Db) => {
-			await tx
+			const result = await tx
 				.update(posts)
 				.set({
 					title: input.title,
@@ -117,26 +113,17 @@ export async function updatePost(
 					updatedAt: now,
 				})
 				.where(
-					and(
-						eq(posts.slug, input.slug),
-						eq(posts.revision, input.revision),
-					),
-				);
+					and(eq(posts.slug, input.slug), eq(posts.revision, input.revision)),
+				)
+				.returning({ revision: posts.revision })
+				.all();
 
-			const updated: { revision: number } | undefined = await tx
-				.select({ revision: posts.revision })
-				.from(posts)
-				.where(eq(posts.slug, input.slug))
-				.get();
-
-			if (!updated || updated.revision !== newRevision) {
+			if (result.length === 0) {
 				tx.rollback();
+				return;
 			}
 
-			await tx
-				.delete(postTags)
-				.where(eq(postTags.postSlug, input.slug))
-				.run();
+			await tx.delete(postTags).where(eq(postTags.postSlug, input.slug)).run();
 
 			for (const tagName of input.tags) {
 				await tx
@@ -170,9 +157,7 @@ export async function searchPosts(
 		const tagFilteredSlugs: Array<{ postSlug: string }> = await db
 			.select({ postSlug: postTags.postSlug })
 			.from(postTags)
-			.where(
-				or(...opts.tags.map((t: string) => eq(postTags.tagName, t))),
-			)
+			.where(or(...opts.tags.map((t: string) => eq(postTags.tagName, t))))
 			.all();
 		const slugSet = new Set(
 			tagFilteredSlugs.map((r: { postSlug: string }) => r.postSlug),
@@ -182,7 +167,10 @@ export async function searchPosts(
 			.select()
 			.from(posts)
 			.where(
-				or(like(posts.title, pattern), like(posts.body, pattern)),
+				and(
+					eq(posts.draft, false),
+					or(like(posts.title, pattern), like(posts.body, pattern)),
+				),
 			)
 			.orderBy(sql`${posts.date} DESC`)
 			.all();
@@ -194,7 +182,10 @@ export async function searchPosts(
 			.select()
 			.from(posts)
 			.where(
-				or(like(posts.title, pattern), like(posts.body, pattern)),
+				and(
+					eq(posts.draft, false),
+					or(like(posts.title, pattern), like(posts.body, pattern)),
+				),
 			)
 			.orderBy(sql`${posts.date} DESC`)
 			.limit(limit)
@@ -203,9 +194,7 @@ export async function searchPosts(
 		const tagFilteredSlugs: Array<{ postSlug: string }> = await db
 			.select({ postSlug: postTags.postSlug })
 			.from(postTags)
-			.where(
-				or(...opts.tags.map((t: string) => eq(postTags.tagName, t))),
-			)
+			.where(or(...opts.tags.map((t: string) => eq(postTags.tagName, t))))
 			.all();
 		const slugSet = new Set(
 			tagFilteredSlugs.map((r: { postSlug: string }) => r.postSlug),
@@ -214,6 +203,7 @@ export async function searchPosts(
 		const allPosts: PostRow[] = await db
 			.select()
 			.from(posts)
+			.where(eq(posts.draft, false))
 			.orderBy(sql`${posts.date} DESC`)
 			.all();
 
@@ -222,6 +212,7 @@ export async function searchPosts(
 		matchedPosts = await db
 			.select()
 			.from(posts)
+			.where(eq(posts.draft, false))
 			.orderBy(sql`${posts.date} DESC`)
 			.limit(limit)
 			.all();
