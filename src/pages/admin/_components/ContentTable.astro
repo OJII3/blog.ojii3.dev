@@ -1,9 +1,9 @@
 ---
 import { Icon } from "astro-icon/components";
-import type { GitHubContentItem } from "@/pages/admin/_lib/github";
+import type { ContentListingEntry } from "@/pages/admin/_lib/load-content-listing";
 
 interface Props {
-	entries: GitHubContentItem[];
+	entries: ContentListingEntry[];
 }
 
 const { entries } = Astro.props;
@@ -19,17 +19,17 @@ const { entries } = Astro.props;
 		<ul class="divide-base-200 divide-y">
 			{entries.map((item) => (
 				<li class="active:bg-base-200/50 flex items-center justify-between gap-2 py-2.5">
-					<span class="truncate font-mono text-sm">{item.name}</span>
+					<span class="truncate font-mono text-sm">{item.slug}</span>
 					<div class="flex shrink-0 items-center gap-1">
 						<a
-							href={`/admin/edit/${item.name}`}
+							href={`/admin/edit/${item.slug}`}
 							class="btn btn-primary btn-circle btn-sm"
 							title="Edit"
 						>
 							<Icon name="tabler:edit" class="size-4" />
 						</a>
 						<a
-							href={`/admin/preview/${item.name}`}
+							href={`/admin/preview/${item.slug}`}
 							class="btn btn-ghost btn-circle btn-sm"
 							title="Preview"
 						>

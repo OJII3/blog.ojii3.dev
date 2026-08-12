@@ -9,24 +9,15 @@ import { defineConfig, envField } from "astro/config";
 
 import expressiveCode from "astro-expressive-code";
 import icon from "astro-icon";
-import pagefind from "astro-pagefind";
 
 export const markdownConfig = {};
 
 // https://astro.build/config
 export default defineConfig({
 	site: "https://blog.ojii3.dev",
+	output: "server",
 	vite: {
 		plugins: [tailwindcss()],
-		build: {
-			rolldownOptions: {
-				external: [
-					"/pagefind/pagefind.js",
-					"@resvg/resvg-js",
-					"node:fs/promises",
-				],
-			},
-		},
 	},
 	integrations: [
 		expressiveCode({
@@ -74,13 +65,12 @@ export default defineConfig({
 		}),
 		partytown(),
 		sitemap(),
-		pagefind(),
 	],
 	markdown: {
 		processor: unified(),
 	},
 	image: {
-		domains: ["raw.githubusercontent.com", "github.com", "*.s3.amazonaws.com"],
+		domains: ["*.s3.amazonaws.com"],
 		layout: "constrained",
 	},
 	adapter: cloudflare({

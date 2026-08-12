@@ -1,13 +1,23 @@
 ---
+import { createContentDb, getContentEnv } from "@/db/client";
+import { listPosts } from "@/lib/content/repository";
 import GlobalLayout from "@/pages/_layouts/GlobalLayout.astro";
 import SearchForm from "./_components/SearchForm.astro";
 import SearchResult from "./_components/SearchResult.astro";
+import { getAllTags } from "./_lib/getAllTags";
+
+export const prerender = false;
+
+const env = await getContentEnv();
+const db = createContentDb(env);
+const allPosts = await listPosts(db, { includeDrafts: false });
+const allTags = getAllTags(allPosts);
 ---
 
 <GlobalLayout title="Search">
 	<main class="max-w-5x mx-auto p-4">
 		<div class="flex flex-col gap-8">
-			<SearchForm />
+			<SearchForm allTags={allTags} />
 			<SearchResult />
 		</div>
 	</main>

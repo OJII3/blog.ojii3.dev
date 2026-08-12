@@ -1,12 +1,10 @@
-import type { CollectionEntry } from "astro:content";
+import type { ContentPost } from "@/lib/content/types";
 
-export const getAllTags = (
-	allPosts: CollectionEntry<"blog">[],
-): Record<string, number> => {
+export const getAllTags = (allPosts: ContentPost[]): Record<string, number> => {
 	const tags: Record<string, number> = {};
 	for (const post of allPosts) {
-		if (post.data.draft) continue;
-		for (const tag of post.data.tags ?? []) {
+		if (post.draft) continue;
+		for (const tag of post.tags ?? []) {
 			tags[tag] = (tags[tag] ?? 0) + 1;
 		}
 	}
