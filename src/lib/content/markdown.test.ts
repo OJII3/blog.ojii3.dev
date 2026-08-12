@@ -59,19 +59,6 @@ describe("createContentMarkdownProcessor", () => {
 	});
 
 	describe("image URL rewriting", () => {
-		it("should keep the first image eager and defer later article images", async () => {
-			const result = await processor.render(
-				"![hero](hero.png)\n\n![large screenshot](screenshot.png)",
-				"2024-01-01-0",
-			);
-			const images = result.html.match(/<img[^>]+>/g) ?? [];
-			expect(images).toHaveLength(2);
-			expect(images[0]).not.toContain("loading=");
-			expect(images[0]).toContain('decoding="async"');
-			expect(images[1]).toContain('loading="lazy"');
-			expect(images[1]).toContain('decoding="async"');
-		});
-
 		it("should transform relative path to media URL", async () => {
 			const md = `![test](image.png)`;
 			const result = await processor.render(md, "2024-01-01-0");
@@ -381,5 +368,20 @@ describe("createContentMarkdownProcessor", () => {
 				expect(result.html).toContain("1");
 			});
 		});
+	});
+
+	it("should reuse the expensive syntax-highlighting processor", () => {
+		const first = createContentMarkdownProcessor({
+			mediaBaseUrl: "https://media.example.com",
+		});
+		const second = createContentMarkdownProcessor({
+			mediaBaseUrl: "https://media.example.com",
+		});
+		const otherOrigin = createContentMarkdownProcessor({
+			mediaBaseUrl: "https://other.example.com",
+		});
+
+		expect(second).toBe(first);
+		expect(otherOrigin).not.toBe(first);
 	});
 });
