@@ -1,21 +1,27 @@
 import { defineLiveCollection } from "astro:content";
 import { z } from "astro/zod";
-import { d1LiveLoader } from "./loaders/d1-live";
 import { getColorIndex } from "./pages/_lib/utils/color";
+import { githubLiveLoader } from "./pages/admin/_lib/github";
 
-const blog = defineLiveCollection({
-	loader: d1LiveLoader(),
+const liveBlog = defineLiveCollection({
+	loader: githubLiveLoader({
+		owner: "OJII3",
+		repo: "content",
+		basePath: "",
+		filename: "README.md",
+	}),
 	schema: z
 		.object({
 			path: z.string(),
+			sha: z.string(),
 			content: z.string(),
 			html: z.string(),
+			htmlUrl: z.string().optional(),
 			title: z.string(),
 			date: z.date(),
 			dateString: z.string(), // YYYY-MM-DD 形式の日付
-			draft: z.boolean(),
-			tags: z.string().array(),
-			revision: z.number(),
+			draft: z.boolean().optional(),
+			tags: z.string().array().optional(),
 		})
 		.transform((data) => {
 			return {
@@ -27,5 +33,5 @@ const blog = defineLiveCollection({
 });
 
 export const collections = {
-	blog,
+	liveBlog,
 };

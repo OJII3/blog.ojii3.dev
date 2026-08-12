@@ -1,42 +1,26 @@
-import { actions } from "astro:actions";
+import type { PagefindResult } from "/pagefind/pagefind.js";
+import { getPostBorderColorFromDate } from "./_lib/getPostBorderColorFromDate";
 
-type SearchResultItem = {
-	slug: string;
-	title: string;
-	excerpt: string;
-	dateString: string;
-	color: string;
-};
-
-const createResultElement = (result: SearchResultItem): HTMLElement => {
-	const url = `/${result.slug}/`;
-
-	const link = document.createElement("a");
-	link.className = `${result.color} 2x:w-[200px] 2x:h-[200px] 2x:max-w-[200px] flex h-[calc(50dvw-32px)] max-w-full min-w-full flex-col gap-2 overflow-hidden rounded-2xl border-2 p-4`;
-	link.href = url;
-
-	const title = document.createElement("h3");
-	title.className = "text-gray-5 text-xs";
-	title.textContent = result.title;
-
-	const excerptWrapper = document.createElement("p");
-	excerptWrapper.className = "overflow-hidden";
-
-	const excerpt = document.createElement("span");
-	excerpt.className = "text-sm font-bold overflow-ellipsis";
-	excerpt.textContent = result.excerpt;
-
-	excerptWrapper.appendChild(excerpt);
-	link.appendChild(title);
-	link.appendChild(excerptWrapper);
-
-	return link;
+const createResultElement = async (
+	result: PagefindResult,
+	template: Element,
+): Promise<Node | null> => {
+	const data = await result.data();
+	const borderColor = getPostBorderColorFromDate(data.meta.date);
+	const resultElement = document.createElement("div");
+	resultElement.innerHTML = template.innerHTML
+		.replace("%%borderColor%%", borderColor)
+		.replace("%%url%%", data.url)
+		.replace("%%title%%", data.meta.title)
+		.replace("%%excerpt%%", data.excerpt);
+	return resultElement.firstElementChild;
 };
 
 export const initSearch = () => {
 	const resultsContainer = document.querySelector("#results");
+	const template = document.querySelector("#search-result-template");
 
-	if (!resultsContainer) return;
+	if (!resultsContainer || !template) return;
 
 	const searchAndShow = async (tags: string[], query: string | null) => {
 		if ((!query || query.trim() === "") && (!tags || tags.length === 0)) {
@@ -44,21 +28,18 @@ export const initSearch = () => {
 			return;
 		}
 
-		const { data, error } = await actions.searchPosts({
-			query: query || undefined,
-			tags: tags.length > 0 ? tags : undefined,
+		const pagefind = await import("/pagefind/pagefind.js");
+		const search = await pagefind.search(query || null, {
+			filters: tags && tags.length > 0 ? { tag: tags } : undefined,
 		});
 
 		resultsContainer.innerHTML = "";
 
-		if (error) {
-			console.error("Search error:", error);
-			return;
-		}
-
-		for (const result of data) {
-			const element = createResultElement(result);
-			resultsContainer.appendChild(element);
+		for (const result of search.results) {
+			const node = await createResultElement(result, template);
+			if (node) {
+				resultsContainer.appendChild(node);
+			}
 		}
 	};
 

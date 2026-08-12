@@ -7,3 +7,15 @@
 	class="3x:grid-cols-3 3x:w-3x 4x:grid-cols-4 4x:w-4x 5x:grid-cols-5 5x:w-5x 2x:w-2x 2x:columns-1x mx-auto grid max-w-[1096px] grid-cols-2 items-center justify-items-center gap-4 overflow-hidden"
 >
 </div>
+
+<template id="search-result-template">
+	<a
+		class="%%borderColor%% 2x:w-[200px] 2x:h-[200px] 2x:max-w-[200px] flex h-[calc(50dvw-32px)] max-w-full min-w-full flex-col gap-2 overflow-hidden rounded-2xl border-2 p-4"
+		href="%%url%%"
+	>
+		<h3 class="text-gray-5 text-xs">%%title%%</h3>
+		<p class="overflow-hidden">
+			<span class="text-sm font-bold overflow-ellipsis">%%excerpt%%</span>
+		</p>
+	</a>
+</template>

@@ -1,37 +1,33 @@
-import { auth } from "@/auth";
-import { getPost } from "@/lib/content/repository";
+import matter from "gray-matter";
 import { err, ok, unauthorized } from "@/lib/result";
+import { getGitHubAccessToken } from "@/pages/admin/_lib/github/client";
+import { createContentClient } from "@/pages/admin/_lib/github/content";
 import type { EditableFrontmatter, LoadEditablePostResult } from "./types";
+
+const POST_PATH = (slug: string) => `${slug}/README.md`;
 
 export const loadEditablePost = async (
 	slug: string,
 	headers: Headers,
-	db: Parameters<typeof getPost>[0],
 ): Promise<LoadEditablePostResult> => {
-	const session = await auth.api.getSession({ headers });
-	if (!session?.user) {
+	const accessToken = await getGitHubAccessToken(headers);
+	if (!accessToken) {
 		return unauthorized();
 	}
 
 	try {
-		const post = await getPost(db, slug);
-		if (!post) {
-			return err("記事が見つかりません");
-		}
+		const client = createContentClient(accessToken);
+		const file = await client.getFile({ path: POST_PATH(slug) });
+		const { data, content } = matter(file.content);
 
 		return ok({
-			frontmatter: {
-				title: post.title,
-				date: post.dateString,
-				tags: post.tags,
-				draft: post.draft,
-			} as EditableFrontmatter,
-			body: post.body,
-			revision: post.revision,
+			frontmatter: data as EditableFrontmatter,
+			body: content.trim(),
+			sha: file.sha,
 		});
 	} catch (error) {
 		const message =
-			error instanceof Error ? error.message : "記事の読み込みに失敗しました";
+			error instanceof Error ? error.message : "Failed to load post";
 		return err(message);
 	}
 };

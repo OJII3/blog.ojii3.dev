@@ -1,38 +1,32 @@
 ---
-export const prerender = false;
-
-import { getLiveCollection, getLiveEntry } from "astro:content";
+import { type CollectionEntry, getCollection } from "astro:content";
 import PostLayout from "./_layout/PostLayout.astro";
 
-const { slug } = Astro.params;
-if (!slug) {
-	return new Response("Not found", { status: 404 });
+export interface Props {
+	post: CollectionEntry<"blog">;
 }
 
-const { entry: post, error: entryError } = await getLiveEntry("blog", {
-	id: slug,
-});
-if (entryError) {
-	if (entryError.name !== "LiveEntryNotFoundError") throw entryError;
-	return new Response("Not found", { status: 404 });
-}
-if (!post || post.data.draft) {
-	return new Response("Not found", { status: 404 });
+export async function getStaticPaths() {
+	const posts = await getCollection("blog");
+	const postResult = posts.map((post) => ({
+		params: { slug: `/${post.id}` },
+		props: { post },
+	}));
+
+	return postResult;
 }
 
-const { entries: allPosts, error: collectionError } =
-	await getLiveCollection("blog");
-if (collectionError) throw collectionError;
-if (!allPosts) throw new Error("Failed to load blog collection");
+const { post } = Astro.props;
 
-const publishedPosts = allPosts
+const allBlogPosts = (await getCollection("blog"))
 	.filter((p) => !p.data.draft)
-	.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+	.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
-const postIndex = publishedPosts.findIndex((p) => p.id === post.id);
-const prevPost = postIndex > 0 ? publishedPosts[postIndex - 1] : null;
+const postIndex = allBlogPosts.findIndex((p) => p.id === post.id);
+
+const prevPost = postIndex > 0 ? allBlogPosts[postIndex - 1] : null;
 const nextPost =
-	postIndex < publishedPosts.length - 1 ? publishedPosts[postIndex + 1] : null;
+	postIndex < allBlogPosts.length - 1 ? allBlogPosts[postIndex + 1] : null;
 ---
 
 <PostLayout post={post} prevPost={prevPost} nextPost={nextPost} />
