@@ -92,7 +92,7 @@ describe("d1LiveLoader", () => {
 			expect(entry).toBeDefined();
 			expect(entry?.data.path).toBe("hello-world");
 			expect(entry?.data.content).toBe("# Hello\n\nWorld");
-			expect(entry?.data.html).toBe("<div># Hello\n\nWorld</div>");
+			expect(entry?.data.html).toBe("");
 			expect(entry?.data.title).toBe("Hello World");
 			expect(entry?.data.date).toBeInstanceOf(Date);
 			expect(entry?.data.dateString).toBe("2024-01-01");
@@ -113,6 +113,31 @@ describe("d1LiveLoader", () => {
 			expect(draftEntry).toBeDefined();
 			expect(draftEntry?.data.draft).toBe(true);
 			expect(draftEntry?.data.revision).toBe(2);
+		});
+
+		it("does not render markdown for collection entries", async () => {
+			let renderCalls = 0;
+			const loader = d1LiveLoader({
+				getEnv: () => ({
+					DB: {} as D1Database,
+					MEDIA_BASE_URL: "https://media.example.com",
+				}),
+				getDb: () => ({}) as D1LiveLoaderDatabase,
+				deps: {
+					listPosts: fakeListPosts,
+					getPost: fakeGetPost,
+					createMarkdownProcessor: () => ({
+						render: async () => {
+							renderCalls++;
+							return { html: "<div>rendered</div>" };
+						},
+					}),
+				},
+			});
+
+			await loader.loadCollection({ collection: "blog" });
+
+			expect(renderCalls).toBe(0);
 		});
 
 		it("passes mediaBaseUrl to markdown processor", async () => {

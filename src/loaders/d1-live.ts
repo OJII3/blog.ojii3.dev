@@ -63,14 +63,17 @@ const getWorkerEnv = async (): Promise<D1LiveLoaderEnvironment> => {
 const toEntryData = async (
 	post: ContentPost,
 	processor: MarkdownProcessor,
+	renderHtml = true,
 ): Promise<{ id: string; data: D1EntryData }> => {
-	const result = await processor.render(post.body, post.slug);
+	const html = renderHtml
+		? (await processor.render(post.body, post.slug)).html
+		: "";
 	return {
 		id: post.slug,
 		data: {
 			path: post.slug,
 			content: post.body,
-			html: result.html,
+			html,
 			title: post.title,
 			date: post.date,
 			dateString: post.dateString,
@@ -101,7 +104,7 @@ export function d1LiveLoader(
 			const posts = await listPosts(db, { includeDrafts: true });
 
 			const entries = await Promise.all(
-				posts.map((post) => toEntryData(post, processor)),
+				posts.map((post) => toEntryData(post, processor, false)),
 			);
 
 			return { entries };

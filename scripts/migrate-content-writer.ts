@@ -140,7 +140,7 @@ export function generateSql(
 	}
 
 	if (statements.length === 0) return "";
-	return ["BEGIN TRANSACTION;", ...statements, "COMMIT;"].join("\n");
+	return statements.join("\n");
 }
 
 export async function executeSqlFile(
