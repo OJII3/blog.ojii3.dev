@@ -105,6 +105,13 @@ describe("generateSql", () => {
 		expect(sql).not.toContain("UPDATE posts");
 	});
 
+	test("does not use explicit transaction statements", () => {
+		const sql = generateSql([makeArticle()], new Map(), 1000);
+
+		expect(sql).not.toContain("BEGIN TRANSACTION");
+		expect(sql).not.toContain("COMMIT");
+	});
+
 	test("generates UPDATE for existing articles with same body", () => {
 		const article = makeArticle();
 		const existing = new Map([["2025-01-15-0", "Hello world"]]);
