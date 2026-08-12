@@ -10,7 +10,7 @@ export type EditableFrontmatter = {
 export type EditablePost = {
 	frontmatter: EditableFrontmatter;
 	body: string;
-	sha: string;
+	revision: number;
 };
 
 /** 記事読み込みの結果型 */

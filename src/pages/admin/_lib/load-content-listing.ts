@@ -1,34 +1,38 @@
+import { listPosts } from "@/lib/content/repository";
+import type { ContentPost } from "@/lib/content/types";
 import type { Result } from "@/lib/result";
 import { err, ok } from "@/lib/result";
-import {
-	createContentClientFromHeaders,
-	type GitHubContentItem,
-} from "@/pages/admin/_lib/github";
 
 export type ContentListing = {
-	entries: GitHubContentItem[];
+	entries: ContentListingEntry[];
 	fetchedAt: string;
 };
 
+export type ContentListingEntry = Pick<
+	ContentPost,
+	"slug" | "title" | "dateString" | "draft" | "revision"
+>;
+
 export type ContentListingResult = Result<ContentListing>;
 
-// YYYY-MM-DD-n format
-const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}-\d+$/;
-
 export const loadContentListing = async (
-	headers: Headers,
+	db: Parameters<typeof listPosts>[0],
+	listPostsFn: typeof listPosts = listPosts,
 ): Promise<ContentListingResult> => {
 	try {
-		const client = await createContentClientFromHeaders(headers);
-		const listing = await client.listRepoPath("");
-
-		// Filter for directories matching the date pattern
-		const filteredEntries = listing
-			.filter((item) => item.type === "dir" && DATE_PATTERN.test(item.name))
-			.sort((a, b) => b.name.localeCompare(a.name)); // Sort by date descending
+		const posts = await listPostsFn(db, { includeDrafts: true });
+		const entries = posts.map(
+			({ slug, title, dateString, draft, revision }) => ({
+				slug,
+				title,
+				dateString,
+				draft,
+				revision,
+			}),
+		);
 
 		return ok({
-			entries: filteredEntries,
+			entries,
 			fetchedAt: new Date().toISOString(),
 		});
 	} catch (error) {
