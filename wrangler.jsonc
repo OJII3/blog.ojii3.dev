@@ -10,22 +10,5 @@
 	"assets": {
 		"binding": "ASSETS",
 		"directory": "./dist"
-	},
-	"vars": {
-		"MEDIA_BASE_URL": "https://media.blog.ojii3.dev"
-	},
-	"d1_databases": [
-		{
-			"binding": "DB",
-			"database_name": "blog-content",
-			"database_id": "eff6e29e-7810-4092-8d1b-f2a48289a751",
-			"migrations_dir": "drizzle"
-		}
-	],
-	"r2_buckets": [
-		{
-			"binding": "MEDIA",
-			"bucket_name": "blog-media"
-		}
-	]
+	}
 }

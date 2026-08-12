@@ -47,7 +47,7 @@ const { slug, initialData } = Astro.props;
 	id="edit-form"
 	class="flex flex-col gap-3 pb-4"
 	data-slug={slug}
-	data-revision={String(initialData.revision)}
+	data-sha={initialData.sha}
 >
 	<details class="bg-base-200/30 rounded-xl">
 		<summary class="text-base-content/70 cursor-pointer px-3 py-2 text-sm">

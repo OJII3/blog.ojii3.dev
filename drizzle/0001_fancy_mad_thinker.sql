@@ -1,1 +1,0 @@
-ALTER TABLE `posts` ADD `update_token` text DEFAULT '' NOT NULL;

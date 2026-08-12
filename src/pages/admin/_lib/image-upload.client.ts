@@ -17,7 +17,7 @@ const insertTextAtCursor = (textarea: HTMLTextAreaElement, text: string) => {
 const uploadImage = async (
 	file: File,
 	slug: string,
-): Promise<{ path: string } | null> => {
+): Promise<string | null> => {
 	const formData = new FormData();
 	formData.append("image", file);
 	formData.append("slug", slug);
@@ -28,7 +28,7 @@ const uploadImage = async (
 		throw new Error(error.message);
 	}
 
-	return data ?? null;
+	return data?.filename ?? null;
 };
 
 export const setupImageUploader = (
@@ -62,9 +62,9 @@ export const setupImageUploader = (
 
 		for (const file of fileArray) {
 			try {
-				const result = await uploadImage(file, slug);
-				if (result) {
-					const markdown = `![${file.name}](${result.path})`;
+				const filename = await uploadImage(file, slug);
+				if (filename) {
+					const markdown = `![${file.name}](${filename})`;
 					insertTextAtCursor(textarea, `${markdown}\n`);
 					successCount++;
 				}

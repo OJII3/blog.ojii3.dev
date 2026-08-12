@@ -1,60 +1,23 @@
-import { getLiveEntry } from "astro:content";
-import { initWasm, Resvg } from "@resvg/resvg-wasm";
+import { getCollection, getEntry } from "astro:content";
+import { readFile } from "node:fs/promises";
+import { Resvg } from "@resvg/resvg-js";
 import type { APIRoute } from "astro";
 import { createElement } from "react";
 import satori from "satori";
 import { OGImage } from "./_components/OGImage";
 
-export const prerender = false;
-
-let wasmInitPromise: Promise<void> | undefined;
-let fontPromise: Promise<ArrayBuffer> | undefined;
-
-const fetchAsset = async (path: string, baseUrl: URL): Promise<ArrayBuffer> => {
-	const response = await fetch(new URL(path, baseUrl));
-	if (!response.ok) {
-		throw new Error(`Failed to load OG asset ${path}: ${response.status}`);
-	}
-	return response.arrayBuffer();
-};
-
-const initResvg = (baseUrl: URL) => {
-	wasmInitPromise ??= fetchAsset("/resvg.wasm", baseUrl)
-		.then((wasmBuffer) => initWasm(wasmBuffer))
-		.catch((error) => {
-			wasmInitPromise = undefined;
-			throw error;
-		});
-	return wasmInitPromise;
-};
-
-const loadFont = (baseUrl: URL) => {
-	fontPromise ??= fetchAsset("/MPLUSRounded1c-Bold.ttf", baseUrl).catch(
-		(error) => {
-			fontPromise = undefined;
-			throw error;
-		},
-	);
-	return fontPromise;
-};
-
-export const GET: APIRoute = async ({ params, url }) => {
+export const GET: APIRoute = async ({ params }) => {
 	const { slug } = params;
 	if (slug == null) {
 		return new Response("Not found", { status: 404 });
 	}
 
-	const { entry: post, error } = await getLiveEntry("blog", { id: slug });
-	if (error) {
-		if (error.name !== "LiveEntryNotFoundError") throw error;
-		return new Response("Not found", { status: 404 });
-	}
-	if (!post || post.data.draft) {
+	const post = await getEntry("blog", slug);
+	if (post == null) {
 		return new Response("Not found", { status: 404 });
 	}
 
-	const font = await loadFont(url);
-
+	const font = await readFile("./src/assets/MPLUSRounded1c-Bold.ttf");
 	const { title, date, color } = post.data;
 	const svg = await satori(createElement(OGImage, { title, date, color }), {
 		width: 1200,
@@ -68,24 +31,18 @@ export const GET: APIRoute = async ({ params, url }) => {
 			},
 		],
 	});
+	const png = new Resvg(svg).render().asPng();
 
-	await initResvg(url);
-	const resvg = new Resvg(svg, {
-		fitTo: { mode: "width", value: 1200 },
+	return new Response(png as BodyInit, {
+		headers: { "Content-Type": "image/png" },
+		status: 200,
 	});
-
-	try {
-		const rendered = resvg.render();
-		try {
-			const png = rendered.asPng();
-			return new Response(png as BodyInit, {
-				headers: { "Content-Type": "image/png" },
-				status: 200,
-			});
-		} finally {
-			rendered.free();
-		}
-	} finally {
-		resvg.free();
-	}
 };
+
+export async function getStaticPaths() {
+	const posts = await getCollection("blog");
+
+	return posts.map((post) => ({
+		params: { slug: post.id },
+	}));
+}

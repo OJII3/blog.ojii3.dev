@@ -1,6 +1,5 @@
 ---
 import { Icon } from "astro-icon/components";
-import { createContentDb, getContentEnv } from "@/db/client";
 import AdminLayout from "@/pages/admin/_layouts/AdminLayout.astro";
 import AdminDashboardHeader from "./_components/AdminDashboardHeader.astro";
 import ContentTable from "./_components/ContentTable.astro";
@@ -8,8 +7,7 @@ import { loadContentListing } from "./_lib/load-content-listing";
 
 export const prerender = false;
 
-const env = await getContentEnv();
-const contentResult = await loadContentListing(createContentDb(env));
+const contentResult = await loadContentListing(Astro.request.headers);
 ---
 
 <AdminLayout title="Admin">

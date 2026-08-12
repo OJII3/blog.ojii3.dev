@@ -30,4 +30,4 @@ pnpm-debug.log*
 .direnv/
 
 # cloned content from external repository
-/content/
+content/

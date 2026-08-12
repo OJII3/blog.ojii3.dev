@@ -1,4 +1,5 @@
 ---
+import { type CollectionEntry } from "astro:content";
 import { Icon } from "astro-icon/components";
 import GlobalLayout from "@/pages/_layouts/GlobalLayout.astro";
 import {
@@ -11,24 +12,29 @@ import {
 import PostHeader from "./PostHeader.astro";
 import PostPrevNext from "./PostPrevNext.astro";
 
-export interface PostLink {
-	id: string;
-	data: { title: string };
-}
-
 export interface Props {
 	title: string;
 	dateString: string;
 	color: VitaColor;
 	tags?: string[];
+	draft?: boolean;
 	postId?: string; // If present, enables view transitions and OG image
-	prevPost?: PostLink | null;
-	nextPost?: PostLink | null;
+	prevPost?: CollectionEntry<"blog"> | null;
+	nextPost?: CollectionEntry<"blog"> | null;
 	html?: string; // For preview content
 }
 
-const { title, dateString, color, tags, postId, prevPost, nextPost, html } =
-	Astro.props;
+const {
+	title,
+	dateString,
+	color,
+	tags,
+	draft,
+	postId,
+	prevPost,
+	nextPost,
+	html,
+} = Astro.props;
 
 const titleText = `${title} | ${SITE_NAME}`;
 // postId がある場合のみ OG 画像 URL を生成
@@ -40,12 +46,21 @@ const ogImage = postId ? `${SITE_URL}/${postId}/og-image.png` : undefined;
 		<PostHeader color={color} />
 
 		<main transition:name={postId} class="w-full p-4">
-			<h1 class="mt-4 text-2xl font-bold sm:text-3xl">
+			<h1
+				class="mt-4 text-2xl font-bold sm:text-3xl"
+				data-pagefind-meta={postId ? "title" : undefined}
+				data-pagefind-ignore={draft}
+			>
 				{title}
 			</h1>
 
 			<div class="mt-2 mb-8 flex items-center gap-2">
-				<span aria-hidden="true" class="text-sm">{dateString}</span>
+				<span
+					aria-hidden="true"
+					class="text-sm"
+					data-pagefind-meta={postId ? "date" : undefined}
+					data-pagefind-ignore={draft}>{dateString}</span
+				>
 			</div>
 
 			<article
@@ -55,6 +70,8 @@ const ogImage = postId ? `${SITE_URL}/${postId}/og-image.png` : undefined;
 					"prose-h2:pl-2 prose-h2:border-l-4",
 					H2_BORDER_COLORS[color],
 				]}
+				data-pagefind-body={!draft && postId ? true : undefined}
+				data-pagefind-ignore={draft}
 			>
 				{html ? <Fragment set:html={html} /> : <slot />}
 			</article>
@@ -69,7 +86,13 @@ const ogImage = postId ? `${SITE_URL}/${postId}/og-image.png` : undefined;
 										href={`/search?tag=${tag}`}
 										class:list={["px-1 hover:underline", TEXT_COLORS[color]]}
 									>
-										#<span>{tag}</span>
+										#
+										<span
+											data-pagefind-filter="tag"
+											data-pagefind-ignore={draft}
+										>
+											{tag}
+										</span>
 									</a>
 								</li>
 							))}
@@ -90,7 +113,10 @@ const ogImage = postId ? `${SITE_URL}/${postId}/og-image.png` : undefined;
 			{/* postId（本番記事）の場合のみ前後リンクを表示 */}
 			{
 				postId && (
-					<div class="grid grid-cols-1 gap-4 pt-8 pb-4 sm:grid-cols-2">
+					<div
+						data-pagefind-ignore="all"
+						class="grid grid-cols-1 gap-4 pt-8 pb-4 sm:grid-cols-2"
+					>
 						{prevPost ? (
 							<PostPrevNext
 								color={color}
