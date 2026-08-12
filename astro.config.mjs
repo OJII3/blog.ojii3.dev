@@ -17,6 +17,13 @@ export default defineConfig({
 	site: "https://blog.ojii3.dev",
 	output: "server",
 	vite: {
+		optimizeDeps: {
+			include: [
+				"astro/assets/services/noop",
+				"astro-icon/components",
+				"@iconify/utils",
+			],
+		},
 		plugins: [tailwindcss()],
 	},
 	integrations: [
@@ -28,6 +35,7 @@ export default defineConfig({
 				},
 			},
 			shiki: {
+				engine: "javascript",
 				bundledLangs: [
 					"astro",
 					"csharp",

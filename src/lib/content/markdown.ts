@@ -158,6 +158,9 @@ export const createContentMarkdownProcessor = (
 				rehypeExpressiveCode,
 				{
 					themes: ["tokyo-night"],
+					shiki: {
+						engine: "javascript",
+					},
 					styleOverrides: {
 						frames: {
 							frameBoxShadowCssValue: "none",

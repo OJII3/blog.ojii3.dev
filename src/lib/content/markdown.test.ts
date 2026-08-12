@@ -7,6 +7,26 @@ describe("createContentMarkdownProcessor", () => {
 	});
 
 	describe("markdown rendering", () => {
+		it("should render code blocks when WebAssembly is unavailable", async () => {
+			const originalInstantiate = WebAssembly.instantiate;
+			WebAssembly.instantiate = async () => {
+				throw new Error("WebAssembly is unavailable");
+			};
+
+			try {
+				const processor = createContentMarkdownProcessor({
+					mediaBaseUrl: "https://media.blog.ojii3.dev",
+				});
+				const result = await processor.render(
+					"```typescript\nconst x = 1;\n```",
+					"test-post",
+				);
+				expect(result.html).toContain("expressive-code");
+			} finally {
+				WebAssembly.instantiate = originalInstantiate;
+			}
+		});
+
 		it("should render GFM tables", async () => {
 			const md = `| Header | Header |
 |--------|--------|
