@@ -71,7 +71,7 @@
 			}
 		},
 		{
-			"includes": ["**/generated/**"],
+			"includes": ["**/generated/**", "drizzle/**"],
 			"linter": {
 				"enabled": false
 			},

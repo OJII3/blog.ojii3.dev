@@ -13,4 +13,7 @@ declare namespace App {
 
 interface Env {
 	ASSETS: Fetcher;
+	DB: D1Database;
+	MEDIA: R2Bucket;
+	MEDIA_BASE_URL: string;
 }
