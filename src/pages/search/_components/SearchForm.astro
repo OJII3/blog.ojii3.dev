@@ -1,11 +1,12 @@
 ---
-import { getCollection } from "astro:content";
 import { Icon } from "astro-icon/components";
 import { SEARCH_ICON_TRANSITION_NAME } from "@/pages/_lib/constants";
-import { getAllTags } from "../_lib/getAllTags";
 
-const allPosts = await getCollection("blog");
-const allTags = getAllTags(allPosts);
+interface Props {
+	allTags: Record<string, number>;
+}
+
+const { allTags } = Astro.props;
 ---
 
 <form class="flex flex-col gap-4">

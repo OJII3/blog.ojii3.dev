@@ -50,9 +50,9 @@ const readSubmitState = (form: HTMLFormElement): SubmitState => {
 
 const getFormMetadata = (form: HTMLFormElement) => {
 	const slug = form.dataset.slug;
-	const sha = form.dataset.sha;
+	const revision = Number(form.dataset.revision);
 
-	return { slug, sha };
+	return { slug, revision };
 };
 
 export const setupEditPostForm = (formId = "edit-form") => {
@@ -60,14 +60,14 @@ export const setupEditPostForm = (formId = "edit-form") => {
 	if (!form) return;
 
 	const submitState = readSubmitState(form);
-	const { slug, sha } = getFormMetadata(form);
+	const { slug, revision } = getFormMetadata(form);
 
 	if (!slug) {
 		console.warn("Missing slug on edit form; aborting setup.");
 		return;
 	}
 
-	let currentSha = sha;
+	let currentRevision = revision;
 
 	form.addEventListener("submit", async (event) => {
 		event.preventDefault();
@@ -83,28 +83,25 @@ export const setupEditPostForm = (formId = "edit-form") => {
 				slug,
 				frontmatter,
 				body: typeof body === "string" ? body : "",
-				sha: currentSha,
+				revision: currentRevision,
 			});
 
 			if (!error && data) {
-				if (data.sha) {
-					currentSha = data.sha;
-					form.dataset.sha = data.sha;
+				if (data.revision != null) {
+					currentRevision = data.revision;
+					form.dataset.revision = String(data.revision);
 				}
 				showToast("保存しました", "success");
 				return;
 			}
 
-			const message = error?.message ?? "Unknown error";
-			if (
-				message.includes("409") ||
-				message.toLowerCase().includes("conflict")
-			) {
+			if (error?.code === "CONFLICT") {
 				showToast(
 					"コンフリクトが発生しました。ページを再読み込みしてください。",
 					"error",
 				);
 			} else {
+				const message = error?.message ?? "Unknown error";
 				showToast(`エラー: ${message}`, "error");
 			}
 		} catch (err) {

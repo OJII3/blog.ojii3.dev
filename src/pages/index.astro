@@ -1,13 +1,19 @@
 ---
-import { getCollection } from "astro:content";
+export const prerender = false;
+
+import { getLiveCollection } from "astro:content";
 import BottomCard from "@/pages/_components/BottomCard.astro";
 import PostCard from "@/pages/_components/PostCard.astro";
 import TopCard from "@/pages/_components/TopCard.astro";
 import GlobalLayout from "@/pages/_layouts/GlobalLayout.astro";
 
-const allBlogPosts = (await getCollection("blog"))
+const result = await getLiveCollection("blog");
+if (result.error) throw result.error;
+if (!result.entries) throw new Error("Failed to load blog collection");
+
+const allBlogPosts = result.entries
 	.filter((post) => !post.data.draft)
-	.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+	.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 ---
 
 <GlobalLayout title="晴れときどき崩壊ブログ">
