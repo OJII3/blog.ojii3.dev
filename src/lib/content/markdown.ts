@@ -97,8 +97,12 @@ const createRehypeMediaImageUrl = (mediaBaseUrl: string, slug: string) => {
 
 	return () => {
 		return (tree: Root) => {
+			let imageIndex = 0;
 			visit(tree, "element", (node: Element) => {
 				if (node.tagName !== "img") return;
+				node.properties.decoding = "async";
+				if (imageIndex > 0) node.properties.loading = "lazy";
+				imageIndex += 1;
 
 				const src = node.properties?.src;
 				if (typeof src !== "string" || !src) return;
