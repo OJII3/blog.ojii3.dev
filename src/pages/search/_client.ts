@@ -67,7 +67,7 @@ export const initSearch = () => {
 		const query = urlParams.get("q") || "";
 		const tags = urlParams.getAll("tag");
 
-		searchAndShow(tags, query);
+		void searchAndShow(tags, query);
 	};
 
 	if (window._searchUrlChangeHandler) {
@@ -82,5 +82,5 @@ export const initSearch = () => {
 	const urlParams = new URLSearchParams(window.location.search);
 	const query = urlParams.get("q") || null;
 	const tags = urlParams.getAll("tag");
-	searchAndShow(tags, query);
+	void searchAndShow(tags, query);
 };

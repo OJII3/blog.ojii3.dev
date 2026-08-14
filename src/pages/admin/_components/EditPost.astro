@@ -97,7 +97,7 @@ const { slug, initialData } = Astro.props;
 				pending = true;
 				requestAnimationFrame(() => {
 					textarea.style.height = "auto";
-					textarea.style.height = textarea.scrollHeight + "px";
+					textarea.style.height = `${textarea.scrollHeight}px`;
 					pending = false;
 				});
 			};
