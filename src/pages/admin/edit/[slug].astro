@@ -35,8 +35,7 @@ if (!loadResult.ok) {
 
 <AdminLayout title={`Edit: ${slug}`}>
 	<main class="mx-auto min-h-dvh max-w-lg px-2">
-		{
-			errorMsg ? (
+		{errorMsg ? (
 				<div class="flex min-h-[50vh] flex-col items-center justify-center">
 					<div class="text-center">
 						<Icon
@@ -51,7 +50,6 @@ if (!loadResult.ok) {
 				</div>
 			) : (
 				<EditPost slug={slug} initialData={postData} />
-			)
-		}
+			)}
 	</main>
 </AdminLayout>

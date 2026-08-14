@@ -16,20 +16,19 @@ const contentResult = await loadContentListing(createContentDb(env));
 	<main class="mx-auto max-w-lg px-2">
 		<AdminDashboardHeader />
 
-		{
-			!contentResult.ok ? (
+		{!contentResult.ok ? (
 				<div class="bg-error/10 flex items-center gap-3 rounded-xl p-3 text-sm">
 					<Icon name="tabler:alert-circle" class="text-error size-5 shrink-0" />
 					<span class="text-error">{contentResult.error}</span>
 				</div>
 			) : (
 				<ContentTable entries={contentResult.value.entries} />
-			)
-		}
+			)}
 	</main>
 </AdminLayout>
 
 <script>
 	import { setupAdminDashboard } from "./_lib/admin-dashboard.client";
+
 	setupAdminDashboard();
 </script>

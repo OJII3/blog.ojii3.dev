@@ -25,6 +25,7 @@ const allTags = getAllTags(allPosts);
 
 <script>
 	import { initSearch } from "./_client";
+
 	document.addEventListener("astro:after-swap", initSearch);
 	initSearch();
 </script>

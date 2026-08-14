@@ -9,8 +9,7 @@ interface Props {
 const { entries } = Astro.props;
 ---
 
-{
-	entries.length === 0 ? (
+{entries.length === 0 ? (
 		<div class="bg-base-200/50 flex flex-col items-center justify-center rounded-xl py-12">
 			<Icon name="tabler:file-off" class="text-base-content/30 size-10" />
 			<p class="text-base-content/50 mt-2 text-sm">No posts</p>
@@ -39,5 +38,4 @@ const { entries } = Astro.props;
 				</li>
 			))}
 		</ul>
-	)
-}
+	)}

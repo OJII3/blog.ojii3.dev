@@ -91,7 +91,7 @@ export const setupImageUploader = (
 
 	fileInput.addEventListener("change", () => {
 		if (fileInput.files) {
-			handleFiles(fileInput.files);
+			void handleFiles(fileInput.files);
 		}
 	});
 
@@ -112,7 +112,7 @@ export const setupImageUploader = (
 
 			const files = e.dataTransfer?.files;
 			if (files) {
-				handleFiles(files);
+				void handleFiles(files);
 			}
 		});
 	}
@@ -138,7 +138,7 @@ export const setupImageUploader = (
 
 		if (imageFiles.length > 0) {
 			e.preventDefault();
-			handleFiles(imageFiles);
+			void handleFiles(imageFiles);
 		}
 	});
 };

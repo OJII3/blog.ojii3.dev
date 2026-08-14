@@ -60,8 +60,7 @@ const ogImage = postId ? `${SITE_URL}/${postId}/og-image.png` : undefined;
 			</article>
 
 			<div class="my-8 flex items-start justify-between">
-				{
-					tags && tags.length > 0 && (
+				{tags && tags.length > 0 && (
 						<ul class="flex flex-wrap gap-2">
 							{tags.map((tag) => (
 								<li>
@@ -74,11 +73,10 @@ const ogImage = postId ? `${SITE_URL}/${postId}/og-image.png` : undefined;
 								</li>
 							))}
 						</ul>
-					)
-				}
+					)}
 				<div class="flex">
 					<a
-						href=`/admin/edit/${postId}`
+						href={`/admin/edit/${postId}`}
 						class="bg-gray-1 hover:bg-gray-2 flex gap-2 rounded-2xl p-2 px-4"
 					>
 						<Icon name="tabler:edit" class="h-6 w-6 align-middle" />
@@ -87,9 +85,8 @@ const ogImage = postId ? `${SITE_URL}/${postId}/og-image.png` : undefined;
 				</div>
 			</div>
 
-			{/* postId（本番記事）の場合のみ前後リンクを表示 */}
-			{
-				postId && (
+			<!-- postId（本番記事）の場合のみ前後リンクを表示 -->
+			{postId && (
 					<div class="grid grid-cols-1 gap-4 pt-8 pb-4 sm:grid-cols-2">
 						{prevPost ? (
 							<PostPrevNext
@@ -112,8 +109,7 @@ const ogImage = postId ? `${SITE_URL}/${postId}/og-image.png` : undefined;
 							<div />
 						)}
 					</div>
-				)
-			}
+				)}
 		</main>
 	</div>
 </GlobalLayout>

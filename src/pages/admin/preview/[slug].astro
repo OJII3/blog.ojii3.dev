@@ -19,8 +19,7 @@ if (error) {
 ---
 
 <AdminLayout>
-	{
-		entry ? (
+	{entry ? (
 			<PostShell
 				title={entry.data.title}
 				dateString={entry.data.dateString}
@@ -30,6 +29,5 @@ if (error) {
 			/>
 		) : (
 			<div />
-		)
-	}
+		)}
 </AdminLayout>

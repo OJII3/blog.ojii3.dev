@@ -1,5 +1,5 @@
 {
-	"$schema": "https://biomejs.dev/schemas/2.3.10/schema.json",
+	"$schema": "https://biomejs.dev/schemas/2.5.8/schema.json",
 	"vcs": {
 		"enabled": true,
 		"clientKind": "git",
@@ -16,7 +16,12 @@
 	"linter": {
 		"enabled": true,
 		"rules": {
-			"recommended": true
+			"a11y": {
+				"noSvgWithoutTitle": "off"
+			},
+			"nursery": {
+				"noFloatingPromises": "error"
+			}
 		}
 	},
 	"javascript": {
@@ -30,7 +35,11 @@
 		}
 	},
 	"html": {
-		"experimentalFullSupportEnabled": false
+		"formatter": {
+			"enabled": true,
+			"indentScriptAndStyle": true
+		},
+		"experimentalFullSupportEnabled": true
 	},
 	"assist": {
 		"enabled": true,
