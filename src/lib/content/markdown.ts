@@ -11,6 +11,12 @@ type ContentMarkdownProcessorOptions = {
 	mediaBaseUrl: string;
 };
 
+type ContentMarkdownProcessor = ReturnType<
+	typeof createUncachedContentMarkdownProcessor
+>;
+
+const processorCache = new Map<string, ContentMarkdownProcessor>();
+
 const isRelativePath = (src: string): boolean => {
 	if (/^https?:\/\//i.test(src) || src.startsWith("//")) {
 		return false;
@@ -146,7 +152,7 @@ const createRehypeMediaImageUrl = (mediaBaseUrl: string, slug: string) => {
 	};
 };
 
-export const createContentMarkdownProcessor = (
+const createUncachedContentMarkdownProcessor = (
 	options: ContentMarkdownProcessorOptions,
 ) => {
 	const { mediaBaseUrl } = options;
@@ -195,4 +201,15 @@ export const createContentMarkdownProcessor = (
 			};
 		},
 	};
+};
+
+export const createContentMarkdownProcessor = (
+	options: ContentMarkdownProcessorOptions,
+): ContentMarkdownProcessor => {
+	const cached = processorCache.get(options.mediaBaseUrl);
+	if (cached) return cached;
+
+	const processor = createUncachedContentMarkdownProcessor(options);
+	processorCache.set(options.mediaBaseUrl, processor);
+	return processor;
 };

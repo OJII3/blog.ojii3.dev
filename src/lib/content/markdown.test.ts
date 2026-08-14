@@ -369,4 +369,19 @@ describe("createContentMarkdownProcessor", () => {
 			});
 		});
 	});
+
+	it("should reuse the expensive syntax-highlighting processor", () => {
+		const first = createContentMarkdownProcessor({
+			mediaBaseUrl: "https://media.example.com",
+		});
+		const second = createContentMarkdownProcessor({
+			mediaBaseUrl: "https://media.example.com",
+		});
+		const otherOrigin = createContentMarkdownProcessor({
+			mediaBaseUrl: "https://other.example.com",
+		});
+
+		expect(second).toBe(first);
+		expect(otherOrigin).not.toBe(first);
+	});
 });
