@@ -16,7 +16,12 @@
 	"linter": {
 		"enabled": true,
 		"rules": {
-			"recommended": true
+			"a11y": {
+				"noSvgWithoutTitle": "off"
+			},
+			"nursery": {
+				"noFloatingPromises": "error"
+			}
 		}
 	},
 	"javascript": {
@@ -30,7 +35,11 @@
 		}
 	},
 	"html": {
-		"experimentalFullSupportEnabled": false
+		"formatter": {
+			"enabled": true,
+			"indentScriptAndStyle": true
+		},
+		"experimentalFullSupportEnabled": true
 	},
 	"assist": {
 		"enabled": true,
