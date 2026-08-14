@@ -2,7 +2,13 @@ import { and, eq, like, or, sql } from "drizzle-orm";
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 import type { ContentD1Database, ContentD1Result } from "../../db/client";
 import { posts, postTags, type tags } from "../../db/schema";
-import type { ContentPost, UpdatePostInput, UpdatePostResult } from "./types";
+import type {
+	ContentPost,
+	CreatePostInput,
+	CreatePostResult,
+	UpdatePostInput,
+	UpdatePostResult,
+} from "./types";
 
 type Schema = {
 	posts: typeof posts;
@@ -165,6 +171,68 @@ export async function updatePost(
 	}
 
 	return { kind: "updated", revision: newRevision };
+}
+
+export async function createPost(
+	d1: ContentD1Database,
+	input: CreatePostInput,
+): Promise<CreatePostResult> {
+	const uniqueTags = [...new Set(input.tags)];
+
+	for (let attempt = 0; attempt < 3; attempt++) {
+		const sequenceRow = await d1
+			.prepare(
+				"SELECT MAX(CAST(substr(`slug`, 12) AS INTEGER)) AS `max_sequence` FROM `posts` WHERE `slug` LIKE ?",
+			)
+			.bind(`${input.date}-%`)
+			.first<{ max_sequence: number | null }>();
+
+		const sequence = (sequenceRow?.max_sequence ?? -1) + 1;
+		const slug = `${input.date}-${sequence}`;
+		const now = Date.now();
+
+		const statements = [
+			d1
+				.prepare(
+					"INSERT INTO `posts` (`slug`, `title`, `date`, `draft`, `body`, `revision`, `created_at`, `updated_at`, `update_token`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+				)
+				.bind(
+					slug,
+					input.title,
+					input.date,
+					input.draft ? 1 : 0,
+					input.body,
+					1,
+					now,
+					now,
+					crypto.randomUUID(),
+				),
+		];
+
+		for (const tagName of uniqueTags) {
+			statements.push(
+				d1
+					.prepare("INSERT OR IGNORE INTO `tags` (`name`) VALUES (?)")
+					.bind(tagName),
+			);
+			statements.push(
+				d1
+					.prepare(
+						"INSERT INTO `post_tags` (`post_slug`, `tag_name`) VALUES (?, ?)",
+					)
+					.bind(slug, tagName),
+			);
+		}
+
+		try {
+			await d1.batch(statements);
+			return { kind: "created", slug, revision: 1 };
+		} catch (error) {
+			if (attempt === 2) throw error;
+		}
+	}
+
+	return { kind: "conflict" };
 }
 
 export async function searchPosts(

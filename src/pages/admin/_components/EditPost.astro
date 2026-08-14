@@ -8,11 +8,12 @@ import EditTitle from "./EditTitle.astro";
 import ImageUploader from "./ImageUploader.astro";
 
 interface Props {
-	slug: string;
+	slug?: string;
 	initialData: EditablePost;
 }
 
 const { slug, initialData } = Astro.props;
+const isNew = !slug;
 ---
 
 <div class="bg-base-200/50 sticky top-0 z-20 -mx-2 mb-3 backdrop-blur-sm">
@@ -21,21 +22,23 @@ const { slug, initialData } = Astro.props;
 			<a href="/admin" class="btn btn-ghost btn-circle btn-sm">
 				<Icon name="tabler:arrow-left" class="size-5" />
 			</a>
-			<span class="truncate font-mono text-sm">{slug}</span>
+			<span class="truncate font-mono text-sm">{slug ?? "新規記事"}</span>
 		</div>
 		<div class="flex items-center gap-1">
-			<a
-				href={`/admin/preview/${slug}`}
-				class="btn btn-ghost btn-circle btn-sm"
-				title="Preview"
-			>
-				<Icon name="tabler:eye" class="size-4" />
-			</a>
+			{!isNew && (
+					<a
+						href={`/admin/preview/${slug}`}
+						class="btn btn-ghost btn-circle btn-sm"
+						title="Preview"
+					>
+						<Icon name="tabler:eye" class="size-4" />
+					</a>
+				)}
 			<button
 				type="submit"
 				form="edit-form"
 				class="btn btn-primary btn-circle btn-sm shadow-sm"
-				title="Save"
+				title={isNew ? "Create" : "Save"}
 			>
 				<Icon name="tabler:device-floppy" class="size-4" />
 			</button>
@@ -46,7 +49,8 @@ const { slug, initialData } = Astro.props;
 <form
 	id="edit-form"
 	class="flex flex-col gap-3 pb-4"
-	data-slug={slug}
+	data-slug={slug ?? undefined}
+	data-mode={isNew ? "create" : "edit"}
 	data-revision={String(initialData.revision)}
 >
 	<details class="bg-base-200/30 rounded-xl">
@@ -63,7 +67,13 @@ const { slug, initialData } = Astro.props;
 		</div>
 	</details>
 
-	<ImageUploader slug={slug} />
+	{isNew ? (
+			<div class="bg-base-200/50 rounded-lg px-3 py-2 text-xs text-base-content/60">
+				初回保存後に画像をアップロードできます。
+			</div>
+		) : (
+			<ImageUploader slug={slug} />
+		)}
 
 	<textarea
 		id="body"

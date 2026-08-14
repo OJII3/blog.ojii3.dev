@@ -1,0 +1,23 @@
+---
+import type { EditablePost } from "@/pages/admin/_lib/types";
+import EditPost from "./_components/EditPost.astro";
+import AdminLayout from "./_layouts/AdminLayout.astro";
+
+export const prerender = false;
+
+const today = new Date().toISOString().slice(0, 10);
+const postData: EditablePost = {
+	frontmatter: {
+		date: today,
+		draft: true,
+	},
+	body: "",
+	revision: 0,
+};
+---
+
+<AdminLayout title="New post">
+	<main class="mx-auto min-h-dvh max-w-lg px-2">
+		<EditPost initialData={postData} />
+	</main>
+</AdminLayout>
