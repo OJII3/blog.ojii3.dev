@@ -8,12 +8,14 @@ import TopCard from "@/pages/_components/TopCard.astro";
 import GlobalLayout from "@/pages/_layouts/GlobalLayout.astro";
 
 const result = await getLiveCollection("blog");
+
 if (result.error) throw result.error;
 if (!result.entries) throw new Error("Failed to load blog collection");
 
 const allBlogPosts = result.entries
 	.filter((post) => !post.data.draft)
 	.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
 ---
 
 <GlobalLayout title="晴れときどき崩壊ブログ">
