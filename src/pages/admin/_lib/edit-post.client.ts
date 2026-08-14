@@ -5,6 +5,7 @@ type SubmitState = {
 	button?: HTMLButtonElement | null;
 	label?: HTMLElement | null;
 	originalText?: string;
+	originalTitle?: string;
 };
 
 const parseTags = (value: FormDataEntryValue | null) => {
@@ -25,34 +26,45 @@ const buildFrontmatter = (formData: FormData) => {
 		title: typeof title === "string" ? title : "",
 		date: typeof date === "string" ? date : "",
 		tags: parseTags(formData.get("tags")),
-		draft: draft ? true : undefined,
+		draft,
 	};
 };
 
 const toggleSubmitState = (state: SubmitState, isSubmitting: boolean) => {
-	if (!state.button || !state.label || !state.originalText) return;
+	if (!state.button) return;
+
 	state.button.disabled = isSubmitting;
-	state.label.textContent = isSubmitting ? "Saving..." : state.originalText;
+	state.button.setAttribute("aria-busy", String(isSubmitting));
+	if (state.originalTitle) {
+		state.button.title = isSubmitting ? "Saving..." : state.originalTitle;
+	}
+	if (state.label && state.originalText) {
+		state.label.textContent = isSubmitting ? "Saving..." : state.originalText;
+	}
 };
 
 const readSubmitState = (form: HTMLFormElement): SubmitState => {
-	const button = form.querySelector(
-		'button[type="submit"]',
-	) as HTMLButtonElement | null;
+	const button =
+		form.querySelector<HTMLButtonElement>('button[type="submit"]') ??
+		form.ownerDocument.querySelector<HTMLButtonElement>(
+			`button[type="submit"][form="${form.id}"]`,
+		);
 	const label = form.querySelector<HTMLElement>("#btn-text");
 
 	return {
 		button,
 		label,
 		originalText: label?.textContent ?? undefined,
+		originalTitle: button?.title ?? undefined,
 	};
 };
 
 const getFormMetadata = (form: HTMLFormElement) => {
 	const slug = form.dataset.slug;
 	const revision = Number(form.dataset.revision);
+	const isNew = form.dataset.mode === "create";
 
-	return { slug, revision };
+	return { slug, revision, isNew };
 };
 
 export const setupEditPostForm = (formId = "edit-form") => {
@@ -60,17 +72,20 @@ export const setupEditPostForm = (formId = "edit-form") => {
 	if (!form) return;
 
 	const submitState = readSubmitState(form);
-	const { slug, revision } = getFormMetadata(form);
+	const { slug, revision, isNew } = getFormMetadata(form);
 
-	if (!slug) {
+	if (!slug && !isNew) {
 		console.warn("Missing slug on edit form; aborting setup.");
 		return;
 	}
 
 	let currentRevision = revision;
+	let isSubmitting = false;
 
 	form.addEventListener("submit", async (event) => {
 		event.preventDefault();
+		if (isSubmitting) return;
+		isSubmitting = true;
 
 		toggleSubmitState(submitState, true);
 
@@ -79,14 +94,24 @@ export const setupEditPostForm = (formId = "edit-form") => {
 		const body = formData.get("body");
 
 		try {
-			const { data, error } = await actions.updatePost({
-				slug,
-				frontmatter,
-				body: typeof body === "string" ? body : "",
-				revision: currentRevision,
-			});
+			const { data, error } = isNew
+				? await actions.createPost({
+						frontmatter,
+						body: typeof body === "string" ? body : "",
+					})
+				: await actions.updatePost({
+						slug: slug as string,
+						frontmatter,
+						body: typeof body === "string" ? body : "",
+						revision: currentRevision,
+					});
 
 			if (!error && data) {
+				if (isNew && "slug" in data) {
+					showToast("記事を作成しました", "success");
+					window.location.assign(`/admin/edit/${data.slug}`);
+					return;
+				}
 				if (data.revision != null) {
 					currentRevision = data.revision;
 					form.dataset.revision = String(data.revision);
@@ -108,6 +133,7 @@ export const setupEditPostForm = (formId = "edit-form") => {
 			console.error(err);
 			showToast("ネットワークエラーが発生しました", "error");
 		} finally {
+			isSubmitting = false;
 			toggleSubmitState(submitState, false);
 		}
 	});

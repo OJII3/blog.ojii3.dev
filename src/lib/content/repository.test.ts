@@ -1,6 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { posts, postTags, tags } from "../../db/schema";
-import { getPost, listPosts, searchPosts, updatePost } from "./repository";
+import {
+	createPost,
+	getPost,
+	listPosts,
+	searchPosts,
+	updatePost,
+} from "./repository";
 import { createTestDb, type TestDb } from "./test-helper";
 
 let testDb: TestDb;
@@ -161,6 +167,59 @@ describe("getPost", () => {
 	it("returns null for non-existent slug", async () => {
 		const post = await getPost(testDb.db, "nonexistent");
 		expect(post).toBeNull();
+	});
+});
+
+describe("createPost", () => {
+	it("creates a draft with a date-based slug and tags", async () => {
+		const result = await createPost(testDb.d1, {
+			title: "New post",
+			date: "2024-01-01",
+			draft: true,
+			body: "new body",
+			tags: ["astro", "blog", "astro"],
+		});
+
+		expect(result).toEqual({
+			kind: "created",
+			slug: "2024-01-01-0",
+			revision: 1,
+		});
+
+		const post = await getPost(testDb.db, "2024-01-01-0");
+		expect(post).toMatchObject({
+			title: "New post",
+			dateString: "2024-01-01",
+			draft: true,
+			body: "new body",
+			tags: ["astro", "blog"],
+		});
+	});
+
+	it("uses the next sequence for the selected date", async () => {
+		await seedPost(testDb, {
+			slug: "2024-01-01-0",
+			title: "First",
+			date: "2024-01-01",
+		});
+		await seedPost(testDb, {
+			slug: "2024-01-01-2",
+			title: "Third",
+			date: "2024-01-01",
+		});
+
+		const result = await createPost(testDb.d1, {
+			title: "Fourth",
+			date: "2024-01-01",
+			draft: true,
+			body: "body",
+			tags: [],
+		});
+
+		expect(result).toMatchObject({
+			kind: "created",
+			slug: "2024-01-01-3",
+		});
 	});
 });
 

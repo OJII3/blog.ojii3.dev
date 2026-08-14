@@ -1,7 +1,7 @@
 import { describe, expect, it, mock } from "bun:test";
 import type { ContentD1Database } from "@/db/client";
-import type { updatePost } from "@/lib/content/repository";
-import { handleUpdatePost } from "./content";
+import type { createPost, updatePost } from "@/lib/content/repository";
+import { handleCreatePost, handleUpdatePost } from "./content";
 
 function createMockDb(): ContentD1Database {
 	return {} as ContentD1Database;
@@ -154,5 +154,51 @@ describe("handleUpdatePost", () => {
 		const callArgs = mockUpdatePost.mock.calls[0]?.[1];
 		expect(callArgs?.tags).toEqual([]);
 		expect(callArgs?.draft).toBe(false);
+	});
+});
+
+describe("handleCreatePost", () => {
+	it("returns the created slug and revision", async () => {
+		const mockCreatePost = mock<typeof createPost>(() =>
+			Promise.resolve({ kind: "created", slug: "2024-01-01-0", revision: 1 }),
+		);
+
+		const result = await handleCreatePost(
+			{
+				frontmatter: {
+					title: " New post ",
+					date: "2024-01-01",
+					tags: ["astro"],
+				},
+				body: "body",
+			},
+			createMockDb(),
+			mockCreatePost,
+		);
+
+		expect(result).toEqual({ slug: "2024-01-01-0", revision: 1 });
+		expect(mockCreatePost).toHaveBeenCalledWith(expect.anything(), {
+			title: "New post",
+			date: "2024-01-01",
+			tags: ["astro"],
+			draft: true,
+			body: "body",
+		});
+	});
+
+	it("rejects an invalid date before creating", async () => {
+		const mockCreatePost = mock<typeof createPost>();
+
+		expect(
+			handleCreatePost(
+				{
+					frontmatter: { title: "New post", date: "2024-02-30" },
+					body: "body",
+				},
+				createMockDb(),
+				mockCreatePost,
+			),
+		).rejects.toMatchObject({ code: "BAD_REQUEST" });
+		expect(mockCreatePost).not.toHaveBeenCalled();
 	});
 });
