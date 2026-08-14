@@ -19,9 +19,10 @@ const { id, title, date, href, color } = Astro.props;
 		BORDER_COLORS[color],
 	]}
 	href={href}
+	rel="canonical"
 >
-	<h2 class="2x:text-lg inline-block text-sm overflow-ellipsis md:text-lg">
+	<h2 class="2x:text-lg inline-block text-sm text-ellipsis md:text-lg">
 		{title}
 	</h2>
-	<p class="2x:text-sm text-xs overflow-ellipsis">{date}</p>
+	<p class="2x:text-sm text-xs text-ellipsis">{date}</p>
 </a>
