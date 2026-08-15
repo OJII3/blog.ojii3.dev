@@ -1,5 +1,6 @@
 import { defineMiddleware } from "astro:middleware";
 import { auth } from "@/auth";
+import { withNoStore } from "./cache-control";
 
 const PRIVATE_ROUTES_PREFIX = "/admin";
 const AUTH_API_PREFIX = "/api/auth";
@@ -34,14 +35,16 @@ export const onRequest = defineMiddleware(async (context, next) => {
 	if (isPrivateRoute) {
 		if (!context.locals.user) {
 			const redirectTo = url.pathname + url.search;
-			return context.redirect(
-				`${LOGIN_ROUTE}?redirectTo=${encodeURIComponent(redirectTo)}`,
+			return withNoStore(
+				context.redirect(
+					`${LOGIN_ROUTE}?redirectTo=${encodeURIComponent(redirectTo)}`,
+				),
 			);
 		}
 	} else if (isLoginRoute && context.locals.user) {
 		// If already logged in and trying to access /login, redirect to /admin
-		return context.redirect(PRIVATE_ROUTES_PREFIX);
+		return withNoStore(context.redirect(PRIVATE_ROUTES_PREFIX));
 	}
 
-	return next();
+	return withNoStore(await next());
 });
