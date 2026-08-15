@@ -3,9 +3,6 @@ import { type ContentEnv, createContentDb } from "../db/client";
 import type { ContentPost } from "../lib/content/types";
 
 type ContentDb = ReturnType<typeof createContentDb>;
-type MarkdownProcessor = {
-	render: (content: string, slug: string) => Promise<{ html: string }>;
-};
 export type D1LiveLoaderDatabase = ContentDb;
 export type D1LiveLoaderEnvironment = Pick<ContentEnv, "DB" | "MEDIA_BASE_URL">;
 
@@ -14,17 +11,12 @@ type ListPostsFn = (
 	opts: { includeDrafts: boolean },
 ) => Promise<ContentPost[]>;
 type GetPostFn = (db: ContentDb, slug: string) => Promise<ContentPost | null>;
-type CreateMarkdownProcessorFn = (opts: {
-	mediaBaseUrl: string;
-}) => MarkdownProcessor;
-
 export type D1LiveLoaderOptions = {
 	getEnv?: () => D1LiveLoaderEnvironment | Promise<D1LiveLoaderEnvironment>;
 	getDb?: (env: D1LiveLoaderEnvironment) => D1LiveLoaderDatabase;
 	deps?: {
 		listPosts: ListPostsFn;
 		getPost: GetPostFn;
-		createMarkdownProcessor: CreateMarkdownProcessorFn;
 	};
 };
 
@@ -50,11 +42,6 @@ async function getDefaultGetPost(): Promise<GetPostFn> {
 	return mod.getPost;
 }
 
-async function getDefaultCreateMarkdownProcessor(): Promise<CreateMarkdownProcessorFn> {
-	const mod = await import("../lib/content/markdown");
-	return mod.createContentMarkdownProcessor;
-}
-
 const getWorkerEnv = async (): Promise<D1LiveLoaderEnvironment> => {
 	const { env } = await import("cloudflare:workers");
 	return env as unknown as D1LiveLoaderEnvironment;
@@ -62,18 +49,14 @@ const getWorkerEnv = async (): Promise<D1LiveLoaderEnvironment> => {
 
 const toEntryData = async (
 	post: ContentPost,
-	processor: MarkdownProcessor,
-	renderHtml = true,
+	includeHtml = true,
 ): Promise<{ id: string; data: D1EntryData }> => {
-	const html = renderHtml
-		? (await processor.render(post.body, post.slug)).html
-		: "";
 	return {
 		id: post.slug,
 		data: {
 			path: post.slug,
 			content: post.body,
-			html,
+			html: includeHtml ? post.renderedHtml : "",
 			title: post.title,
 			date: post.date,
 			dateString: post.dateString,
@@ -92,19 +75,13 @@ export function d1LiveLoader(
 		loadCollection: async () => {
 			const env = await (options.getEnv?.() ?? getWorkerEnv());
 			const db = options.getDb?.(env) ?? createContentDb(env);
-			const mediaBaseUrl = env.MEDIA_BASE_URL;
 
 			const listPosts =
 				options.deps?.listPosts ?? (await getDefaultListPosts());
-			const createMarkdownProcessor =
-				options.deps?.createMarkdownProcessor ??
-				(await getDefaultCreateMarkdownProcessor());
-
-			const processor = createMarkdownProcessor({ mediaBaseUrl });
 			const posts = await listPosts(db, { includeDrafts: true });
 
 			const entries = await Promise.all(
-				posts.map((post) => toEntryData(post, processor, false)),
+				posts.map((post) => toEntryData(post, false)),
 			);
 
 			return { entries };
@@ -112,19 +89,13 @@ export function d1LiveLoader(
 		loadEntry: async ({ filter }) => {
 			const env = await (options.getEnv?.() ?? getWorkerEnv());
 			const db = options.getDb?.(env) ?? createContentDb(env);
-			const mediaBaseUrl = env.MEDIA_BASE_URL;
 
 			const getPost = options.deps?.getPost ?? (await getDefaultGetPost());
-			const createMarkdownProcessor =
-				options.deps?.createMarkdownProcessor ??
-				(await getDefaultCreateMarkdownProcessor());
-
-			const processor = createMarkdownProcessor({ mediaBaseUrl });
 			const post = await getPost(db, filter.id);
 
 			if (!post) return undefined;
 
-			return toEntryData(post, processor);
+			return toEntryData(post);
 		},
 	};
 }

@@ -6,12 +6,15 @@ export type ContentPost = {
 	tags: string[];
 	draft: boolean;
 	body: string;
+	renderedHtml: string;
 	revision: number;
 };
 
+export type RenderContentHtml = (body: string, slug: string) => Promise<string>;
+
 export type UpdatePostInput = Omit<
 	ContentPost,
-	"date" | "dateString" | "revision"
+	"date" | "dateString" | "renderedHtml" | "revision"
 > & { date: string; revision: number };
 
 export type UpdatePostResult =
@@ -21,7 +24,7 @@ export type UpdatePostResult =
 
 export type CreatePostInput = Omit<
 	ContentPost,
-	"slug" | "date" | "dateString" | "revision"
+	"slug" | "date" | "dateString" | "renderedHtml" | "revision"
 > & { date: string };
 
 export type CreatePostResult =

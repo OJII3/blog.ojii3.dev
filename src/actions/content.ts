@@ -5,6 +5,7 @@ import {
 	createPost as defaultCreatePost,
 	updatePost as defaultUpdatePost,
 } from "@/lib/content/repository";
+import type { RenderContentHtml } from "@/lib/content/types";
 import {
 	isValidContentSlug,
 	normalizeContentDate,
@@ -36,6 +37,7 @@ export async function handleCreatePost(
 	input: z.infer<typeof createPostInput>,
 	db: ContentD1Database,
 	createPostFn: typeof defaultCreatePost = defaultCreatePost,
+	renderContentHtml?: RenderContentHtml,
 ) {
 	if (!input.frontmatter.title.trim()) {
 		throw new ActionError({
@@ -52,13 +54,16 @@ export async function handleCreatePost(
 		});
 	}
 
-	const result = await createPostFn(db, {
+	const createInput = {
 		title: input.frontmatter.title.trim(),
 		date: normalizedDate,
 		tags: input.frontmatter.tags ?? [],
 		draft: input.frontmatter.draft ?? true,
 		body: input.body,
-	});
+	};
+	const result = renderContentHtml
+		? await createPostFn(db, createInput, renderContentHtml)
+		: await createPostFn(db, createInput);
 
 	switch (result.kind) {
 		case "created":
@@ -75,6 +80,7 @@ export async function handleUpdatePost(
 	input: z.infer<typeof updatePostInput>,
 	db: ContentD1Database,
 	updatePostFn: typeof defaultUpdatePost = defaultUpdatePost,
+	renderContentHtml?: RenderContentHtml,
 ) {
 	if (!isValidContentSlug(input.slug)) {
 		throw new ActionError({
@@ -91,7 +97,7 @@ export async function handleUpdatePost(
 		});
 	}
 
-	const result = await updatePostFn(db, {
+	const updateInput = {
 		slug: input.slug,
 		title: input.frontmatter.title,
 		date: normalizedDate,
@@ -99,7 +105,10 @@ export async function handleUpdatePost(
 		draft: input.frontmatter.draft ?? false,
 		body: input.body,
 		revision: input.revision,
-	});
+	};
+	const result = renderContentHtml
+		? await updatePostFn(db, updateInput, renderContentHtml)
+		: await updatePostFn(db, updateInput);
 
 	switch (result.kind) {
 		case "updated":
