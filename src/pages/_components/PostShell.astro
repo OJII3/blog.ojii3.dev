@@ -21,7 +21,7 @@ export interface Props {
 	dateString: string;
 	color: VitaColor;
 	tags?: string[];
-	postId?: string; // If present, enables view transitions and OG image
+	postId: string; // Enables the edit link, view transitions, and OG image
 	prevPost?: PostLink | null;
 	nextPost?: PostLink | null;
 	html?: string; // For preview content

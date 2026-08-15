@@ -196,6 +196,28 @@ describe("createPost", () => {
 		});
 	});
 
+	it("makes the created body visible to the admin listing", async () => {
+		const result = await createPost(testDb.d1, {
+			title: "Listed post",
+			date: "2024-01-01",
+			draft: true,
+			body: "# Listed body",
+			tags: [],
+		});
+
+		expect(result.kind).toBe("created");
+		if (result.kind !== "created") return;
+
+		const listed = await listPosts(testDb.db, { includeDrafts: true });
+		expect(listed).toContainEqual(
+			expect.objectContaining({
+				slug: result.slug,
+				body: "# Listed body",
+				revision: 1,
+			}),
+		);
+	});
+
 	it("uses the next sequence for the selected date", async () => {
 		await seedPost(testDb, {
 			slug: "2024-01-01-0",

@@ -4,8 +4,11 @@
 	"main": "@astrojs/cloudflare/entrypoints/server",
 	"compatibility_date": "2025-07-12",
 	"compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+	// SSR pages include authenticated admin data and must not be served from
+	// Workers Caching. Add route-specific caching only after setting explicit
+	// Cache-Control headers for every dynamic response.
 	"cache": {
-		"enabled": true
+		"enabled": false
 	},
 	"observability": {
 		"enabled": true
