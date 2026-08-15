@@ -4,6 +4,9 @@
 	"main": "@astrojs/cloudflare/entrypoints/server",
 	"compatibility_date": "2025-07-12",
 	"compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+	"cache": {
+		"enabled": true
+	},
 	"observability": {
 		"enabled": true
 	},
