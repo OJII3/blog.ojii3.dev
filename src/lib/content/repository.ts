@@ -1,4 +1,4 @@
-import { and, eq, like, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gt, like, lt, or, sql } from "drizzle-orm";
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 import type { ContentD1Database, ContentD1Result } from "../../db/client";
 import { posts, postTags, type tags } from "../../db/schema";
@@ -6,6 +6,7 @@ import type {
 	ContentPost,
 	CreatePostInput,
 	CreatePostResult,
+	RenderContentHtml,
 	UpdatePostInput,
 	UpdatePostResult,
 } from "./types";
@@ -24,6 +25,7 @@ type PostRow = {
 	date: string;
 	draft: boolean;
 	body: string;
+	renderedHtml: string;
 	revision: number;
 };
 
@@ -36,7 +38,61 @@ function rowToContentPost(row: PostRow, tagList: string[]): ContentPost {
 		tags: tagList,
 		draft: row.draft,
 		body: row.body,
+		renderedHtml: row.renderedHtml,
 		revision: row.revision,
+	};
+}
+
+export type AdjacentPost = {
+	slug: string;
+	title: string;
+};
+
+export async function getAdjacentPosts(
+	db: DrizzleDb,
+	current: { slug: string; date: string | Date },
+): Promise<{ prevPost: AdjacentPost | null; nextPost: AdjacentPost | null }> {
+	const date =
+		current.date instanceof Date
+			? current.date.toISOString().slice(0, 10)
+			: current.date;
+
+	const [prev, next] = await Promise.all([
+		db
+			.select({ slug: posts.slug, title: posts.title })
+			.from(posts)
+			.where(
+				and(
+					eq(posts.draft, false),
+					or(
+						gt(posts.date, date),
+						and(eq(posts.date, date), gt(posts.slug, current.slug)),
+					),
+				),
+			)
+			.orderBy(asc(posts.date), asc(posts.slug))
+			.limit(1)
+			.all(),
+		db
+			.select({ slug: posts.slug, title: posts.title })
+			.from(posts)
+			.where(
+				and(
+					eq(posts.draft, false),
+					or(
+						lt(posts.date, date),
+						and(eq(posts.date, date), lt(posts.slug, current.slug)),
+					),
+				),
+			)
+			.orderBy(desc(posts.date), desc(posts.slug))
+			.limit(1)
+			.all(),
+	]);
+
+	return {
+		prevPost: prev[0] ?? null,
+		nextPost: next[0] ?? null,
 	};
 }
 
@@ -97,6 +153,7 @@ export async function getPost(
 export async function updatePost(
 	d1: ContentD1Database,
 	input: UpdatePostInput,
+	renderContentHtml?: RenderContentHtml,
 ): Promise<UpdatePostResult> {
 	const existing = await d1
 		.prepare("SELECT `revision` FROM `posts` WHERE `slug` = ?")
@@ -112,28 +169,48 @@ export async function updatePost(
 	const now = Date.now();
 	const newRevision = input.revision + 1;
 	const updateToken = crypto.randomUUID();
+	const renderedHtml = renderContentHtml
+		? await renderContentHtml(input.body, input.slug)
+		: null;
 
 	const uniqueTags = [...new Set(input.tags)];
 
 	const stmts = [];
 
-	stmts.push(
-		d1
-			.prepare(
-				"UPDATE `posts` SET `title` = ?, `date` = ?, `draft` = ?, `body` = ?, `revision` = ?, `updated_at` = ?, `update_token` = ? WHERE `slug` = ? AND `revision` = ?",
-			)
-			.bind(
-				input.title,
-				input.date,
-				input.draft ? 1 : 0,
-				input.body,
-				newRevision,
-				now,
-				updateToken,
-				input.slug,
-				input.revision,
-			),
-	);
+	const updateStatement =
+		renderedHtml === null
+			? d1
+					.prepare(
+						"UPDATE `posts` SET `title` = ?, `date` = ?, `draft` = ?, `body` = ?, `revision` = ?, `updated_at` = ?, `update_token` = ? WHERE `slug` = ? AND `revision` = ?",
+					)
+					.bind(
+						input.title,
+						input.date,
+						input.draft ? 1 : 0,
+						input.body,
+						newRevision,
+						now,
+						updateToken,
+						input.slug,
+						input.revision,
+					)
+			: d1
+					.prepare(
+						"UPDATE `posts` SET `title` = ?, `date` = ?, `draft` = ?, `body` = ?, `rendered_html` = ?, `revision` = ?, `updated_at` = ?, `update_token` = ? WHERE `slug` = ? AND `revision` = ?",
+					)
+					.bind(
+						input.title,
+						input.date,
+						input.draft ? 1 : 0,
+						input.body,
+						renderedHtml,
+						newRevision,
+						now,
+						updateToken,
+						input.slug,
+						input.revision,
+					);
+	stmts.push(updateStatement);
 
 	stmts.push(
 		d1
@@ -176,6 +253,7 @@ export async function updatePost(
 export async function createPost(
 	d1: ContentD1Database,
 	input: CreatePostInput,
+	renderContentHtml?: RenderContentHtml,
 ): Promise<CreatePostResult> {
 	const uniqueTags = [...new Set(input.tags)];
 
@@ -190,11 +268,14 @@ export async function createPost(
 		const sequence = (sequenceRow?.max_sequence ?? -1) + 1;
 		const slug = `${input.date}-${sequence}`;
 		const now = Date.now();
+		const renderedHtml = renderContentHtml
+			? await renderContentHtml(input.body, slug)
+			: "";
 
 		const statements = [
 			d1
 				.prepare(
-					"INSERT INTO `posts` (`slug`, `title`, `date`, `draft`, `body`, `revision`, `created_at`, `updated_at`, `update_token`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+					"INSERT INTO `posts` (`slug`, `title`, `date`, `draft`, `body`, `rendered_html`, `revision`, `created_at`, `updated_at`, `update_token`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
 				)
 				.bind(
 					slug,
@@ -202,6 +283,7 @@ export async function createPost(
 					input.date,
 					input.draft ? 1 : 0,
 					input.body,
+					renderedHtml,
 					1,
 					now,
 					now,

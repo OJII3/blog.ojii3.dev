@@ -43,6 +43,7 @@ export default defineConfig({
 					"javascript",
 					"json",
 					"nix",
+					"python",
 					"shell",
 					"toml",
 					"typescript",

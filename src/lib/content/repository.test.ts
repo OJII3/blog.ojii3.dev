@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { posts, postTags, tags } from "../../db/schema";
 import {
 	createPost,
+	getAdjacentPosts,
 	getPost,
 	listPosts,
 	searchPosts,
@@ -170,7 +171,63 @@ describe("getPost", () => {
 	});
 });
 
+describe("getAdjacentPosts", () => {
+	it("returns the nearest published posts and skips drafts", async () => {
+		await seedPost(testDb, {
+			slug: "older",
+			title: "Older",
+			date: "2024-01-01",
+		});
+		await seedPost(testDb, {
+			slug: "current",
+			title: "Current",
+			date: "2024-02-01",
+		});
+		await seedPost(testDb, {
+			slug: "newer",
+			title: "Newer",
+			date: "2024-03-01",
+		});
+		await seedPost(testDb, {
+			slug: "draft-newer",
+			title: "Draft Newer",
+			date: "2024-04-01",
+			draft: true,
+		});
+
+		const result = await getAdjacentPosts(testDb.db, {
+			slug: "current",
+			date: "2024-02-01",
+		});
+
+		expect(result.prevPost).toEqual({ slug: "newer", title: "Newer" });
+		expect(result.nextPost).toEqual({ slug: "older", title: "Older" });
+	});
+});
+
 describe("createPost", () => {
+	it("stores rendered HTML when a renderer is provided", async () => {
+		const result = await createPost(
+			testDb.d1,
+			{
+				title: "Rendered post",
+				date: "2024-01-01",
+				draft: false,
+				body: "# body",
+				tags: [],
+			},
+			async (body, slug) => `<article data-slug="${slug}">${body}</article>`,
+		);
+
+		expect(result.kind).toBe("created");
+		if (result.kind !== "created") return;
+
+		const post = await getPost(testDb.db, result.slug);
+		expect(post?.renderedHtml).toBe(
+			`<article data-slug="${result.slug}"># body</article>`,
+		);
+	});
+
 	it("creates a draft with a date-based slug and tags", async () => {
 		const result = await createPost(testDb.d1, {
 			title: "New post",
@@ -246,6 +303,35 @@ describe("createPost", () => {
 });
 
 describe("updatePost", () => {
+	it("stores rendered HTML when a renderer is provided", async () => {
+		await seedPost(testDb, {
+			slug: "rendered",
+			title: "Original",
+			date: "2024-01-01",
+			body: "old body",
+		});
+
+		const result = await updatePost(
+			testDb.d1,
+			{
+				slug: "rendered",
+				title: "Updated",
+				date: "2024-02-01",
+				body: "new body",
+				draft: false,
+				tags: [],
+				revision: 1,
+			},
+			async (body, slug) => `<article data-slug="${slug}">${body}</article>`,
+		);
+
+		expect(result).toEqual({ kind: "updated", revision: 2 });
+		const post = await getPost(testDb.db, "rendered");
+		expect(post?.renderedHtml).toBe(
+			'<article data-slug="rendered">new body</article>',
+		);
+	});
+
 	it("updates post and tags with matching revision", async () => {
 		await seedPost(testDb, {
 			slug: "post",

@@ -1,21 +1,29 @@
 import {
+	index,
 	integer,
 	primaryKey,
 	sqliteTable,
 	text,
 } from "drizzle-orm/sqlite-core";
 
-export const posts = sqliteTable("posts", {
-	slug: text("slug").primaryKey(),
-	title: text("title").notNull(),
-	date: text("date").notNull(),
-	draft: integer("draft", { mode: "boolean" }).notNull().default(false),
-	body: text("body").notNull(),
-	revision: integer("revision").notNull().default(1),
-	createdAt: integer("created_at").notNull(),
-	updatedAt: integer("updated_at").notNull(),
-	updateToken: text("update_token").notNull().default(""),
-});
+export const posts = sqliteTable(
+	"posts",
+	{
+		slug: text("slug").primaryKey(),
+		title: text("title").notNull(),
+		date: text("date").notNull(),
+		draft: integer("draft", { mode: "boolean" }).notNull().default(false),
+		body: text("body").notNull(),
+		renderedHtml: text("rendered_html").notNull().default(""),
+		revision: integer("revision").notNull().default(1),
+		createdAt: integer("created_at").notNull(),
+		updatedAt: integer("updated_at").notNull(),
+		updateToken: text("update_token").notNull().default(""),
+	},
+	(table) => [
+		index("posts_published_order_idx").on(table.draft, table.date, table.slug),
+	],
+);
 
 export const tags = sqliteTable("tags", {
 	name: text("name").primaryKey(),

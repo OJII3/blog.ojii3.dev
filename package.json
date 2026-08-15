@@ -14,7 +14,8 @@
 		"preview": "wrangler dev --port 4321",
 		"astro": "astro",
 		"wrangler": "wrangler",
-		"migrate-content": "bun scripts/migrate-content.ts"
+		"migrate-content": "bun scripts/migrate-content.ts",
+		"backfill-rendered-html": "bun scripts/backfill-rendered-html.ts"
 	},
 	"dependencies": {
 		"@astrojs/cloudflare": "^14.2.0",

@@ -11,6 +11,7 @@ const posts: ContentPost[] = [
 		tags: [],
 		draft: true,
 		body: "draft",
+		renderedHtml: "<p>draft</p>",
 		revision: 3,
 	},
 	{
@@ -21,6 +22,7 @@ const posts: ContentPost[] = [
 		tags: ["test"],
 		draft: false,
 		body: "published",
+		renderedHtml: "<p>published</p>",
 		revision: 2,
 	},
 ];

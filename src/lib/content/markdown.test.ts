@@ -56,6 +56,13 @@ describe("createContentMarkdownProcessor", () => {
 			const result = await processor.render(md, "test-post");
 			expect(result.html).toContain("expressive-code");
 		});
+
+		it("should render Python code blocks with expressive-code", async () => {
+			const md = '```python\nprint("hello")\n```';
+			const result = await processor.render(md, "test-post");
+			expect(result.html).toContain("expressive-code");
+			expect(result.html).toContain('data-language="python"');
+		});
 	});
 
 	describe("image URL rewriting", () => {

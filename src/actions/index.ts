@@ -1,5 +1,6 @@
 import { type ActionAPIContext, defineAction } from "astro:actions";
 import { getContentEnv } from "@/db/client";
+import { createContentMarkdownProcessor } from "@/lib/content/markdown";
 import { requireAdmin } from "@/pages/admin/_lib/auth/require-admin";
 import {
 	createPostInput,
@@ -17,7 +18,12 @@ export const server = {
 		handler: async (input, context: ActionAPIContext) => {
 			await requireAdmin(context.request.headers);
 			const env = await getContentEnv();
-			return handleCreatePost(input, env.DB);
+			const processor = createContentMarkdownProcessor({
+				mediaBaseUrl: env.MEDIA_BASE_URL,
+			});
+			return handleCreatePost(input, env.DB, undefined, async (body, slug) => {
+				return (await processor.render(body, slug)).html;
+			});
 		},
 	}),
 	updatePost: defineAction({
@@ -26,7 +32,12 @@ export const server = {
 		handler: async (input, context: ActionAPIContext) => {
 			await requireAdmin(context.request.headers);
 			const env = await getContentEnv();
-			return handleUpdatePost(input, env.DB);
+			const processor = createContentMarkdownProcessor({
+				mediaBaseUrl: env.MEDIA_BASE_URL,
+			});
+			return handleUpdatePost(input, env.DB, undefined, async (body, slug) => {
+				return (await processor.render(body, slug)).html;
+			});
 		},
 	}),
 	uploadImage: defineAction({

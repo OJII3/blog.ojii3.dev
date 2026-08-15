@@ -14,9 +14,14 @@ export interface LiveBlogEntry {
 	};
 }
 
+export type LiveBlogEntryLink = {
+	id: string;
+	data: { title: string };
+};
+
 export interface Props {
-	prevPost: LiveBlogEntry | null;
-	nextPost: LiveBlogEntry | null;
+	prevPost: LiveBlogEntryLink | null;
+	nextPost: LiveBlogEntryLink | null;
 	post: LiveBlogEntry;
 }
 

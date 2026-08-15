@@ -12,6 +12,7 @@ const fakePosts: ContentPost[] = [
 		tags: ["intro"],
 		draft: false,
 		body: "# Hello\n\nWorld",
+		renderedHtml: "<div>stored hello</div>",
 		revision: 1,
 	},
 	{
@@ -22,6 +23,7 @@ const fakePosts: ContentPost[] = [
 		tags: [],
 		draft: true,
 		body: "# Draft",
+		renderedHtml: "<div>stored draft</div>",
 		revision: 2,
 	},
 ];
@@ -38,14 +40,6 @@ const fakeGetPost = async (_db: D1LiveLoaderDatabase, slug: string) => {
 	return fakePosts.find((p) => p.slug === slug) ?? null;
 };
 
-const fakeCreateMarkdownProcessor = (_opts: { mediaBaseUrl: string }) => {
-	return {
-		render: async (content: string, _slug: string) => {
-			return { html: `<div>${content}</div>` };
-		},
-	};
-};
-
 const createLoader = () =>
 	d1LiveLoader({
 		getEnv: () => ({
@@ -56,7 +50,6 @@ const createLoader = () =>
 		deps: {
 			listPosts: fakeListPosts,
 			getPost: fakeGetPost,
-			createMarkdownProcessor: fakeCreateMarkdownProcessor,
 		},
 	});
 
@@ -114,53 +107,6 @@ describe("d1LiveLoader", () => {
 			expect(draftEntry?.data.draft).toBe(true);
 			expect(draftEntry?.data.revision).toBe(2);
 		});
-
-		it("does not render markdown for collection entries", async () => {
-			let renderCalls = 0;
-			const loader = d1LiveLoader({
-				getEnv: () => ({
-					DB: {} as D1Database,
-					MEDIA_BASE_URL: "https://media.example.com",
-				}),
-				getDb: () => ({}) as D1LiveLoaderDatabase,
-				deps: {
-					listPosts: fakeListPosts,
-					getPost: fakeGetPost,
-					createMarkdownProcessor: () => ({
-						render: async () => {
-							renderCalls++;
-							return { html: "<div>rendered</div>" };
-						},
-					}),
-				},
-			});
-
-			await loader.loadCollection({ collection: "blog" });
-
-			expect(renderCalls).toBe(0);
-		});
-
-		it("passes mediaBaseUrl to markdown processor", async () => {
-			let capturedMediaBaseUrl: string | undefined;
-			const loader = d1LiveLoader({
-				getEnv: () => ({
-					DB: {} as D1Database,
-					MEDIA_BASE_URL: "https://custom-media.example.com",
-				}),
-				getDb: () => ({}) as D1LiveLoaderDatabase,
-				deps: {
-					listPosts: fakeListPosts,
-					getPost: fakeGetPost,
-					createMarkdownProcessor: (opts) => {
-						capturedMediaBaseUrl = opts.mediaBaseUrl;
-						return fakeCreateMarkdownProcessor(opts);
-					},
-				},
-			});
-
-			await loader.loadCollection({ collection: "blog" });
-			expect(capturedMediaBaseUrl).toBe("https://custom-media.example.com");
-		});
 	});
 
 	describe("loadEntry", () => {
@@ -179,7 +125,7 @@ describe("d1LiveLoader", () => {
 			expect(result.data.title).toBe("Hello World");
 			expect(result.data.path).toBe("hello-world");
 			expect(result.data.content).toBe("# Hello\n\nWorld");
-			expect(result.data.html).toBe("<div># Hello\n\nWorld</div>");
+			expect(result.data.html).toBe("<div>stored hello</div>");
 		});
 
 		it("returns undefined for unknown slug", async () => {
