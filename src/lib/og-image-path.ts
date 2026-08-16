@@ -20,3 +20,13 @@ export const getOgImageUrl = (
 		baseUrl,
 	).href;
 };
+
+export const getOgImageRouteUrl = (
+	siteUrl: string | URL,
+	slug: string,
+	revision: number,
+): string => {
+	const url = new URL(`/${encodeURIComponent(slug)}/og-image.png`, siteUrl);
+	url.searchParams.set("v", String(revision));
+	return url.href;
+};
