@@ -13,6 +13,11 @@ variable "worker_name" {
   description = "Worker name. Wrangler appends the environment name for named environments."
 }
 
+variable "session_kv_namespace_name" {
+  type        = string
+  description = "Workers KV namespace title used by Astro sessions."
+}
+
 variable "d1_database_name" {
   type        = string
   description = "D1 database name."

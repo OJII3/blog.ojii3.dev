@@ -35,6 +35,12 @@
 			"bucket_name": "blog-media"
 		}
 	],
+	"kv_namespaces": [
+		{
+			"binding": "SESSION",
+			"id": "e3217c93e2e94c8da0ba6cbf00c554ac"
+		}
+	],
 	"env": {
 		"preview": {
 			"name": "blog-ojii3-dev-preview",
@@ -53,6 +59,12 @@
 				{
 					"binding": "MEDIA",
 					"bucket_name": "blog-media-preview"
+				}
+			],
+			"kv_namespaces": [
+				{
+					"binding": "SESSION",
+					"id": "748fa82224874aa2a0e3eb21065a4d5c"
 				}
 			]
 		}
