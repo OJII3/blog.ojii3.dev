@@ -1,6 +1,6 @@
 ---
 # yamllint disable rule:line-length
-name: Deploy Preview & Publish Production
+name: Upload Preview & Deploy Production
 "on":
   pull_request:
     types: [opened, synchronize, reopened]
@@ -19,14 +19,15 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  upload:
+    name: Upload Worker Version
     runs-on: ubuntu-latest
     timeout-minutes: 5
     environment:
       name: ${{ github.event_name == 'pull_request' && 'preview' || 'production' }}
-      url: ${{ steps.deploy-preview.outputs.deployment-url }}
+      url: ${{ steps.upload-version.outputs.deployment-url }}
     outputs:
-      success: ${{ steps.deploy-preview.outcome == 'success' }}
+      success: ${{ steps.upload-version.outcome == 'success' }}
       version_tag: ${{ steps.get-version.outputs.version }}
     steps:
       - name: Setup | Checkout
@@ -50,12 +51,12 @@ jobs:
             exit 1
           fi
 
-          secret_file="$RUNNER_TEMP/worker-secrets.json"
-          jq -n \
-            --arg better_auth_secret "$BETTER_AUTH_SECRET" \
-            --arg gh_app_client_secret "$GH_APP_CLIENT_SECRET" \
-            '{BETTER_AUTH_SECRET: $better_auth_secret, GH_APP_CLIENT_SECRET: $gh_app_client_secret}' \
-            > "$secret_file"
+          secret_file="$RUNNER_TEMP/worker-secrets.env"
+          umask 077
+          cat > "$secret_file" <<EOF
+          BETTER_AUTH_SECRET=$BETTER_AUTH_SECRET
+          GH_APP_CLIENT_SECRET=$GH_APP_CLIENT_SECRET
+          EOF
           echo "file=$secret_file" >> "$GITHUB_OUTPUT"
         env:
           BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
@@ -101,10 +102,10 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
 
-      - name: Run | Deploy
+      - name: Run | Upload
         # v3.14.1
         uses: cloudflare/wrangler-action@da0e0dfe58b7a431659754fdf3f186c529afbe65
-        id: deploy-preview
+        id: upload-version
         with:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -131,17 +132,18 @@ jobs:
           |---------------------------------|------------------------|
           |<span aria-hidden="true">🔨</span> Latest commit | ${{ github.sha }} |
           |<span aria-hidden="true">🔍</span> Latest deploy log | ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} |
-          |<span aria-hidden="true">🌐</span> Preview link | [${{ steps.deploy-preview.outputs.deployment-url }}](${{ steps.deploy-preview.outputs.deployment-url }}) |
+          |<span aria-hidden="true">🌐</span> Preview link | [${{ steps.upload-version.outputs.deployment-url }}](${{ steps.upload-version.outputs.deployment-url }}) |
           ---
           EOF
         env:
           GH_TOKEN: ${{ github.token }}
 
-  publish:
+  deploy:
+    name: Deploy Production Version
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    needs: deploy
-    if: needs.deploy.outputs.success == 'true' && (github.event_name == 'push' || github.event_name == 'repository_dispatch')
+    needs: upload
+    if: needs.upload.outputs.success == 'true' && (github.event_name == 'push' || github.event_name == 'repository_dispatch')
     steps:
       - name: Setup | Checkout
         # v7.0.1
@@ -179,10 +181,10 @@ jobs:
         run: |
           version_id="$(bun wrangler versions list --json | \
             jq -r 'last(.[] |
-            select(.annotations."workers/tag" == "${{ needs.deploy.outputs.version_tag }}") | .id) // ""')"
+            select(.annotations."workers/tag" == "${{ needs.upload.outputs.version_tag }}") | .id) // ""')"
 
           if [ -z "$version_id" ]; then
-            echo "Error: No version found with tag ${{ needs.deploy.outputs.version_tag }}"
+            echo "Error: No version found with tag ${{ needs.upload.outputs.version_tag }}"
             exit 1
           fi
 
@@ -192,10 +194,10 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
 
-      - name: Run | Publish
+      - name: Run | Deploy
         # v3.14.1
         uses: cloudflare/wrangler-action@da0e0dfe58b7a431659754fdf3f186c529afbe65
-        id: publish
+        id: deploy-version
         with:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
