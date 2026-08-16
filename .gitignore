@@ -29,5 +29,13 @@ pnpm-debug.log*
 .envrc
 .direnv/
 
+# Terraform
+infra/**/.terraform/
+infra/**/backend.hcl
+infra/**/*.tfstate
+infra/**/*.tfstate.*
+infra/**/*.tfplan
+infra/**/terraform.tfvars
+
 # cloned content from external repository
 /content/

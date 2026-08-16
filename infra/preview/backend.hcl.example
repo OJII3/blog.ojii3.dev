@@ -1,0 +1,6 @@
+# Create this file as backend.hcl. It is intentionally ignored by git.
+# The R2 access key must be scoped to the terraform state bucket only.
+bucket = "blog-ojii3-terraform-state"
+endpoints = {
+  s3 = "https://<CLOUDFLARE_ACCOUNT_ID>.r2.cloudflarestorage.com"
+}
