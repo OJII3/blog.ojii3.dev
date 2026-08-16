@@ -1,5 +1,7 @@
 ---
 import { getLiveEntry } from "astro:content";
+import { getContentEnv } from "@/db/client";
+import { getOgImageUrl } from "@/lib/og-image-path";
 import PostShell from "@/pages/_components/PostShell.astro";
 import AdminLayout from "../_layouts/AdminLayout.astro";
 
@@ -16,6 +18,12 @@ const { entry, error } = await getLiveEntry("blog", {
 if (error) {
 	return Astro.redirect("/404");
 }
+
+const env = await getContentEnv();
+const ogImageUrl =
+	entry && !entry.data.draft
+		? getOgImageUrl(env.MEDIA_BASE_URL, entry.id, entry.data.revision)
+		: undefined;
 ---
 
 <AdminLayout>
@@ -26,6 +34,7 @@ if (error) {
 				color={entry.data.color}
 				tags={entry.data.tags}
 				postId={slug}
+				ogImageUrl={ogImageUrl}
 				html={entry.data.html}
 			/>
 		) : (

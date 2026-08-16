@@ -6,9 +6,10 @@ type Props = {
 	title: string;
 	date: Date;
 	color: VitaColor;
+	wordmarkSrc?: string;
 };
 
-export const OGImage: FC<Props> = async ({ title, color }) => {
+export const OGImage: FC<Props> = ({ title, color, wordmarkSrc }) => {
 	return (
 		<div
 			lang="ja-JP"
@@ -33,7 +34,7 @@ export const OGImage: FC<Props> = async ({ title, color }) => {
 					overflow: "hidden",
 				}}
 			>
-				<img src={wordmark} alt="" width={352} />
+				<img src={wordmarkSrc ?? wordmark} alt="" width={352} />
 				<div
 					style={{
 						fontSize: "64px",
@@ -49,7 +50,7 @@ export const OGImage: FC<Props> = async ({ title, color }) => {
 				<div style={{ display: "flex", gap: "12px" }}>
 					{Object.values(HEX_COLORS).map((value, i) => (
 						<div
-							key={color}
+							key={`${value}-${i}`}
 							style={{
 								width: "32px",
 								height: "32px",

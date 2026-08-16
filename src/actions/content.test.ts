@@ -1,6 +1,7 @@
 import { describe, expect, it, mock } from "bun:test";
 import type { ContentD1Database } from "@/db/client";
 import type { createPost, updatePost } from "@/lib/content/repository";
+import type { SaveOgImage } from "./content";
 import { handleCreatePost, handleUpdatePost } from "./content";
 
 function createMockDb(): ContentD1Database {
@@ -39,6 +40,65 @@ describe("handleUpdatePost", () => {
 			body: "body",
 			revision: 4,
 		});
+	});
+
+	it("saves an OG image when publishing an update", async () => {
+		const mockUpdatePost = mock<typeof updatePost>(() =>
+			Promise.resolve({ kind: "updated", revision: 5 }),
+		);
+		const mockSaveOgImage = mock<SaveOgImage>(() => Promise.resolve());
+
+		await handleUpdatePost(
+			{
+				slug: "2024-01-01-1",
+				frontmatter: {
+					title: "Updated",
+					date: "2024-01-02",
+					tags: [],
+					draft: false,
+				},
+				body: "body",
+				revision: 4,
+			},
+			createMockDb(),
+			mockUpdatePost,
+			undefined,
+			mockSaveOgImage,
+		);
+
+		expect(mockSaveOgImage).toHaveBeenCalledWith({
+			slug: "2024-01-01-1",
+			revision: 5,
+			title: "Updated",
+			date: "2024-01-02",
+		});
+	});
+
+	it("does not save an OG image for a draft update", async () => {
+		const mockUpdatePost = mock<typeof updatePost>(() =>
+			Promise.resolve({ kind: "updated", revision: 5 }),
+		);
+		const mockSaveOgImage = mock<SaveOgImage>(() => Promise.resolve());
+
+		await handleUpdatePost(
+			{
+				slug: "2024-01-01-1",
+				frontmatter: {
+					title: "Draft",
+					date: "2024-01-02",
+					tags: [],
+					draft: true,
+				},
+				body: "body",
+				revision: 4,
+			},
+			createMockDb(),
+			mockUpdatePost,
+			undefined,
+			mockSaveOgImage,
+		);
+
+		expect(mockSaveOgImage).not.toHaveBeenCalled();
 	});
 
 	it("normalizes ISO date to YYYY-MM-DD", async () => {
@@ -183,6 +243,35 @@ describe("handleCreatePost", () => {
 			tags: ["astro"],
 			draft: true,
 			body: "body",
+		});
+	});
+
+	it("saves an OG image when creating a published post", async () => {
+		const mockCreatePost = mock<typeof createPost>(() =>
+			Promise.resolve({ kind: "created", slug: "2024-01-01-0", revision: 1 }),
+		);
+		const mockSaveOgImage = mock<SaveOgImage>(() => Promise.resolve());
+
+		await handleCreatePost(
+			{
+				frontmatter: {
+					title: "New post",
+					date: "2024-01-01",
+					draft: false,
+				},
+				body: "body",
+			},
+			createMockDb(),
+			mockCreatePost,
+			undefined,
+			mockSaveOgImage,
+		);
+
+		expect(mockSaveOgImage).toHaveBeenCalledWith({
+			slug: "2024-01-01-0",
+			revision: 1,
+			title: "New post",
+			date: "2024-01-01",
 		});
 	});
 
