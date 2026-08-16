@@ -5,6 +5,7 @@ import { join } from "node:path";
 import { parseArgs } from "node:util";
 import {
 	createOgImageRenderer,
+	OG_IMAGE_SATORI_WASM_PATH,
 	OG_IMAGE_WASM_PATH,
 	type OgImageAssetLoader,
 	type OgImageRenderInput,
@@ -87,7 +88,9 @@ const createLocalAssetLoader = (): OgImageAssetLoader => {
 						"../node_modules/@resvg/resvg-wasm/index_bg.wasm",
 						import.meta.url,
 					)
-				: new URL(`../public${path}`, import.meta.url),
+				: path === OG_IMAGE_SATORI_WASM_PATH
+					? new URL("../node_modules/satori/yoga.wasm", import.meta.url)
+					: new URL(`../public${path}`, import.meta.url),
 		);
 		return toArrayBuffer(file);
 	};

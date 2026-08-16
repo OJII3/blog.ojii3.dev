@@ -17,6 +17,7 @@ export const markdownConfig = {};
 const resvgWasmPath = fileURLToPath(
 	import.meta.resolve("@resvg/resvg-wasm/index_bg.wasm"),
 );
+const satoriWasmPath = fileURLToPath(import.meta.resolve("satori/yoga.wasm"));
 
 // https://astro.build/config
 export default defineConfig({
@@ -33,17 +34,23 @@ export default defineConfig({
 		plugins: [
 			tailwindcss(),
 			{
-				name: "resvg-wasm-module",
+				name: "compiled-wasm-modules",
 				enforce: "pre",
 				resolveId(source) {
-					if (source !== "@resvg/resvg-wasm/index_bg.wasm") {
+					const wasmPath =
+						source === "@resvg/resvg-wasm/index_bg.wasm"
+							? resvgWasmPath
+							: source === "satori/yoga.wasm"
+								? satoriWasmPath
+								: undefined;
+					if (!wasmPath) {
 						return undefined;
 					}
 
-					// Astro's Cloudflare integration does not route this package
-					// subpath through its additional-module hook.
+					// Astro's Cloudflare integration does not route these package
+					// subpaths through its additional-module hook.
 					return {
-						id: `__CLOUDFLARE_MODULE__CompiledWasm__${resvgWasmPath}__CLOUDFLARE_MODULE__`,
+						id: `__CLOUDFLARE_MODULE__CompiledWasm__${wasmPath}__CLOUDFLARE_MODULE__`,
 						external: true,
 					};
 				},

@@ -28,6 +28,9 @@ describe("createOgImageRenderer", () => {
 
 	it("renders a PNG from the local OG assets", async () => {
 		const requestedPaths: string[] = [];
+		const satoriWasmModule = new WebAssembly.Module(
+			toArrayBuffer(await readFile("node_modules/satori/yoga.wasm")),
+		);
 		const renderer = createOgImageRenderer(
 			async (path) => {
 				requestedPaths.push(path);
@@ -42,6 +45,7 @@ describe("createOgImageRenderer", () => {
 						await readFile("node_modules/@resvg/resvg-wasm/index_bg.wasm"),
 					),
 				),
+				satoriWasmModule,
 				wordmarkSrc: `data:image/svg+xml;base64,${Buffer.from(
 					await readFile("src/assets/wordmark-for-og.svg"),
 				).toString("base64")}`,

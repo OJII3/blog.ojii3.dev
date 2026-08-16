@@ -1,12 +1,14 @@
 import { initWasm, Resvg } from "@resvg/resvg-wasm";
 import bundledResvgWasm from "@resvg/resvg-wasm/index_bg.wasm";
 import { createElement } from "react";
-import satori from "satori";
+import satori, { init as initSatori } from "satori/standalone";
+import bundledSatoriWasm from "satori/yoga.wasm";
 import type { VitaColor } from "@/pages/_lib/constants";
 import { OGImage } from "@/pages/[slug]/_components/OGImage";
 
 export const OG_IMAGE_FONT_PATH = "/MPLUSRounded1c-Bold.ttf";
 export const OG_IMAGE_WASM_PATH = "/resvg.wasm";
+export const OG_IMAGE_SATORI_WASM_PATH = "/satori.wasm";
 
 export type OgImageRenderInput = {
 	title: string;
@@ -22,9 +24,11 @@ export type OgImageRenderer = (
 type OgImageRendererOptions = {
 	wordmarkSrc?: string;
 	wasmModule?: WebAssembly.Module;
+	satoriWasmModule?: WebAssembly.Module;
 };
 
 let wasmInitPromise: Promise<void> | undefined;
+let satoriInitPromise: Promise<void> | undefined;
 let fontPromise: Promise<ArrayBuffer> | undefined;
 
 const loadFont = (loadAsset: OgImageAssetLoader) => {
@@ -48,6 +52,23 @@ const initResvg = (
 		throw error;
 	});
 	return wasmInitPromise;
+};
+
+const initSatoriWasm = (
+	loadAsset: OgImageAssetLoader,
+	wasmModule?: WebAssembly.Module,
+) => {
+	satoriInitPromise ??= (
+		wasmModule
+			? initSatori(wasmModule)
+			: loadAsset(OG_IMAGE_SATORI_WASM_PATH).then((wasmBuffer) =>
+					initSatori(wasmBuffer),
+				)
+	).catch((error) => {
+		satoriInitPromise = undefined;
+		throw error;
+	});
+	return satoriInitPromise;
 };
 
 export const getWasmModule = (
@@ -75,6 +96,7 @@ export const createOgImageRenderer = (
 		const [font] = await Promise.all([
 			loadFont(loadAsset),
 			initResvg(loadAsset, options.wasmModule),
+			initSatoriWasm(loadAsset, options.satoriWasmModule),
 		]);
 
 		const svg = await satori(
@@ -122,6 +144,12 @@ export const createAssetOgImageRenderer = (
 ): OgImageRenderer => {
 	const url = new URL(baseUrl);
 	const bundledWasmModule = getWasmModule(bundledResvgWasm);
+	const bundledSatoriWasmModule = getWasmModule(bundledSatoriWasm);
+	const resvgWasmModule = wasmModule ?? bundledWasmModule;
+	if (!resvgWasmModule || !bundledSatoriWasmModule) {
+		throw new Error("Compiled OG image WASM modules are unavailable");
+	}
+
 	return createOgImageRenderer(
 		async (path) => {
 			const response = await assets.fetch(new URL(path, url));
@@ -130,10 +158,9 @@ export const createAssetOgImageRenderer = (
 			}
 			return response.arrayBuffer();
 		},
-		wasmModule
-			? { wasmModule }
-			: bundledWasmModule
-				? { wasmModule: bundledWasmModule }
-				: undefined,
+		{
+			wasmModule: resvgWasmModule,
+			satoriWasmModule: bundledSatoriWasmModule,
+		},
 	);
 };
