@@ -32,6 +32,7 @@ jobs:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       AWS_ACCESS_KEY_ID: ${{ secrets.TERRAFORM_STATE_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.TERRAFORM_STATE_SECRET_ACCESS_KEY }}
+      AWS_ENDPOINT_URL_S3: https://${{ secrets.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com
       TF_VAR_cloudflare_account_id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       TF_IN_AUTOMATION: "true"
     steps:
@@ -54,7 +55,6 @@ jobs:
           terraform init
           -input=false
           -backend-config="bucket=blog-ojii3-terraform-state"
-          -backend-config="endpoints.s3=https://${{ secrets.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com"
         working-directory: infra/${{ matrix.environment }}
 
       - name: Validate | Configuration
@@ -74,6 +74,7 @@ jobs:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       AWS_ACCESS_KEY_ID: ${{ secrets.TERRAFORM_STATE_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.TERRAFORM_STATE_SECRET_ACCESS_KEY }}
+      AWS_ENDPOINT_URL_S3: https://${{ secrets.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com
       TF_VAR_cloudflare_account_id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       TF_IN_AUTOMATION: "true"
     steps:
@@ -92,7 +93,6 @@ jobs:
           terraform init
           -input=false
           -backend-config="bucket=blog-ojii3-terraform-state"
-          -backend-config="endpoints.s3=https://${{ secrets.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com"
         working-directory: infra/${{ inputs.environment }}
 
       - name: Run | Apply Terraform
