@@ -35,9 +35,6 @@ jobs:
         run: bun run check
         env:
           GOOGLE_ANALYTICS_ID: ${{ secrets.GOOGLE_ANALYTICS_ID }}
-          GH_APP_CLIENT_ID: ${{ secrets.GH_APP_CLIENT_ID }}
-          GH_APP_CLIENT_SECRET: dummy_value
-          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -59,6 +56,3 @@ jobs:
         run: bun test
         env:
           GOOGLE_ANALYTICS_ID: ${{ secrets.GOOGLE_ANALYTICS_ID }}
-          GH_APP_CLIENT_ID: ${{ secrets.GH_APP_CLIENT_ID }}
-          GH_APP_CLIENT_SECRET: dummy_value
-          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}

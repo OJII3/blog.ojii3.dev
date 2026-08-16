@@ -1,49 +1,41 @@
 import { defineMiddleware } from "astro:middleware";
-import { auth } from "@/auth";
+import { getAccessAuthConfig, getAccessIdentity } from "@/auth";
 import { withNoStore } from "./cache-control";
 
 const PRIVATE_ROUTES_PREFIX = "/admin";
-const AUTH_API_PREFIX = "/api/auth";
-const LOGIN_ROUTE = "/login";
+const PRODUCTION_HOSTNAME = "blog.ojii3.dev";
+const ADMIN_HOSTNAME = "admin.blog.ojii3.dev";
 
-const shouldCheckSession = (pathname: string) => {
-	return (
-		pathname.startsWith(PRIVATE_ROUTES_PREFIX) ||
-		pathname.startsWith(AUTH_API_PREFIX) ||
-		pathname === LOGIN_ROUTE
-	);
+const shouldCheckAdmin = (pathname: string) => {
+	return pathname.startsWith(PRIVATE_ROUTES_PREFIX);
 };
 
 export const onRequest = defineMiddleware(async (context, next) => {
 	const url = new URL(context.request.url);
 
-	if (!shouldCheckSession(url.pathname)) {
+	if (!shouldCheckAdmin(url.pathname)) {
 		return next();
 	}
 
-	const sessionData = await auth.api.getSession({
-		headers: context.request.headers,
-	});
+	const accessConfig = await getAccessAuthConfig();
+	context.locals.user = await getAccessIdentity(
+		context.request.headers,
+		accessConfig,
+	);
 
-	context.locals.session = sessionData?.session ?? null;
-	context.locals.user = sessionData?.user ?? null;
-
-	// Redirect logic
-	const isPrivateRoute = url.pathname.startsWith(PRIVATE_ROUTES_PREFIX);
-	const isLoginRoute = url.pathname === LOGIN_ROUTE;
-
-	if (isPrivateRoute) {
-		if (!context.locals.user) {
-			const redirectTo = url.pathname + url.search;
-			return withNoStore(
-				context.redirect(
-					`${LOGIN_ROUTE}?redirectTo=${encodeURIComponent(redirectTo)}`,
-				),
-			);
+	if (accessConfig.required && !context.locals.user) {
+		if (url.hostname === PRODUCTION_HOSTNAME) {
+			const adminUrl = new URL(url);
+			adminUrl.hostname = ADMIN_HOSTNAME;
+			return withNoStore(context.redirect(adminUrl.toString()));
 		}
-	} else if (isLoginRoute && context.locals.user) {
-		// If already logged in and trying to access /login, redirect to /admin
-		return withNoStore(context.redirect(PRIVATE_ROUTES_PREFIX));
+
+		return withNoStore(
+			new Response("Unauthorized", {
+				status: 401,
+				headers: { "Content-Type": "text/plain; charset=utf-8" },
+			}),
+		);
 	}
 
 	return withNoStore(await next());

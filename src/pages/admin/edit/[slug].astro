@@ -23,7 +23,7 @@ const db = createContentDb(env);
 const loadResult = await loadEditablePost(slug, Astro.request.headers, db);
 
 if (isUnauthorized(loadResult)) {
-	return Astro.redirect("/login");
+	return new Response("Unauthorized", { status: 401 });
 }
 
 if (!loadResult.ok) {
