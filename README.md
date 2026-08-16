@@ -42,3 +42,4 @@ GH_APP_CLIENT_SECRET=
 - コンテンツ移行 (remote): `bun run migrate-content -- --source ./content --remote`
   - remote 実行には明示的に `--remote` フラグが必要. デフォルトは local.
 - 生成済み HTML のバックフィル: `bun run backfill-rendered-html -- --remote`
+- OG画像のバックフィル: `bun run backfill-og-images -- --remote`

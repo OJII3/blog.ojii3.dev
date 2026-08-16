@@ -20,6 +20,7 @@ export interface ContentD1Database {
 }
 
 export type ContentEnv = {
+	ASSETS: Fetcher;
 	DB: D1Database;
 	MEDIA: R2Bucket;
 	MEDIA_BASE_URL: string;

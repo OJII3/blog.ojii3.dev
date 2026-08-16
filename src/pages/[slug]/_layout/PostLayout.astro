@@ -11,6 +11,7 @@ export interface LiveBlogEntry {
 		tags: string[];
 		draft: boolean;
 		html: string;
+		revision: number;
 	};
 }
 
@@ -23,9 +24,10 @@ export interface Props {
 	prevPost: LiveBlogEntryLink | null;
 	nextPost: LiveBlogEntryLink | null;
 	post: LiveBlogEntry;
+	ogImageUrl: string;
 }
 
-const { post, prevPost, nextPost } = Astro.props;
+const { post, prevPost, nextPost, ogImageUrl } = Astro.props;
 const { title, dateString, color, tags, html } = post.data;
 ---
 
@@ -35,6 +37,7 @@ const { title, dateString, color, tags, html } = post.data;
 	color={color}
 	tags={tags}
 	postId={post.id}
+	ogImageUrl={ogImageUrl}
 	prevPost={prevPost}
 	nextPost={nextPost}
 	html={html}

@@ -10,6 +10,7 @@ import {
 	isValidContentSlug,
 	normalizeContentDate,
 } from "@/lib/content/validation";
+import type { OgImagePost } from "@/lib/og-image-path";
 
 export const updatePostInput = z.object({
 	slug: z.string(),
@@ -33,11 +34,31 @@ export const createPostInput = z.object({
 	body: z.string(),
 });
 
+export type SaveOgImage = (post: OgImagePost) => Promise<void>;
+
+const saveOgImageIfPublished = async (
+	post: OgImagePost,
+	saveOgImage: SaveOgImage | undefined,
+) => {
+	if (!saveOgImage) return;
+
+	try {
+		await saveOgImage(post);
+	} catch {
+		throw new ActionError({
+			code: "INTERNAL_SERVER_ERROR",
+			message:
+				"記事は保存されましたが、OG画像の生成に失敗しました。もう一度保存してください。",
+		});
+	}
+};
+
 export async function handleCreatePost(
 	input: z.infer<typeof createPostInput>,
 	db: ContentD1Database,
 	createPostFn: typeof defaultCreatePost = defaultCreatePost,
 	renderContentHtml?: RenderContentHtml,
+	saveOgImage?: SaveOgImage,
 ) {
 	if (!input.frontmatter.title.trim()) {
 		throw new ActionError({
@@ -67,6 +88,17 @@ export async function handleCreatePost(
 
 	switch (result.kind) {
 		case "created":
+			if (!createInput.draft) {
+				await saveOgImageIfPublished(
+					{
+						slug: result.slug,
+						revision: result.revision,
+						title: createInput.title,
+						date: createInput.date,
+					},
+					saveOgImage,
+				);
+			}
 			return { slug: result.slug, revision: result.revision };
 		case "conflict":
 			throw new ActionError({
@@ -81,6 +113,7 @@ export async function handleUpdatePost(
 	db: ContentD1Database,
 	updatePostFn: typeof defaultUpdatePost = defaultUpdatePost,
 	renderContentHtml?: RenderContentHtml,
+	saveOgImage?: SaveOgImage,
 ) {
 	if (!isValidContentSlug(input.slug)) {
 		throw new ActionError({
@@ -112,6 +145,17 @@ export async function handleUpdatePost(
 
 	switch (result.kind) {
 		case "updated":
+			if (!updateInput.draft) {
+				await saveOgImageIfPublished(
+					{
+						slug: updateInput.slug,
+						revision: result.revision,
+						title: updateInput.title,
+						date: updateInput.date,
+					},
+					saveOgImage,
+				);
+			}
 			return { revision: result.revision };
 		case "conflict":
 			throw new ActionError({

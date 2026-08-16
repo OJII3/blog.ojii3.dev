@@ -1,6 +1,8 @@
 import { type ActionAPIContext, defineAction } from "astro:actions";
 import { getContentEnv } from "@/db/client";
 import { createContentMarkdownProcessor } from "@/lib/content/markdown";
+import { createAssetOgImageRenderer } from "@/lib/og-image";
+import { createOgImageSaver } from "@/lib/og-image-storage";
 import { requireAdmin } from "@/pages/admin/_lib/auth/require-admin";
 import {
 	createPostInput,
@@ -21,9 +23,19 @@ export const server = {
 			const processor = createContentMarkdownProcessor({
 				mediaBaseUrl: env.MEDIA_BASE_URL,
 			});
-			return handleCreatePost(input, env.DB, undefined, async (body, slug) => {
-				return (await processor.render(body, slug)).html;
+			const saveOgImage = createOgImageSaver({
+				media: env.MEDIA,
+				render: createAssetOgImageRenderer(env.ASSETS, context.request.url),
 			});
+			return handleCreatePost(
+				input,
+				env.DB,
+				undefined,
+				async (body, slug) => {
+					return (await processor.render(body, slug)).html;
+				},
+				saveOgImage,
+			);
 		},
 	}),
 	updatePost: defineAction({
@@ -35,9 +47,19 @@ export const server = {
 			const processor = createContentMarkdownProcessor({
 				mediaBaseUrl: env.MEDIA_BASE_URL,
 			});
-			return handleUpdatePost(input, env.DB, undefined, async (body, slug) => {
-				return (await processor.render(body, slug)).html;
+			const saveOgImage = createOgImageSaver({
+				media: env.MEDIA,
+				render: createAssetOgImageRenderer(env.ASSETS, context.request.url),
 			});
+			return handleUpdatePost(
+				input,
+				env.DB,
+				undefined,
+				async (body, slug) => {
+					return (await processor.render(body, slug)).html;
+				},
+				saveOgImage,
+			);
 		},
 	}),
 	uploadImage: defineAction({

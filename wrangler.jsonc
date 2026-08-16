@@ -15,7 +15,8 @@
 	},
 	"assets": {
 		"binding": "ASSETS",
-		"directory": "./dist"
+		"directory": "./dist",
+		"run_worker_first": ["/*/og-image.png"]
 	},
 	"vars": {
 		"MEDIA_BASE_URL": "https://media.blog.ojii3.dev"

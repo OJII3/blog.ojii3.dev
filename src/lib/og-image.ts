@@ -1,0 +1,102 @@
+import { initWasm, Resvg } from "@resvg/resvg-wasm";
+import { createElement } from "react";
+import satori from "satori";
+import type { VitaColor } from "@/pages/_lib/constants";
+import { OGImage } from "@/pages/[slug]/_components/OGImage";
+
+export const OG_IMAGE_FONT_PATH = "/MPLUSRounded1c-Bold.ttf";
+export const OG_IMAGE_WASM_PATH = "/resvg.wasm";
+
+export type OgImageRenderInput = {
+	title: string;
+	date: Date;
+	color: VitaColor;
+};
+
+export type OgImageAssetLoader = (path: string) => Promise<ArrayBuffer>;
+export type OgImageRenderer = (
+	input: OgImageRenderInput,
+) => Promise<Uint8Array>;
+
+let wasmInitPromise: Promise<void> | undefined;
+let fontPromise: Promise<ArrayBuffer> | undefined;
+
+const loadFont = (loadAsset: OgImageAssetLoader) => {
+	fontPromise ??= loadAsset(OG_IMAGE_FONT_PATH).catch((error) => {
+		fontPromise = undefined;
+		throw error;
+	});
+	return fontPromise;
+};
+
+const initResvg = (loadAsset: OgImageAssetLoader) => {
+	wasmInitPromise ??= loadAsset(OG_IMAGE_WASM_PATH)
+		.then((wasmBuffer) => initWasm(wasmBuffer))
+		.catch((error) => {
+			wasmInitPromise = undefined;
+			throw error;
+		});
+	return wasmInitPromise;
+};
+
+export const createOgImageRenderer = (
+	loadAsset: OgImageAssetLoader,
+	options: { wordmarkSrc?: string } = {},
+): OgImageRenderer => {
+	return async ({ title, date, color }) => {
+		const [font] = await Promise.all([
+			loadFont(loadAsset),
+			initResvg(loadAsset),
+		]);
+
+		const svg = await satori(
+			createElement(OGImage, {
+				title,
+				date,
+				color,
+				wordmarkSrc: options.wordmarkSrc,
+			}),
+			{
+				width: 1200,
+				height: 630,
+				fonts: [
+					{
+						name: "M PLUS Rounded 1c",
+						data: font,
+						weight: 400,
+						style: "normal",
+					},
+				],
+			},
+		);
+
+		const resvg = new Resvg(svg, {
+			fitTo: { mode: "width", value: 1200 },
+		});
+
+		try {
+			const rendered = resvg.render();
+			try {
+				return new Uint8Array(rendered.asPng());
+			} finally {
+				rendered.free();
+			}
+		} finally {
+			resvg.free();
+		}
+	};
+};
+
+export const createAssetOgImageRenderer = (
+	assets: Fetcher,
+	baseUrl: URL | string,
+): OgImageRenderer => {
+	const url = new URL(baseUrl);
+	return createOgImageRenderer(async (path) => {
+		const response = await assets.fetch(new URL(path, url));
+		if (!response.ok) {
+			throw new Error(`Failed to load OG asset ${path}: ${response.status}`);
+		}
+		return response.arrayBuffer();
+	});
+};

@@ -15,7 +15,8 @@
 		"astro": "astro",
 		"wrangler": "wrangler",
 		"migrate-content": "bun scripts/migrate-content.ts",
-		"backfill-rendered-html": "bun scripts/backfill-rendered-html.ts"
+		"backfill-rendered-html": "bun scripts/backfill-rendered-html.ts",
+		"backfill-og-images": "bun scripts/backfill-og-images.ts"
 	},
 	"dependencies": {
 		"@astrojs/cloudflare": "^14.2.0",

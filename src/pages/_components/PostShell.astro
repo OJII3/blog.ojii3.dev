@@ -4,7 +4,6 @@ import GlobalLayout from "@/pages/_layouts/GlobalLayout.astro";
 import {
 	H2_BORDER_COLORS,
 	SITE_NAME,
-	SITE_URL,
 	TEXT_COLORS,
 	type VitaColor,
 } from "@/pages/_lib/constants";
@@ -25,17 +24,25 @@ export interface Props {
 	prevPost?: PostLink | null;
 	nextPost?: PostLink | null;
 	html?: string; // For preview content
+	ogImageUrl?: string;
 }
 
-const { title, dateString, color, tags, postId, prevPost, nextPost, html } =
-	Astro.props;
+const {
+	title,
+	dateString,
+	color,
+	tags,
+	postId,
+	prevPost,
+	nextPost,
+	html,
+	ogImageUrl,
+} = Astro.props;
 
 const titleText = `${title} | ${SITE_NAME}`;
-// postId がある場合のみ OG 画像 URL を生成
-const ogImage = postId ? `${SITE_URL}/${postId}/og-image.png` : undefined;
 ---
 
-<GlobalLayout title={titleText} ogImage={ogImage}>
+<GlobalLayout title={titleText} ogImage={ogImageUrl}>
 	<div class="mx-auto max-w-[80ch]">
 		<PostHeader color={color} />
 
