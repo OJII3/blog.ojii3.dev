@@ -11,6 +11,6 @@ variable "zone_name" {
 
 variable "manage_application_custom_domain" {
   type        = bool
-  description = "Enable after the first preview Worker deployment."
-  default     = false
+  description = "Whether Terraform should create and manage the preview Worker custom domain."
+  default     = true
 }

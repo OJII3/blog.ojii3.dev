@@ -54,6 +54,6 @@ terraform -chdir=infra/preview apply
 ```
 
 Preview用リソースを作成した後、Terraform outputのD1 IDを`wrangler.jsonc`へ反映する。
-初回のpreview applyではWorker custom domainを作成せず、WranglerでWorkerを一度
-deploymentしてから、`preview/terraform.tfvars`に
-`manage_application_custom_domain = true`を設定して再度applyする。
+新規にPreview環境を作る場合だけ、最初のapply前に
+`preview/terraform.tfvars`の`manage_application_custom_domain = false`を使う。
+WranglerでWorkerを一度deploymentしてから`true`に戻して再度applyする。

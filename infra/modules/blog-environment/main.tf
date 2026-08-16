@@ -7,6 +7,15 @@ resource "cloudflare_worker" "app" {
   }
 }
 
+resource "cloudflare_workers_kv_namespace" "session" {
+  account_id = var.account_id
+  title      = var.session_kv_namespace_name
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
 resource "cloudflare_d1_database" "content" {
   account_id = var.account_id
   name       = var.d1_database_name
