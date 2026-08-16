@@ -13,6 +13,7 @@ resource "cloudflare_d1_database" "content" {
 
   lifecycle {
     prevent_destroy = true
+    ignore_changes  = [read_replication]
   }
 }
 
