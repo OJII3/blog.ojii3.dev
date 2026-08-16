@@ -2,9 +2,14 @@ resource "cloudflare_worker" "app" {
   account_id = var.account_id
   name       = var.worker_name
 
+  subdomain = {
+    enabled          = true
+    previews_enabled = true
+  }
+
   lifecycle {
     prevent_destroy = true
-    ignore_changes  = [observability, subdomain, tags]
+    ignore_changes  = [observability, tags]
   }
 }
 
