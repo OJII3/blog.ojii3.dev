@@ -33,6 +33,12 @@ variable "media_hostname" {
   description = "Custom domain serving the R2 bucket."
 }
 
+variable "manage_application_custom_domain" {
+  type        = bool
+  default     = true
+  description = "Whether Terraform should create and manage the Worker custom domain."
+}
+
 variable "manage_media_custom_domain" {
   type        = bool
   default     = true
