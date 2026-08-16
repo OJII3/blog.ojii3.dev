@@ -43,6 +43,7 @@
 	"env": {
 		"preview": {
 			"name": "blog-ojii3-dev-preview",
+			"workers_dev": true,
 			"preview_urls": true,
 			"vars": {
 				"MEDIA_BASE_URL": "https://media-preview.blog.ojii3.dev"
