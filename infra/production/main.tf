@@ -21,12 +21,6 @@ module "blog" {
   manage_media_custom_domain = var.manage_media_custom_domain
 }
 
-resource "cloudflare_zero_trust_device_posture_rule" "gateway" {
-  account_id = var.cloudflare_account_id
-  name       = "blog-admin-gateway"
-  type       = "gateway"
-}
-
 resource "cloudflare_zero_trust_access_application" "admin" {
   account_id                  = var.cloudflare_account_id
   name                        = "Blog admin"
@@ -36,7 +30,7 @@ resource "cloudflare_zero_trust_access_application" "admin" {
   session_duration            = "24h"
 
   policies = [{
-    name       = "Allow Zero Trust devices"
+    name       = "Allow authenticated users"
     decision   = "allow"
     precedence = 1
 
@@ -44,11 +38,6 @@ resource "cloudflare_zero_trust_access_application" "admin" {
       everyone = {}
     }]
 
-    require = [{
-      device_posture = {
-        integration_uid = cloudflare_zero_trust_device_posture_rule.gateway.id
-      }
-    }]
   }]
 }
 

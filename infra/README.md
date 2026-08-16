@@ -44,7 +44,7 @@ D1とR2は既存データを持つため、import前に作成し直してはい�
 applyするとR2 custom domainと、それに対応するCloudflare管理のDNS CNAMEが作成される。
 
 本番の管理画面は`admin.blog.ojii3.dev`で公開し、Cloudflare Accessで保護する。
-Access policyはZero Trust Gatewayに接続された端末だけを許可する。
+通常の端末はCloudflare Accessで認証し、Zero Trustに接続された端末はWARPセッションでの認証も許可する。
 
 ## Preview
 
