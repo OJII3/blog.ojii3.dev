@@ -26,6 +26,26 @@ import {
   id = "${var.cloudflare_account_id}/e3217c93e2e94c8da0ba6cbf00c554ac"
 }
 
+import {
+  to = module.blog.cloudflare_worker.app
+  id = "${var.cloudflare_account_id}/blog-ojii3-dev"
+}
+
+import {
+  to = module.blog.cloudflare_d1_database.content
+  id = "${var.cloudflare_account_id}/eff6e29e-7810-4092-8d1b-f2a48289a751"
+}
+
+import {
+  to = module.blog.cloudflare_r2_bucket.media
+  id = "${var.cloudflare_account_id}/blog-media/default"
+}
+
+import {
+  to = module.blog.cloudflare_workers_custom_domain.app[0]
+  id = "${var.cloudflare_account_id}/9098743afd82ba206167dabb26eccdd9372e0302"
+}
+
 output "worker_name" {
   value = module.blog.worker_name
 }

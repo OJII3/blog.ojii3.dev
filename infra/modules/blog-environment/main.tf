@@ -4,6 +4,7 @@ resource "cloudflare_worker" "app" {
 
   lifecycle {
     prevent_destroy = true
+    ignore_changes  = [observability, subdomain, tags]
   }
 }
 

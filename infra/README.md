@@ -40,9 +40,8 @@ terraform -chdir=infra/production plan
 既存のD1/R2/Worker/Worker Custom Domainは、最初にTerraformへimportしてからapplyする。
 D1とR2は既存データを持つため、import前に作成し直してはいけない。
 
-`cloudflare_r2_custom_domain`は現行Providerでimportに対応していないため、既存の
-`media.blog.ojii3.dev`は初期状態では管理対象外にしている。安全な切り替えを確認した後、
-`production/variables.tf`の`manage_media_custom_domain`を`true`に変更して管理対象にする。
+`cloudflare_r2_custom_domain`はproductionでもTerraform管理対象とする。
+applyするとR2 custom domainと、それに対応するCloudflare管理のDNS CNAMEが作成される。
 
 ## Preview
 
