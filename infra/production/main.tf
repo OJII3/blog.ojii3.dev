@@ -28,7 +28,7 @@ import {
 
 import {
   to = module.blog.cloudflare_worker.app
-  id = "${var.cloudflare_account_id}/f16a280d8a744aa1af2307335ecb6c18"
+  id = "${var.cloudflare_account_id}/blog-ojii3-dev"
 }
 
 import {
