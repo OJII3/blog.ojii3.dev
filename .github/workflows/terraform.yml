@@ -98,3 +98,7 @@ jobs:
       - name: Run | Apply Terraform
         run: terraform apply -input=false -auto-approve
         working-directory: infra/${{ inputs.environment }}
+
+      - name: Report | Terraform outputs
+        run: terraform output -json
+        working-directory: infra/${{ inputs.environment }}
