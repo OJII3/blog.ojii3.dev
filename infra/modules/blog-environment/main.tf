@@ -26,6 +26,8 @@ resource "cloudflare_r2_bucket" "media" {
 }
 
 resource "cloudflare_workers_custom_domain" "app" {
+  count = var.manage_application_custom_domain ? 1 : 0
+
   account_id = var.account_id
   hostname   = var.application_hostname
   service    = cloudflare_worker.app.name

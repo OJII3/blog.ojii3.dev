@@ -8,3 +8,9 @@ variable "zone_name" {
   description = "Cloudflare zone name."
   default     = "ojii3.dev"
 }
+
+variable "manage_application_custom_domain" {
+  type        = bool
+  description = "Enable after the first preview Worker deployment."
+  default     = false
+}
