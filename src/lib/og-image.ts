@@ -1,4 +1,5 @@
 import { initWasm, Resvg } from "@resvg/resvg-wasm";
+import bundledResvgWasm from "@resvg/resvg-wasm/index_bg.wasm";
 import { createElement } from "react";
 import satori from "satori";
 import type { VitaColor } from "@/pages/_lib/constants";
@@ -18,6 +19,11 @@ export type OgImageRenderer = (
 	input: OgImageRenderInput,
 ) => Promise<Uint8Array>;
 
+type OgImageRendererOptions = {
+	wordmarkSrc?: string;
+	wasmModule?: WebAssembly.Module;
+};
+
 let wasmInitPromise: Promise<void> | undefined;
 let fontPromise: Promise<ArrayBuffer> | undefined;
 
@@ -29,24 +35,32 @@ const loadFont = (loadAsset: OgImageAssetLoader) => {
 	return fontPromise;
 };
 
-const initResvg = (loadAsset: OgImageAssetLoader) => {
-	wasmInitPromise ??= loadAsset(OG_IMAGE_WASM_PATH)
-		.then((wasmBuffer) => initWasm(wasmBuffer))
-		.catch((error) => {
-			wasmInitPromise = undefined;
-			throw error;
-		});
+const initResvg = (
+	loadAsset: OgImageAssetLoader,
+	wasmModule?: WebAssembly.Module,
+) => {
+	wasmInitPromise ??= (
+		wasmModule
+			? initWasm(wasmModule)
+			: loadAsset(OG_IMAGE_WASM_PATH).then((wasmBuffer) => initWasm(wasmBuffer))
+	).catch((error) => {
+		wasmInitPromise = undefined;
+		throw error;
+	});
 	return wasmInitPromise;
 };
 
+const isWasmModule = (value: unknown): value is WebAssembly.Module =>
+	value instanceof WebAssembly.Module;
+
 export const createOgImageRenderer = (
 	loadAsset: OgImageAssetLoader,
-	options: { wordmarkSrc?: string } = {},
+	options: OgImageRendererOptions = {},
 ): OgImageRenderer => {
 	return async ({ title, date, color }) => {
 		const [font] = await Promise.all([
 			loadFont(loadAsset),
-			initResvg(loadAsset),
+			initResvg(loadAsset, options.wasmModule),
 		]);
 
 		const svg = await satori(
@@ -90,13 +104,21 @@ export const createOgImageRenderer = (
 export const createAssetOgImageRenderer = (
 	assets: Fetcher,
 	baseUrl: URL | string,
+	wasmModule?: WebAssembly.Module,
 ): OgImageRenderer => {
 	const url = new URL(baseUrl);
-	return createOgImageRenderer(async (path) => {
-		const response = await assets.fetch(new URL(path, url));
-		if (!response.ok) {
-			throw new Error(`Failed to load OG asset ${path}: ${response.status}`);
-		}
-		return response.arrayBuffer();
-	});
+	return createOgImageRenderer(
+		async (path) => {
+			const response = await assets.fetch(new URL(path, url));
+			if (!response.ok) {
+				throw new Error(`Failed to load OG asset ${path}: ${response.status}`);
+			}
+			return response.arrayBuffer();
+		},
+		wasmModule
+			? { wasmModule }
+			: isWasmModule(bundledResvgWasm)
+				? { wasmModule: bundledResvgWasm }
+				: undefined,
+	);
 };
