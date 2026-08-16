@@ -1,1 +1,2 @@
 cloudflare_account_id = "<CLOUDFLARE_ACCOUNT_ID>"
+manage_application_custom_domain = false

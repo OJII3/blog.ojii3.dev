@@ -34,5 +34,27 @@
 			"binding": "MEDIA",
 			"bucket_name": "blog-media"
 		}
-	]
+	],
+	"env": {
+		"preview": {
+			"name": "blog-ojii3-dev-preview",
+			"vars": {
+				"MEDIA_BASE_URL": "https://media-preview.blog.ojii3.dev"
+			},
+			"d1_databases": [
+				{
+					"binding": "DB",
+					"database_name": "blog-content-preview",
+					"database_id": "7b921086-1e3e-42d0-92a6-3ca91a5316d6",
+					"migrations_dir": "drizzle"
+				}
+			],
+			"r2_buckets": [
+				{
+					"binding": "MEDIA",
+					"bucket_name": "blog-media-preview"
+				}
+			]
+		}
+	}
 }
