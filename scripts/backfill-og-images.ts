@@ -5,6 +5,7 @@ import { join } from "node:path";
 import { parseArgs } from "node:util";
 import {
 	createOgImageRenderer,
+	OG_IMAGE_WASM_PATH,
 	type OgImageAssetLoader,
 	type OgImageRenderInput,
 } from "../src/lib/og-image";
@@ -80,7 +81,14 @@ const toArrayBuffer = (file: Uint8Array): ArrayBuffer => {
 
 const createLocalAssetLoader = (): OgImageAssetLoader => {
 	return async (path) => {
-		const file = await readFile(new URL(`../public${path}`, import.meta.url));
+		const file = await readFile(
+			path === OG_IMAGE_WASM_PATH
+				? new URL(
+						"../node_modules/@resvg/resvg-wasm/index_bg.wasm",
+						import.meta.url,
+					)
+				: new URL(`../public${path}`, import.meta.url),
+		);
 		return toArrayBuffer(file);
 	};
 };

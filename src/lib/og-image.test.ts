@@ -1,6 +1,10 @@
 import { describe, expect, it } from "bun:test";
 import { readFile } from "node:fs/promises";
-import { createOgImageRenderer } from "./og-image";
+import {
+	createOgImageRenderer,
+	OG_IMAGE_FONT_PATH,
+	OG_IMAGE_WASM_PATH,
+} from "./og-image";
 
 const toArrayBuffer = (file: Uint8Array): ArrayBuffer => {
 	const copy = new Uint8Array(file.byteLength);
@@ -10,9 +14,21 @@ const toArrayBuffer = (file: Uint8Array): ArrayBuffer => {
 
 describe("createOgImageRenderer", () => {
 	it("renders a PNG from the local OG assets", async () => {
+		const requestedPaths: string[] = [];
 		const renderer = createOgImageRenderer(
-			async (path) => toArrayBuffer(await readFile(`public${path}`)),
+			async (path) => {
+				requestedPaths.push(path);
+				if (path === OG_IMAGE_WASM_PATH) {
+					throw new Error("The compiled WASM module should be used");
+				}
+				return toArrayBuffer(await readFile(`public${path}`));
+			},
 			{
+				wasmModule: new WebAssembly.Module(
+					toArrayBuffer(
+						await readFile("node_modules/@resvg/resvg-wasm/index_bg.wasm"),
+					),
+				),
 				wordmarkSrc: `data:image/svg+xml;base64,${Buffer.from(
 					await readFile("src/assets/wordmark-for-og.svg"),
 				).toString("base64")}`,
@@ -25,6 +41,7 @@ describe("createOgImageRenderer", () => {
 			color: 1,
 		});
 
+		expect(requestedPaths).toEqual([OG_IMAGE_FONT_PATH]);
 		expect(Array.from(png.slice(0, 4))).toEqual([0x89, 0x50, 0x4e, 0x47]);
 	});
 });

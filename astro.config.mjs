@@ -1,5 +1,7 @@
 // @ts-check
 
+import { fileURLToPath } from "node:url";
+
 import cloudflare from "@astrojs/cloudflare";
 import { unified } from "@astrojs/markdown-remark";
 import partytown from "@astrojs/partytown";
@@ -11,6 +13,10 @@ import expressiveCode from "astro-expressive-code";
 import icon from "astro-icon";
 
 export const markdownConfig = {};
+
+const resvgWasmPath = fileURLToPath(
+	import.meta.resolve("@resvg/resvg-wasm/index_bg.wasm"),
+);
 
 // https://astro.build/config
 export default defineConfig({
@@ -24,7 +30,25 @@ export default defineConfig({
 				"@iconify/utils",
 			],
 		},
-		plugins: [tailwindcss()],
+		plugins: [
+			tailwindcss(),
+			{
+				name: "resvg-wasm-module",
+				enforce: "pre",
+				resolveId(source) {
+					if (source !== "@resvg/resvg-wasm/index_bg.wasm") {
+						return undefined;
+					}
+
+					// Astro's Cloudflare integration does not route this package
+					// subpath through its additional-module hook.
+					return {
+						id: `__CLOUDFLARE_MODULE__CompiledWasm__${resvgWasmPath}__CLOUDFLARE_MODULE__`,
+						external: true,
+					};
+				},
+			},
+		],
 	},
 	integrations: [
 		expressiveCode({
