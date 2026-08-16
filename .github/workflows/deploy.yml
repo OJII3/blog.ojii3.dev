@@ -146,7 +146,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     needs: upload
-    if: needs.upload.outputs.success == 'true' && (github.event_name == 'push' || github.event_name == 'repository_dispatch')
+    if: >-
+      needs.upload.outputs.success == 'true' &&
+      (github.event_name == 'push' ||
+      github.event_name == 'repository_dispatch' ||
+      github.event_name == 'workflow_dispatch')
     steps:
       - name: Setup | Checkout
         # v7.0.1
