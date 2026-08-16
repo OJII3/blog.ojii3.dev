@@ -1,4 +1,4 @@
-import { auth } from "@/auth";
+import { getAccessAuthConfig, getAccessIdentity } from "@/auth";
 import { getPost } from "@/lib/content/repository";
 import { err, ok, unauthorized } from "@/lib/result";
 import type { EditableFrontmatter, LoadEditablePostResult } from "./types";
@@ -8,8 +8,9 @@ export const loadEditablePost = async (
 	headers: Headers,
 	db: Parameters<typeof getPost>[0],
 ): Promise<LoadEditablePostResult> => {
-	const session = await auth.api.getSession({ headers });
-	if (!session?.user) {
+	const accessConfig = await getAccessAuthConfig();
+	const user = await getAccessIdentity(headers, accessConfig);
+	if (accessConfig.required && !user) {
 		return unauthorized();
 	}
 

@@ -2,7 +2,7 @@
 
 このディレクトリは、アプリケーションのリリースとは分離した、長寿命のCloudflareリソースを管理する。
 
-- `production/`: 本番Worker、D1、R2、ドメイン
+- `production/`: 本番Worker、D1、R2、公開ドメイン、管理画面用Access
 - `preview/`: Preview用Worker、D1、R2、ドメイン
 - `modules/blog-environment/`: 両環境で共有するリソース定義
 
@@ -43,6 +43,9 @@ D1とR2は既存データを持つため、import前に作成し直してはい�
 `cloudflare_r2_custom_domain`はproductionでもTerraform管理対象とする。
 applyするとR2 custom domainと、それに対応するCloudflare管理のDNS CNAMEが作成される。
 
+本番の管理画面は`admin.blog.ojii3.dev`で公開し、Cloudflare Accessで保護する。
+Access policyはZero Trust Gatewayに接続された端末だけを許可する。
+
 ## Preview
 
 ```sh
@@ -56,3 +59,6 @@ Preview用リソースを作成した後、Terraform outputのD1 IDを`wrangler.
 新規にPreview環境を作る場合だけ、最初のapply前に
 `preview/terraform.tfvars`の`manage_application_custom_domain = false`を使う。
 WranglerでWorkerを一度deploymentしてから`true`に戻して再度applyする。
+
+PreviewのPR URLは`workers.dev`のまま使う。Preview URL全体のCloudflare Access保護は
+TerraformでPRごとに作らず、Workers & PagesのPreview URL設定から一度だけ有効化する。

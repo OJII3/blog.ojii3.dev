@@ -23,6 +23,7 @@ const satoriWasmPath = fileURLToPath(import.meta.resolve("satori/yoga.wasm"));
 export default defineConfig({
 	site: "https://blog.ojii3.dev",
 	output: "server",
+	session: false,
 	vite: {
 		optimizeDeps: {
 			include: [
@@ -94,7 +95,6 @@ export default defineConfig({
 					"eye",
 					"file-off",
 					"home",
-					"logout",
 					"photo-up",
 					"rocket",
 					"search",
@@ -123,18 +123,6 @@ export default defineConfig({
 				context: "client",
 				access: "public",
 				optional: true,
-			}),
-			GH_APP_CLIENT_ID: envField.string({
-				context: "server",
-				access: "public",
-			}),
-			GH_APP_CLIENT_SECRET: envField.string({
-				context: "server",
-				access: "secret",
-			}),
-			BETTER_AUTH_SECRET: envField.string({
-				context: "server",
-				access: "secret",
 			}),
 		},
 	},

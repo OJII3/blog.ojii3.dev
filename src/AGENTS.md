@@ -1,6 +1,6 @@
 ## プロジェクト構造/主要ファイル
 
-- `astro.config.mjs` — Tailwind CSS v4 (`@tailwindcss/vite`), astro-pagefind, expressive-code, partytown、astro-icon、sitemap を有効化。Cloudflare adapter で `/admin/*` をルーティングし、`liveContentCollections` を experimental で ON。`GOOGLE_ANALYTICS_ID` は client/public、GitHub/BETTER_AUTH 系は server/secret。
+- `astro.config.mjs` — Tailwind CSS v4 (`@tailwindcss/vite`), astro-pagefind, expressive-code, partytown、astro-icon、sitemap を有効化。Cloudflare adapter で `/admin/*` をルーティングし、`liveContentCollections` を experimental で ON。`GOOGLE_ANALYTICS_ID` は client/public。
 - `src/pages/`（Astro 制約でページ専用; ルートのみ）
   - `_components/` — アプリケーション共通またはメイン機能（ブログ）の UI コンポーネント。`blog/` ディレクトリ配下にブログ専用コンポーネントを配置。
   - `_layouts/` — レイアウトファイル。`GlobalLayout` (全ページ共通), `PostLayout` (ブログ記事), `AdminLayout` (管理画面)。
@@ -13,26 +13,23 @@
     - `_components/` — 検索専用コンポーネント。
     - `_lib/` — 検索専用ロジック。
     - `_client.ts` — 検索クライアントロジック。
-  - `login/`
-    - `index.astro` — ログイン画面。
   - `admin/`
     - `index.astro` — 管理ダッシュボード。
     - `edit/[slug].astro` — 記事編集画面。
     - `preview/[slug].astro` — ライブプレビュー画面。
     - `_components/` — 管理画面専用コンポーネント（エディタ UI など）。
     - `_layouts/` — 管理画面専用レイアウト（実体は `src/pages/admin/_layouts/AdminLayout.astro`）。
-    - `_lib/` — 管理画面用ロジック（認証、GitHub API、編集ロジック）。
+    - `_lib/` — 管理画面用ロジック（認証、編集ロジック）。
       - `github/content.ts` — GitHub Contents API クライアント（`createContentClient`, `createContentClientFromHeaders`）。
       - `github/encoding.ts` — Base64 エンコード/デコードユーティリティ。
       - `github/rehype-image-url.ts` — Markdown 内の相対パス画像を GitHub Raw URL に変換する rehype プラグイン。
       - `ui/toast.ts` — Toast 通知表示ユーティリティ（クライアントサイド）。
-  - `api/auth/[...all].ts` — BetterAuth API。
 - `src/lib/`（アプリケーション共通ユーティリティ）
   - `result.ts` — 統一 Result 型（`Result<T, E>`, `AuthResult<T, E>`）とヘルパー関数。
 - `src/actions/`（Astro 制約でサーバーアクション専用）
   - `index.ts` — `updatePost` サーバーアクション。
 - `src/middleware.ts` — Astro エントリーポイント。実処理は `src/pages/_lib/middleware.ts` に委譲。
-- `src/auth.ts` — BetterAuth サーバー設定。
+- `src/auth.ts` — Cloudflare Access JWTの検証。
 - `src/content.config.ts` — コンテンツコレクション定義。
 - `src/live.config.ts` — Live Content Loader 定義。
 - `content/` — ブログ記事マークダウン。

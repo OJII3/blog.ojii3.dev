@@ -9,10 +9,6 @@ Astro と Cloudflare Workers を利用した個人ブログ. [ojii3/content](htt
 ```sh
 # .env
 CLOUDFLARE_API_TOKEN=
-BETTER_AUTH_URL=http://localhost:4321
-BETTER_AUTH_SECRET=dummy # dummy only for astro build
-GH_APP_CLIENT_ID=
-GH_APP_CLIENT_SECRET=dummy # dummy only for astro build
 SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt 
 ```
 
@@ -27,9 +23,20 @@ bun i
 
 ```sh
 # .dev.vars
-BETTER_AUTH_SECRET=
-GH_APP_CLIENT_SECRET=
+ACCESS_AUTH_REQUIRED=false
+
+# 本番だけ。どちらも秘密情報ではないが、GitHub Actionsではsecretとして渡す。
+# ACCESS_TEAM_DOMAIN=https://<your-team>.cloudflareaccess.com
+# ACCESS_AUDIENCE=<production-access-application-aud>
 ```
+
+本番Workerでは、Cloudflare Access ApplicationのTeam domainとAudience tagを
+`ACCESS_TEAM_DOMAIN`と`ACCESS_AUDIENCE`として登録する。Previewは
+`ACCESS_AUTH_REQUIRED=false`で、CloudflareのPreview URL全体に設定したAccess保護へ委譲する。
+
+Preview URLのAccess保護は、Cloudflare Dashboardの
+Workers & Pages > Preview Worker > Settings > Domains & Routes > Preview URLsから
+一度だけ有効化する。PRごとのPreview URLをTerraformへ追加する必要はない。
 
 ## D1/R2 Content Storage
 

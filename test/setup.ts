@@ -25,9 +25,3 @@ mock.module("astro/zod", () => ({
 		unknown: () => ({}),
 	},
 }));
-
-mock.module("astro:env/server", () => ({
-	BETTER_AUTH_SECRET: "mock-secret",
-	GH_APP_CLIENT_ID: "mock-client-id",
-	GH_APP_CLIENT_SECRET: "mock-client-secret",
-}));

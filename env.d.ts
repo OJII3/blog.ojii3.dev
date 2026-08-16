@@ -6,8 +6,7 @@ type Runtime = import("@astrojs/cloudflare").Runtime<Env>;
 declare namespace App {
 	// Note: 'import {} from ""' syntax does not work in .d.ts files.
 	interface Locals extends Runtime {
-		user: import("better-auth").User | null;
-		session: import("better-auth").Session | null;
+		user: import("./src/auth").AccessIdentity | null;
 	}
 }
 
@@ -16,4 +15,7 @@ interface Env {
 	DB: D1Database;
 	MEDIA: R2Bucket;
 	MEDIA_BASE_URL: string;
+	ACCESS_AUTH_REQUIRED?: string;
+	ACCESS_TEAM_DOMAIN?: string;
+	ACCESS_AUDIENCE?: string;
 }

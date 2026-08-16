@@ -13,15 +13,6 @@ resource "cloudflare_worker" "app" {
   }
 }
 
-resource "cloudflare_workers_kv_namespace" "session" {
-  account_id = var.account_id
-  title      = var.session_kv_namespace_name
-
-  lifecycle {
-    prevent_destroy = true
-  }
-}
-
 resource "cloudflare_d1_database" "content" {
   account_id = var.account_id
   name       = var.d1_database_name
@@ -46,6 +37,19 @@ resource "cloudflare_workers_custom_domain" "app" {
 
   account_id = var.account_id
   hostname   = var.application_hostname
+  service    = cloudflare_worker.app.name
+  zone_id    = var.zone_id
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "cloudflare_workers_custom_domain" "admin" {
+  count = var.admin_hostname == null ? 0 : 1
+
+  account_id = var.account_id
+  hostname   = var.admin_hostname
   service    = cloudflare_worker.app.name
   zone_id    = var.zone_id
 

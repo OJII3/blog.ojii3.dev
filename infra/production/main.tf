@@ -13,17 +13,43 @@ module "blog" {
   account_id                 = var.cloudflare_account_id
   zone_id                    = data.cloudflare_zone.main.id
   worker_name                = "blog-ojii3-dev"
-  session_kv_namespace_name  = "blog-ojii3-dev-session"
   d1_database_name           = "blog-content"
   r2_bucket_name             = "blog-media"
   application_hostname       = "blog.ojii3.dev"
+  admin_hostname             = "admin.blog.ojii3.dev"
   media_hostname             = "media.blog.ojii3.dev"
   manage_media_custom_domain = var.manage_media_custom_domain
 }
 
-import {
-  to = module.blog.cloudflare_workers_kv_namespace.session
-  id = "${var.cloudflare_account_id}/e3217c93e2e94c8da0ba6cbf00c554ac"
+resource "cloudflare_zero_trust_device_posture_rule" "gateway" {
+  account_id = var.cloudflare_account_id
+  name       = "blog-admin-gateway"
+  type       = "gateway"
+}
+
+resource "cloudflare_zero_trust_access_application" "admin" {
+  account_id                  = var.cloudflare_account_id
+  name                        = "Blog admin"
+  domain                      = "admin.blog.ojii3.dev"
+  type                        = "self_hosted"
+  allow_authenticate_via_warp = true
+  session_duration            = "24h"
+
+  policies = [{
+    name       = "Allow Zero Trust devices"
+    decision   = "allow"
+    precedence = 1
+
+    include = [{
+      everyone = {}
+    }]
+
+    require = [{
+      device_posture = {
+        integration_uid = cloudflare_zero_trust_device_posture_rule.gateway.id
+      }
+    }]
+  }]
 }
 
 import {
@@ -50,8 +76,8 @@ output "worker_name" {
   value = module.blog.worker_name
 }
 
-output "session_kv_namespace_id" {
-  value = module.blog.session_kv_namespace_id
+output "access_application_audience" {
+  value = cloudflare_zero_trust_access_application.admin.aud
 }
 
 output "d1_database_id" {
