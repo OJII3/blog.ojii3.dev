@@ -11,6 +11,6 @@ variable "zone_name" {
 
 variable "manage_media_custom_domain" {
   type        = bool
-  description = "Enable after the existing R2 custom domain has been adopted."
-  default     = false
+  description = "Whether Terraform should create and manage the production R2 custom domain."
+  default     = true
 }
