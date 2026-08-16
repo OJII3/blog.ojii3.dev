@@ -2,6 +2,7 @@ import { describe, expect, it } from "bun:test";
 import { readFile } from "node:fs/promises";
 import {
 	createOgImageRenderer,
+	getWasmModule,
 	OG_IMAGE_FONT_PATH,
 	OG_IMAGE_WASM_PATH,
 } from "./og-image";
@@ -13,6 +14,18 @@ const toArrayBuffer = (file: Uint8Array): ArrayBuffer => {
 };
 
 describe("createOgImageRenderer", () => {
+	it("accepts a compiled module and a default-export wrapper", async () => {
+		const module = new WebAssembly.Module(
+			toArrayBuffer(
+				await readFile("node_modules/@resvg/resvg-wasm/index_bg.wasm"),
+			),
+		);
+
+		expect(getWasmModule(module)).toBe(module);
+		expect(getWasmModule({ default: module })).toBe(module);
+		expect(getWasmModule({ default: new Uint8Array() })).toBeUndefined();
+	});
+
 	it("renders a PNG from the local OG assets", async () => {
 		const requestedPaths: string[] = [];
 		const renderer = createOgImageRenderer(
