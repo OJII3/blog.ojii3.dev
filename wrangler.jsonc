@@ -15,8 +15,7 @@
 	},
 	"assets": {
 		"binding": "ASSETS",
-		"directory": "./dist",
-		"run_worker_first": ["/*/og-image.png"]
+		"directory": "./dist"
 	},
 	"vars": {
 		"MEDIA_BASE_URL": "https://media.blog.ojii3.dev"
@@ -44,6 +43,8 @@
 	"env": {
 		"preview": {
 			"name": "blog-ojii3-dev-preview",
+			"workers_dev": true,
+			"preview_urls": true,
 			"vars": {
 				"MEDIA_BASE_URL": "https://media-preview.blog.ojii3.dev"
 			},
