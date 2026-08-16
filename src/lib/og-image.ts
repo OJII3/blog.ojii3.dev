@@ -50,8 +50,22 @@ const initResvg = (
 	return wasmInitPromise;
 };
 
-const isWasmModule = (value: unknown): value is WebAssembly.Module =>
-	value instanceof WebAssembly.Module;
+export const getWasmModule = (
+	value: unknown,
+): WebAssembly.Module | undefined => {
+	if (value instanceof WebAssembly.Module) return value;
+
+	if (
+		typeof value === "object" &&
+		value !== null &&
+		"default" in value &&
+		value.default instanceof WebAssembly.Module
+	) {
+		return value.default;
+	}
+
+	return undefined;
+};
 
 export const createOgImageRenderer = (
 	loadAsset: OgImageAssetLoader,
@@ -107,6 +121,7 @@ export const createAssetOgImageRenderer = (
 	wasmModule?: WebAssembly.Module,
 ): OgImageRenderer => {
 	const url = new URL(baseUrl);
+	const bundledWasmModule = getWasmModule(bundledResvgWasm);
 	return createOgImageRenderer(
 		async (path) => {
 			const response = await assets.fetch(new URL(path, url));
@@ -117,8 +132,8 @@ export const createAssetOgImageRenderer = (
 		},
 		wasmModule
 			? { wasmModule }
-			: isWasmModule(bundledResvgWasm)
-				? { wasmModule: bundledResvgWasm }
+			: bundledWasmModule
+				? { wasmModule: bundledWasmModule }
 				: undefined,
 	);
 };

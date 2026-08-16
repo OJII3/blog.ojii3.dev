@@ -44,7 +44,12 @@ const saveOgImageIfPublished = async (
 
 	try {
 		await saveOgImage(post);
-	} catch {
+	} catch (error) {
+		console.error("Failed to generate OG image", {
+			slug: post.slug,
+			revision: post.revision,
+			error,
+		});
 		throw new ActionError({
 			code: "INTERNAL_SERVER_ERROR",
 			message:
