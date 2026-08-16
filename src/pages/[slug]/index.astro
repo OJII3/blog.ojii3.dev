@@ -4,7 +4,7 @@ export const prerender = false;
 import { getLiveEntry } from "astro:content";
 import { createContentDb, getContentEnv } from "@/db/client";
 import { getAdjacentPosts } from "@/lib/content/repository";
-import { getOgImageRouteUrl } from "@/lib/og-image-path";
+import { getOgImageUrl } from "@/lib/og-image-path";
 import PostLayout from "./_layout/PostLayout.astro";
 
 const { slug } = Astro.params;
@@ -29,7 +29,11 @@ const { prevPost: adjacentPrevPost, nextPost: adjacentNextPost } =
 		slug: post.id,
 		date: post.data.date,
 	});
-const ogImageUrl = getOgImageRouteUrl(Astro.url, post.id, post.data.revision);
+const ogImageUrl = getOgImageUrl(
+	env.MEDIA_BASE_URL,
+	post.id,
+	post.data.revision,
+);
 const prevPost = adjacentPrevPost
 	? { id: adjacentPrevPost.slug, data: { title: adjacentPrevPost.title } }
 	: null;
