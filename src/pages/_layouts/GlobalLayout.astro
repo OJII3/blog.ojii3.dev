@@ -12,6 +12,13 @@ type Props = {
 };
 
 const { title, ogImage } = Astro.props;
+
+// Canonical URL for this page: absolute URL on the site origin, normalized
+// to the trailing-slash form used by the sitemap (e.g. "/post/" not "/post").
+const canonicalPathname = Astro.url.pathname.endsWith("/")
+	? Astro.url.pathname
+	: `${Astro.url.pathname}/`;
+const canonicalUrl = new URL(canonicalPathname, Astro.site);
 ---
 
 <!doctype html>
@@ -24,6 +31,7 @@ const { title, ogImage } = Astro.props;
 			name="description"
 			content="日々のことや技術について書いている個人ブログです。"
 		>
+		<link rel="canonical" href={canonicalUrl}>
 		<link rel="icon" href="/favicon.ico" sizes="32x32">
 		<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 		<link rel="manifest" href="/site.webmanifest">
@@ -32,7 +40,7 @@ const { title, ogImage } = Astro.props;
 		<title>{title}</title>
 
 		<meta property="og:title" content={title}>
-		<meta property="og:url" content={Astro.site?.toString()}>
+		<meta property="og:url" content={canonicalUrl}>
 		<meta property="og:image" content={ogImage}>
 		<meta property="og:type" content="website">
 		<meta property="twitter:card" content="summary_large_image">
